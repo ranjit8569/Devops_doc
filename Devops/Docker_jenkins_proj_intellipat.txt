@@ -1,0 +1,914 @@
+linux version: 20.04
+Ansible version: 2.9
+terraform version: 1.1.9
+current docker version 19.3.somthing
+kubernetes version: 1.22
+QA 512
+
+Q what is CI in jenkins?  
+Ans: Build and Test. ( if get any failure the report to developer).
+
+# Release/Delivery means provide build to end customer. who will use this build.
+# Deployment mean deploy build to any enviroments. Staging env, Pre-Production env, Production env in WebServer/Tomcat-apache server.
+
+-------------------------------------
+Containers are the Fastest Growing Cloud Enabling Technology.
+Docker is all about speed.
+1) Developer faster
+2) Build Faster
+3) Test Faster
+4) Deploy Faster
+5) Update Faster
+6) Recover Faster
+
+DOCKER -> used for portablity.
+container -> standerdized units of software.
+Two type of containers:
+  Linux containers
+  Windows Containers
+
+docker            # to check docker install or not
+git.docker.com       #easiest way to install docker on linux
+
+sudo yum update
+sudo yum install docker -y
+sudo apt install docker.io         # this is way to install docker
+sudo apt install git               # install git 
+git version       # to check istalll or not
+curl -fsSL get.docker.com -o get-docker.sh        # to download this script
+sh get-docker.sh
+sudo useradd bret
+sudo usermod -aG docker bret      # add user to docker
+sudo docker version          # check version
+docker --version    # check version that which docker is running
+docker -v
+service docker status  # to check docker service start or stoped.
+docker info         # to check all container status
+service docker start/stop   # to start docker service
+docker search ubuntu   # search ubuntu image from docker hub.
+
+docker info  # show most configuration values for the engine
+docker     # show list of command and options
+-----------------------------------
+-----------------------------------
+Image vs. Container    
+	An image is the Application we want to run.
+	Container is an instance of that image running as a process
+	You can have many containers running of the same image
+
+NOTE :  3 way to create image.
+1) take image from docke hub, using pull
+2) create docker file to create image.
+3) create image from runing container.
+
+***********So our image will be the Nginx web server (for example)**********
+
+Docker's default image "registry" is called Docker Hub (hub.docker.com)
+docker container run --publish 80:80 nginx #    Starts a new container from an image
+
+A Docker File is a simple text file with instructions on how to build your images.
+
+docker container run --publish 80:80 --detach nginx # container runing into background 
+
+docker ps  # list runing container   (old way)
+docker container ls      # bydefault list runing container
+CONTAINER_ID	IMAGE	COMMAND	CREATED
+7f6677d777	nginx	nginx..	36 second ago
+
+##################################################################################################
+
+PROJECT 1.
+
+https://www.youtube.com/watch?v=vQRSRo7Ef7c
+
+DevOps Setup for Test, Build and Deploy a Java Project | DevOps Project to Build, Test and Deploy
+Agenda:
+a. First create two ec2 linux server name jenkins and tomcat. (new security grupp Custome TCP Rule 8080)  #jenkins/tomcat server run on 8080 port.
+b. Server1: install java and setup jenkins
+c. Server2: install java and setup Tomcat Server
+d. Install Git and Maven on jenkins Server
+e. Setup java, git and maven paths on jenkins console
+f. # install plugins : Git,GitHub,maven,junit,checkstyle,pmd,findbugs,deploy to container  (all plugin store in /var/lib/jenkins/plugins)
+g. Create a Maven project to RUN jenkins job.
+
+1. Connect jenkins Ec2 server # sudo yum install java-1.8* -y       (install java)
+java -version
+find /usr/lib/jvm/java-1.8*|head -n 3
+sudo su -
+vi .bash_profile
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.272.b10-1.amzn2.0.1.x86_64
+PATH=$PATH:$HOME/bin:$JAVA_HOME
+source .bash_profile
+
+# https://pkg.jenkins.io/redhat
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo    (download jenkins repo)
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+yum install jenkins -y
+service jenkins status
+service jenkins start
+execute ec2 jenkins public IP:8080 on URL, after login, select plugin to install (directly cancle because install plugin latter)
+
+GoTo Gloable tool configuration > Add JDK > java-1.8 > set JAVA_HOME: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.282.b08-1.amzn2.0.1.x86_64 
+Add MAVEN > maven name: MAVEN, MAVEN_HOME: /opt/apache-maven-3.8.1 
+Add Git also (Apply and save)
+#ranjit/ranjit123
+#ec2 jenkins public IP:8080/restart
+
+
+2. sudo yum install git   # on ec2 jenkin server  
+cd /opt
+# wget https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz   ##(Download MAVEN and configured)
+
+tar -xvzf apache-maven-3.6.3-bin.tar.gz
+cd apache-maven-3.6.3
+vi ~/.bash_profile
+M2_HOME=/opt/apache-maven-3.8.1      or      /opt/apache-maven-3.8.1
+M2=/opt/apache-maven-3.8.1/bin
+PATH=$PATH:$HOME/bin:$JAVA_HOME:$M2_HOME:$M2
+source .bash_profile
+mvn --version   #find maven version
+# which git;which maven;which java
+
+In Jenkins GoTo Gloable tool configuration: Add Git > Name: Git > Path to Git: /usr/bin/git  (apply and save)
+
+In Jenkins GoTo Gloable tool configuration: Add maven > Name: Maven-3.6.3 > MAVIN_HOME: /opt/apache-maven-3.6.3  (apply and save)
+
+** Now create new project > goto Build > Goals and option: clean package
+   Git: https://github.com/ravdy/petclinic.git (petclinic repository) save and build (after run it success)
+
+         if any error found then use this repo https://github.com/ValaxyTech/hello-world.git
+** Goto Build > Goals and option: clean package checkstyle:checkstyle findbugs:findbugs pmd:pmd  (apply and save)
+Now buld and check in console output and it will be success.
+
+--------below is tomcat server
+3 Connect tomcat ec2 server # yum install java-1.8* -y
+java -version
+find /usr/lib/jvm/java-1.8*|head -n 3
+sudo su -
+vi .bash_profile
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.272.b10-1.amzn2.0.1.x86_64
+PATH=$PATH:$HOME/bin:$JAVA_HOME
+source .bash_profile
+
+cd /opt
+# wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.57/bin/apache-tomcat-8.5.57.tar.gz    ## (download apache-tomcat and configured)
+tar -xvzf apache-tomcat-8.5.57.tar.gz
+cd apache-tomcat-8.5.57
+find / -name context.xml
+vi /opt/apache-tomcat-8.5.57/webapps/host-manager/META-INF/context.xml    # comment these line, without comment access only local server
+<!--  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> 
+       <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/> -->  
+
+cd conf
+vi tomcat-users.xml   
+<user username="deployer" password="deployer" roles="manager-gui, manager-script"/>                # add only this line
+
+
+cd ..
+cd bin    # All script is there
+./startup.sh   # started   
+netstat -tulpn    # to check port
+IN URL : tomcat ec2 pulic IP:8080     # tomcat runing
+If Click on manager App tab then need enter admin/admin  as above credentials
+
+===== Now going to deploy on tomcat Using Jenkins
+mvn clean install
+
+Configure > Add post build action > Deploy war/ear to a container
+WAR/EAR files: target/petclinic.war          (save file workspace>target/petclinic.war)
+Container : Tomcat 8x Remote
+URL : http://13.234.32.165:8080/              #tomcat url; cd /opt/apache-tomcat-8.5.57/bin/ and ./startup.sh
+Credential Add: deployer/deployer                    (credentials of roles=manager script) /opt/apache-tomcat-8.5.57/conf and cat tomcat-users.xml
+ID: tomcat_deployer   #any name
+Description: user to deploy war file on tomcat        (Apply and save)
+BUild > console output  # build deploy successed
+When refresh page then petclinic website runing in URL and now petclinic.war file exist in /opt/apache-tomcat-8.5.57/webapps
+
+# tomcat several log files in the /opt/bitnami/tomcat/logs/catalina_date.log(history file) catalina.out(main log file) localhost_access_log.date.txt
+# /var/log/tomcat7/*.txt
+# main Apache Tomcat configuration file is at /opt/bitnami/tomcat/conf/server.xml
+======================================== END ========================
+
+/var/lib/jenkins/workspace/Project_petclinic/target/petclinic.war
+/opt/apache-tomcat-8.5.57/webapps
+------------------------------------------------------------------------------------
+
+Simple DevOps Project-3 | DevOps project with Git, Jenkins and Docker on AWS | CICD on containers
+User (commit code) > Git > (Build and Test code) Jenkins >  (Deploy) Docker
+
+1. Launch and EC2 instance for Docker host
+2. Install docker on EC2 instance and start service
+   sudo su -
+   yum install docker -y
+   service docker start
+   service docker status
+3 Create a new user for Docker management and add him to Docker (default) group
+useradd dockeradmin
+passwd dockeradmin
+usermod -aG docker dockeradmin
+
+4 Write a Docker file under /opt/docker
+mkdir -p /opt/docker ; cd /opt/docker/
+vi Dockerfile
+
+From tomcat:8-jre8
+MAINTAINER "valaxytech@gmail.com"
+COPY ./webapp.war /usr/local/tomcat/webapps # copy from local path to container path
+
+Install jenkins on ec2 instance
+5 Login to jenkins console and add Docker server to execute command from jenkins
+
+Manage jenkins -> configure system -> publish over SSH -> add > SSH server and credentials              (if not ssh then install plugin)
+Name: docker_host, private ip of ec2instance, username: dockeradmin, > advance > password: dockeradmin
+Test the connection
+if getting error in password the execute below command for password authentication
+--------
+
+vi /etc/ssh/sshd_config 
+PermitRootLogin yes  # Uncomment
+PasswordAuthentication yes  # Uncomment
+PasswordAuthentication no  # Comment
+# service sshd restart
+--------  # now click test connection and connection fine > and clicek SAVE
+6 Create jenkins job
+> Create an item name: Docker project 3
+> select Maven project
+
+A) source code management > select GIT
+Repository URL: https://github.com/ValaxyTech/hello-world.git       # valaxy technologies website is there on GitHUb
+Branch to build: */master
+B) Build Root POM: pom.xml
+Goals and options: clean install package          # webapp.war created on jenkins workspace 
+
+C) send files or execute commands over SSH Server Name: docker_host
+Source files: webapp/target/*.war       # pick webapp.war file from this jenkins path.
+Remove prefix: webapp/target
+Remote directory: //opt//docker        # webapp.war file copy to /opt/docker remote path
+Exec command : docker stop valaxy_demo; docker rm -f valaxy_demo;docker image rm -f valaxy_demo;cd /opt/docker;
+docker build -t valaxy_demo .
+
+Add POST Build Steps :
+D) send files or execute command over SSH
+Name: docker_host
+Exec command: docker run -d --name valaxy_demo -p 8090:8080 valaxy_demo       # container created
+
+Apply and SAVE
+7. docker images; docker ps -a (no image and containers) (docker ps :- show only active container. docker ps -a :- show active/inactive container)
+8. Execute jenkins job
+if error in run
+chown -R dockeradmin:dockeradmin /opt/docker
+after run jenkin below file created
+now created webapp.war   in /opt/docker
+container runing and images is there
+URL: ec2 docker_host public IP:8090  # now runing tomcat server  (inbound set http,https,all trafic anywhere)
+URL: ec2 docker_host public IP:8090/webapp/   # Now Valaxy Technologies runing....
+LAB PRACTICE COMPLETED
+
+======================================================end
+Simple DevOps Project-4 - Part-01 | How To Create a Docker Image Using Jenkins And Ansible
+
+STRUCTURE : user->git->jenkins->Ansible->Docker Hub and Create container. (container pull image from docker hub)
+User code commit to Git repository and Build&Test <---> Jenkins initialize Ansible and Ansible push image to Docker hub aswell Ansible create container and container pull image from docker hub.
+------
+Login to Jenkin Console:
+Create jenkins job
+Enter and Item name: docker-project1
+select: Maven project > OK
+
+Source Code Management :
+Repository : https://github.com/ValaxyTech/hello-world.git        # out java code is reside on GitHub, so provide path       
+Branches to bild: */master
+
+#hello-world/webapp/src/main/webapp/index.jsp
+
+Build:
+Root POM: pom.xml     # must give pom.xml file and read from GitHub java project here if i used maven tool to build java code.
+Goals and options: clean install package        #deleted created file, compile and package it. build and generate .war file of project.
+
+Add Post Build Steps: (Add post-build step)
+* send files or execute commands over SSH
+SSH server Name: ansible_server
+Source files: webapp/target/*.war
+Remove prefix: webapp/target
+Remote directory: //opt//docker           # put war file in this location
+
+Clicke Add post-build Step > 
+* Send files or execute command over SSH
+SSH server Name: ansible_server
+Source files: Dockerfile          # This Dockerfile file pick from jenkins Workspace. (already stored on jenkins when first time build)
+Remote directory: //opt//docker     # and Dockerfile copy into this path
+exec Command:
+cd /opt/docker
+docker build -t valaxy_demo .
+docker tag valaxy_demo ranjit1234/valaxy_demo
+docker push ranjit1234/valaxy_demo
+docker rmi valaxy_demo ranjit1234/valaxy_demo
+
+Click Apply and Save.
+
+Build Now > click on job name and check in console output.
+ranjit1234/valaxy_demo image pushed in docker hub.
+before execute nothing any file in /opt/docker/. but after build jenkins below files there.
+Dockerfile, webapp.war  in /opt/docker/
+LAB Completed..
+
+------------------------------------------------
+Simple DevOps Project-1 | Simple DevOps project for CI/CD | CI/CD through Jenkins    (.war file deploy on ec2 tomcat server)
+User (commit code) > Git > (Build and Test code) Jenkins > (Deploy) EC2 instance
+There is already two server jenkins server and tomcate web server
+
+1. Login to Jenkins and create new jobs >
+Enter and item name: Hello-world
+Select : Maven project  > OK
+
+2. Source Code Management >
+select : Git
+Repository URL: https://github.com/ValaxyTech/hello-world.git  (java code reside on GitHub, so need to provide path here)
+(if private repository then must give Credentials)
+Branches to build: */master
+
+3. Build >
+Root POM : pom.xml           # must give pom.xml and read from GitHub java project if use maven tool to build java code.
+Goals and option: clean install package   (removed preview generated file and compile and package it. like build and generate .war file.)
+Apply and SAVE.
+
+Click on Build Now    # after build it will create .war and .jar file on jenkins worksapce
+
+Goto EC2 linux instance:    #must setup tomcat server first
+cd /app
+cd apache-tomcat-8.5.31
+ps -ef|grep tomcat
+tomcatup
+/temp
+ps -aef|grep tomcat     # now running.
+cd conf
+cat server.xml     # to check/change ip and port
+cat tomcat-users.xml  # to check user credentials details. (roles=manager-script deployer)
+In EC2 instance, inbound Rule > Custom TCP 8090 , anywhere (0.0.0.0/0)
+Now open tomcat apache in URL
+
+# manage jenkins > manage plugins > search deploy container > select and click to install  # this is plugin to need to install
+
+# Now need to setup credentials as below
+Got Credentials > jenkins > Global credentials > add credentials>
+username: deployer
+password : ...
+ID : Tomcat_Credentials
+Description: Tomcat_credentials.   > OK
+
+GoTo configure > add post build action > Deploy war/ear to a container >
+WAR/EAR files : **/*.war
+contaxt path : 
+containers : Tomcat 8.x
+Credentials: credentials
+Tomcat URL : http://13.229.104.141:8090     # server ip
+
+Build Now >
+cd app/apache.tomcat:8.5.31/webapps        #after build automatically war file came into this path
+ls # webapp and webapp.war file is there now
+Now refresh URL  # came Hello valaxy Technologies
+
+#### but now want continous integeration and cont delevery
+GoTo our job > Build Triggers >
+checked Poll SCM : schedule:  */2 ****       # executed every after 2 minuts
+now automatic builded new code from github after 2 minuts automatically. deveoper put up new code in git hub
+ Now goto URL and new mesage come.
+
+and can also clone remote repository.
+git clone https://github.com/valaxyTech/hello-world.git
+cd webapp/src/main/webapp/ index.html  # same mesg there and can edit there also > and save
+cd
+git status
+git add .
+git commit -m "new commiting file"
+git push origin master  and along with automatically job executed every 2 min and pick from git new code and execute and came new output
+(means continue integration and continue develory)
+
+=======================================================================
+
+1. Jenkins Pipeline - What is Jenkins Pipeline | How to write 1st Jenkins pipeline
+
+Pipeline Script:            (install pipeline plugin)
+1. LAB  Declaritive pipeline (latest simple jenkins file)       2. Scripted pipeline   (grovy language)
+
+pipeline {                       # Top-level
+          agent any              # on which agent/machine code to build
+          stages{                # Where work happens
+                stage("hello"){  # What to  do
+                        steps{ 
+                               echo " Welcome to jenkins pipeline"
+                        }
+                }
+          }
+}
+
+Build now.
+
+pipeline {                       # Top-level
+          agent any              # Where to build
+          stages{                # Where work happens
+                stage("hello"){  # What to  do
+                        steps{ 
+                               echo " Welcome to jenkins pipeline"
+                        }
+                }
+          }
+}
+
+
+2 LAB : GoTo pipeline syntex > select Git   > enter Git credentials  > Add  > select same credentials  (if private github)
+Click on Generate pipeline script   >copy code and past in steps block  (git credentialsId: 'git_repository', url: 'https://github.com/ranjit8569/hello-world.git')
+pipeline {                       
+          agent any             
+          stages{               
+                stage("Git"){  
+                        steps{ 
+                               git credentialsId: 'git_repository', url: 'https://github.com/ranjit8569/hello-world.git'
+                        }
+                }
+          }
+}
+Build and success.
+
+3. LAB Jenkins Pipeline - Build a Maven Project Using Declarative Pipeline | Pipeline Script for Maven
+pipeline {                       
+          agent any
+          environment{
+             PATH = "/opt/apache-maven-3.6.3/bin:$PATH"     
+          }    
+          stages{               
+                stage("Clone Code"){  
+                        steps{ 
+                               git credentialsId: 'git_repository', url: 'https://github.com/ranjit8569/hello-world.git'
+                        }
+                }
+               stage("Test Code"){  
+                        steps{ 
+                             sh "mvn test"      # testing the project
+                        }
+                }
+              stage("Build Code"){  
+                        steps{ 
+                             sh "mvn clean install"      # if mvn command not found then use environment
+                        }
+                }
+          }
+}
+Build and success.
+
+===========================================================
+
+=====================================================================
+4. Jenkins Pipeline - Build and Deploy a war file on Tomcat Server | Pipeline script for CI/CD
+
+Git ---> Jenkins ----> Apache Tomcat
+
+There is Two Server Jenkins server and Tomcat Servers.
+
+Login Tomcat server :  Already setup.
+cd /opt/apache-tomcat-8.5.55/bin 
+ls # shutdown.sh and startup.sh
+
+chown -R ec2-user:ec2-user /opt
+ps -aef|grep tomcat    # to check runing or not  (if not start then use startup.sh)
+./startup.sh
+
+URL : tomcat server public IP:8080        # tomcat runing.
+
+Now login Jenkins server.
+cd /var/lib/jenkins/workspace  # ls all job name is there (suppose job name pipeline_job)
+cd pipeline_job/webapp/ ; ls # target dir is there
+cd target
+tree   # show in tree dir  and found webapp.war  file.
+
+Now login Jenkins goto pipeline_job > Click on "Pipeline_systax" (below of the screen)
+
+select in dropdown "sshagent SSH Agent"
+Add jenkins credentials:
+select SSH Username with private key.
+ID : deploy_user
+Description : deploy user
+Username : ec2-user
+
+checked private key: and click Add and paste ppk key (after puttygen )
+
+Add and select ec2-user (deploy_user)
+Click on Generate pipeline Script  # generate  sshagent pipeline and edit below
+
+jenkins pipeline part
+
+pipeline {                       
+          agent any
+          environment{
+             PATH = "/opt/apache-maven-3.6.3/bin:$PATH"     
+          }    
+          stages{               
+                stage("Clone Code"){  
+                        steps{ 
+                               git credentialsId: 'git_repository', url: 'https://github.com/ranjit8569/hello-world.git'
+                        }
+                }
+               stage("Build Code"){  
+                        steps{ 
+                             sh "mvn clean install"      
+                        }
+                }
+                stage("Deploy") {
+                   steps{
+                      sshagent(['deploy_user']) {
+                         sh  "scp -o StrictHostKeyChecking=no webapp/target/webapp.war  ec2-user@3.109.59.255:/opt/apache-tomcat-8.5.57/webapps" 
+                       }              
+                   }
+                }
+          }
+}
+### sh ''' 
+multiple unix commnad 
+'''   
+
+SAVE
+Build Now and check console output.
+URL : tomcat publid IP:8080/webapp     # runing fine Welcome to Valaxy Technologies.
+
+for verify I can edit content in github : repository hello-world/webapp/src/main/webapp/index.jsp
+
+# with help of Blue-Ocean plugin, we generate pipeline job using click, click graphically. (normally declaritive pipeline)
+# Declarative pipeline has feture, suppose 10 jobs/stage, so we can Run directly any job.
+# All stages are work on same Workspace, so no need to move jar/war file to any server in declarative pipline project.
+# pipeline script are execute from git-hub using pipline scm option.
+# Slack plugin, use for notification. slack configure using gmail ID. and configure secret text for credentials in slack. alert will come in email and slack tool.
+=====================================================================
+Using Thin backup plugin we can take backup of full jenkins and as well  restore .
+1. install thin backup plugin. 2 open thin backup and configure backup os path. when click on backup now then take backup. THen delete some file then when click Restore then restored.
+
+==========================================
+Jenkins integration with S3 | Store/Upload build artifact on S3 |Highly Durable Artifact Repository
+
+1) create jenkins server.
+2) Create S3 bucket to store artifact. Bucket Name: valaxy-s3-artifact, Region: Singapur.
+3 Create new IAM role with "S3 full access" and assign it to jenkins ec2 server.  as below steps
+
+IAM ---->  Create role ----> EC2  (first select EC2 and Next)
+
+permission: AmazonS3FullAccess  
+Tags: key - Name, value - S3FullAccess. Role
+Name: S3_Full_Access.
+
+##  select jenkins instance and goto Action, assigned created role.
+
+4. Install "S3 Publisher"  plugin on jenkins.
+Manage Jenkins ---> Manage Plugins --> Available --> S3 publisher
+
+5. Configure S3 profile on Jenkins.
+manage Jenkins ---> Configure Systems -- > Amazon S3 profiles.
+
+profile name : s3-artifact-demo
+Use IAM Role: chose     > SAVE
+
+6 Create a job, select Maven project           #to store artifacts under S3.
+Git Url: hellow-world repo.
+Goals and option: clean install package
+
+goto Post build Action: select Publish artifact to S3 Bucket.
+Files to upload : Add
+Source : **/webapp/target/*.war
+Exclude : /webapp/target
+Destination bucket : s3-artifact-demo (bucket name)
+Storage class: STANDARD
+Bucket Region:  ap-southeast-1      ( take help aws region website)
+APPLY and SAVE.
+
+Build and success  # Now stored webapp.war in S3 bucket.
+=============================================================================================================
+
+CI CD Pipeline Using Jenkins | Continuous Integration and Deployment | Intellipaat
+
+Q Configured CI/CD pipeline? (configure slave)
+
+The Jenkins master acts to schedule the jobs, assign jobs to slaves, and send builds to slaves to execute the jobs
+The workload of building jobs is delegated to multiple slaves
+
+**** JENKINS Ec2 server (master slave)  # 87.63                  (inbound rule CUSTOME TCP, 8080,Anywhere) also all trafic added
+sudo apt-get update ; sudo apt install -y openjdk-8-jdk
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo apt-key add-
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt update ; sudo apt install jenkins
+sudo service jenkins start
+sudo systemctl status jenkins
+
+## goto Git-Hub > Setting > WebHook and enter Jenkins URL in Payload URL http://3.17.26.25:8080/github-webhook  then add webhook
+
+# add Slave node to jenkins server using JNLP connection  as below  (after configured,  job will run in both slave node.)
+
+**** STAGING Ec2 server(slave1)   # connect putty 93.21 
+sudo apt-get update ; sudo apt install -y openjdk-8-jdk
+sudo apt-get install docker.io
+execute java -jar agent.jar -jnlpUrl......) Now staging agent connect to jenkins master server   (first download agent/jnlp file and copy to this server)
+
+
+
+**** PRODUCTION Ec2 server(slave2)    # connect putty 87.144 
+sudo apt-get update ; sudo apt install -y openjdk-8-jdk
+sudo apt-get install docker.io
+execute java -jar agent.jar -jnlpUrl......) Now prod agent connect to jenkins master server
+
+
+----------
+LOGINS Jenkins:
+Configure Global Security -> Agents
+TCP port for inbound agents: -> click on random and OK
+
+
+GOTO Manage Node:
+
+>> Add new Node, node name: "staging", click permanent add then  OK
+Remote root dir: /home/ubuntu/jenkins             # where jenkin install
+Launch method: select "Launch agent by connecting it to the master" > save
+
+>> Add new Node, node name: "production", click permanent add
+Remote root dir: /home/ubuntu/jenkin
+Launch method: select "Launch agent by connecting it to the master" > save  
+
+-------------------------
+OR (if use "Launch agent via SSH" then easly slave configured. enter slave ec3 ip, user/pas then select "None verifying Verification Strategy" then click on "Launch Agent" then automatically slave configure.
+-------------------------
+
+click on staging node > click on "Launch" to downloaded jnlp file  # (there is java -jar agent.jar -jnlpUrl http://.... -workDir "/home/ubuntu/jenkins)
+click on agent.jar, to downloaded agent.jar file
+First copy slave-agent.jnlp and agent.jar files to staging ec2 server, And On Staging server > mkdir jenkins and execute java -jar as above.
+ (come mesg "Connected") # Now Agent configured on staging server.
+
+
+click on production node > click on "Launch" downloaded jnlp file  # (there is java -jar agent.jar -jnlpUrl http://....)
+click on agent.jar, downloaded agent.jar file
+First move slave-agent.jnlp and agent.jar files to production ec2 server, And On production server > execute java -jar as above. 
+(come mesg "Connected") # Now Agent configured on production server.
+
+
+Now GoTo GitHub > create repository and
+goto setting > Webhook > Add webhook and Enter Jenkins URL/github-webhook/
+
+ON Jenkins master server:
+mkdir website; cd website
+vi index.html
+
+vi Dockerfile
+FROM hshar/webapp      # just download apache container
+ADD . /var/www/html
+
+git init
+git remote add origin github path
+git add .; git commit -m "added website"; git push origin master
+
+############### Now create job "Git-job"   (first freestyl)   
+
+Git: https://github.com/hshar94/website.git           # Click on "GitHub project" also and enter url github path
+checked "Restrict where this job can be run".
+Label Expression: select staging
+checked "GitHub hook trigger for GITScm polling".     SAVE       # using this automatically Git-job execute when update on github.
+
+--------
+Build job Git-job and successed.   # executed on slave ec2 staging server
+# (automatically download Dockerfile and index.html files from git-hub to Staging ec2 Server jenkins/workspace/Git_job dir.)
+
+###############  Now create job "build-website" (second freestyl)
+
+checked "Restrict where this job can be run".
+Label Expression: select staging               # using this lable, builded on staging server.
+Build:
+Execute shell:
+Command: sudo docker rm -f $(sudo docker ps -a -q)
+sudo docker build /home/ubuntu/jenkins/workspace/build-website -t website        # after execute Git-job, Dockerfile exist in this path
+sudo docker run -it -p 82:80 -d website       # container will run on Staging Server only
+
+-------
+Build "build-website" job and get successed
+URL: staging public IP:82         # In web application working fine
+
+PIPELINE:
+GoTo Git-Job > configure > Add post-build action > Build Other Project
+Project to build: build-website      SAVE
+
+ON Jenkins server 
+vi index.html    # edit code
+git add . ; git commit -m " changed website content"
+git push origin master        # code pushed to github Then job "build-website" again executed automatically
+URL: staging public IP:82         # modify application working fine
+
+############# Now create job "pushprod"    (third freestyl) 
+checked GitHub project:
+URL: github path                  # download code to production server in jenkins/workspace
+checked "Restrict where this project can be run"
+Label: select production            # using this label, builded on production server.
+Git : URL github path
+Build:
+shell command: 
+sudo docker rm -f $(sudo docker ps -a -q)
+sudo docker build /home/ubuntu/jenkins/workspace/pushprod -t website
+sudo docker run -it -p 80:80 -d website      # container will run on Production Server only
+
+GOTO Build-website > configure > Add post-build action > Build other project:
+project to build: pushprod  SAVE
+
+ON Jenkins server 
+vi index.html    # again edit code
+git add . ; git commit -m " added code for production"
+git push origin master        # code pushed to github Then first "Git-job" executed then build-website execute then pushprod executed automatically
+URL: production public IP:80  # modify application working fine
+Finally application runing on both slave node (93.21 staging server, 87.144 production server) together.
+---------------END----
+To view pipeline
+first install "build pipeline" plugin
+goto Dashboard click + (view)
+check Build Pipeline View :
+view name: first_cicd   OK
+Upstream/downstream: select initial job: Git-Job  OK
+Now show graphically pipeline
+
+===========================================================
+if use selenium to test application then follow below steps:
+1) first download chromedriver on staging ec2 server. /home/ubuntu
+2) apt-get install chromium-browser   /home/ubuntu
+3) There is java code to test application runing or not /home/ubuntu/test.jar file (in java code configured slave ip, application content (index.html)  if any mismatch content between index.html and java code's index.html content then come Failure: 1
+4) java -jar test.jar         # for manually testing application,msg came Total test run: 1, Failure: 0, skips: 0
+5) push test.jar to git-hub.
+6) create New job (free style)  as git-hub path configured as above job
+Build: execute shell: sudo cp ./test.jar /home/ubuntu        # copy from jenkins workspace
+sudo su -c "java -jar /home/ubuntu/test.jar" -s /bin/sh ubuntu       # ubuntu is user
+
+execute this job # error found permission denied in copy so on staging server vi /etc/sudoers and enter: jenkins ALL=(ALL) NOPASSWD: ALL
+again execute this job and got successed. on jenkin console output: Total test run: 1, Failure: 0, skips: 0
+
+============================================================================================
+
+Gaurav Sharma CI/CD project.
+
+First create TWO server (Test server and production server)
+Test Server:
+sudo -i
+apt-get update ; apt-get install -y tomcat9 ; apt-get install tomcat9-admin
+vi /etc/tomcat9/tomcat-users.xml
+<user username="gaurav" password="mypassword" roles="manager-gui,manager-seript,manager-jmx,manager-status"/>
+service tomcat9 restart
+service tomcat9 status
+URL: public IP   tomcat working fine
+
+
+Prod Server:
+sudo -i
+apt-get update ; apt-get install -y tomcat9 ; apt-get install tomcat9-admin
+vi /etc/tomcat9/tomcat-users.xml
+<user username="gaurav" password="mypassword" roles="manager-gui,manager-seript,manager-jmx,manager-status"/>
+service tomcat9 restart
+service tomcat9 status
+URL: public IP   tomcat working fine
+
+Suppose Jenkins installed on seprate server.
+
+Login Jenkins > first install plugins (Build pipeline, Maven integration, deploy to container, Copy artifact)
+Goto Global Tool Configuration > Add Maven > Name: maven, Checked Install automaticall, select version
+
+Create New Item > HelloWorld-Test  (select Maven project) ####################### 
+Git 
+Repository Url: https://github.com/coolgourav147/spring-boot-war-example.git
+
+Goals and option: test               SAVE          (Add post build action, build other projects, select Hello-World-Build) configured Downstream 
+
+
+Create New Item > Hello-World-Build  (select Maven project) ####################### 
+Git 
+Repository Url: https://github.com/coolgourav147/spring-boot-war-example.git
+
+Goals and option: install            SAVE         (Add post build action, build other projects, select HelloWorld-Deploy-Test) configured Downstream
+Add post build action, select "Archive the artifact"         # create snapshot of war file
+Files to archive: **/*.war 
+checked "Permission to Copy artifact"
+Project to allow copy artifact: HelloWorld-*
+
+
+Create New Item > HelloWorld-Deploy-Test  (Freestyle project) ####################### 
+
+checked: "Permission to Copy Artifact"
+Projects to allow copy artifact: HelloWorld-Deploy-Prod
+
+Add build step: select "copy artifact from another project"
+project name: Hello-World-Build
+Artifacts to copy:  null           # so copy .war into workspace/target working dir
+
+Add post build action, select "Archive the artifact"         # create snapshot of war file
+Files to archive: **/*.war 
+
+(Add post build action, Build other project(manual step), select HelloWorld-Deploy-Prod) configured Downstream
+
+Add post build action, select "Deploy war/ear to a container"
+WAR/EAR files: **/*.war
+Context path: /app
+Add Container: Tomcat 9.x Remote
+Enter credential of tomcat
+Tomcat URL: tomcat url: http:192.168.1.13:8080        # in Test server, app working fine.  
+SAVE
+
+Create New Item > HelloWorld-Deploy-Prod  (Freestyle project) ####################### 
+Copy artifact from another project
+project name: HelloWorld-Deploy-Test
+
+Post Build Action: Deploy war/ear to container
+WAR/EAR files: **/*.war
+Context path: /app
+Add Container: Tomcat9.x Remote
+Credential: select of tomcat.
+Tomcat URL: tomcat url: http://182.168.1.14:8080              # in prod server, app working fine.
+
+SAVE
+
+---------
+pipeline:
+View>view name: HelloWorld
+checked: Build pipeline view    OK
+select initial job: HelloWorld-Test       OK
+---------
+=============================================================================================
+
+Configure SSL certificate in tomcat server:  (purchase SSL certificate from godaddy/freenom and configure in tomcat)
+
+1) keytool -genkey -alias tomcat -keyalg RSA
+Enter pass: password1     # enter all details, and  saved file in .keystore
+
+2) vi apache-tomcat-8.0.36/conf/server.xml    # replace below code
+
+Connector SSLEnabled="true" acceptCount="100" clientAugh="false"
+  disableUploadTimeout="true" enableLookups="false" maxThreads="25"
+  port="8443" keystoreFile="/path/.keystore" keystorePas="password1"
+protocol="org.apache.coyote.http11.Http11NioProtocol" schema="https"
+secure="true" sslProtocol="TLS" />
+
+
+cd apache-tomcat-8.0.36/bin ; ./startup.sh         # tomcate server restarted.
+
+URL: https://localhost:8443        # working fine.
+
+
+# if need to configure https (security) in tomcate 
+vi web.xml    # for web application
+
+<security-constraint> <web-resource-collection>
+<web-resource-name>securedapp </web-resource-name>
+-----
+----
+<transport-guarantee> CONFIDENTIAL </transport-guarantee>
+-----
+-----
+===========================================================================
+
+Pull artifact (.war) from Nexus and deploy to tomcat server using jenkins cicd.
+-----------
+There is one jenkins server and one Nexus servers first. login to nexus and click on browser/repository_name and found already stored all artifact (.war).
+
+Now login Jenkins server. create new job> (freestyle project)
+goto Build > add build step > Execute shell
+command: wget --user=admin --password=admin http://url of nexus repo artifact (spring-webapp-1.0.02020070.war)
+mv spring-webapp-1.0.02020070.war devops.war
+
+Now goto Post-build Action: > select "Deploy war/ear to a container"
+WAR/EAR files: devops.war             # path of workspace
+Context path: devops
+Containers: Tomcat 8x Remote
+   Credentials: admin/admin
+   Tomcat URL: tomcat url
+SAVE and build job.
+URL: tomcatURl/devops/home        # website working fine
+=======================================================================
+
+
+How to Integrated Nexus with Jenkins CICD pipeline.
+1) Setup Nexus server first and login.
+2) Setup Jenkins server first and login.
+
+Install plugin "Nexus Artifact Uploader" in jenkins.
+Create new jenkins Job 
+Git: git url           # java project reside in GitHub
+Goals: clean install   # generate .WAR file in local repo (.m2 folder)
+POM: MyWebApp/pom.xml
+
+Add Build step: select "Nexus artifact uploader" Then configure below all steps:
+Nexus version: NEXUS3
+Protocol: HTTP
+Nexus URL: url   (remove http://)    
+Credentials: admin/admin123 
+GroupID: myGroupid
+Version: 1.0-SNAPSHOT
+Repository: maven-snapshots
+Artifacts:
+   Artifactid: MyWebApp
+   Type: WAR
+   File: MyWebApp/target/MyWebApp.war    # .war file store in this path
+
+
+## After execute job, artifact (.war) uploaded on Nexus repository (click on Browse, maven-snapshots)
+
+
+
+

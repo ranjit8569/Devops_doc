@@ -1,0 +1,201 @@
+What is MAVEN and why we use it?
+Ans:
+MAVEN is project management tool. It is a framework. ANd this build tool and manage dependency. it manage complete java project. 
+maven has predefine directory structure where source code and pom.xml file is placed.
+
+Maven --> Modules(dependencies) --> Building --> Executable --> Application
+
+JAVA Project Structure:
+Source code
+Test Code
+project structure (assets, directory, resources)
+Dependency/Library
+Configuration
+Task Runner (build, test, run)
+Reporting
+
+MAVEN ->   
+           Maven is an Automation and Project management tool developed by Apache Software foundation, it is based on POM (project object model).
+* Maven can build any number of project into desired output such as .jar, .war, metadata.
+* Mostly used for java based project.
+* It was initially released on 13 july 2004 and Maven is written in JAVA.
+* Meaning of Maven is "Accumlator of Knowledge"
+* Maven helps in getting the right jar file for each project as these may be different version of Separate Packages.
+* To download dependency by easly done by visiting "mavenrepository.com"
+
+Dependency -> It refers to the java library that are needed for the project.
+Repository -> Refers to the directories of packaged for files.
+
+Problems without Maven :
+* Adding set of jars in each project. we need to add jar files in each project it mush include all the dependencies of jar also.
+* There is difficult to create directory under subdirectory name.
+
+What is Maven does?
+ANs:
+It makes a project easly to build. it building an application that has several different modules.
+It provide project information (ex log document, cross refrences, mailing list, dependency list, unit test.)
+
+Easly to add new dependencies.
+
+Therefore Apache Maven helps to Manage.
+1) Build       (compile or convert source code to machine language)
+2) Dependency    (manage dependency)
+3) Reports         (make report of failure and success build)
+4) Release         (manage version).
+5) Distribution    
+ 
+# Requirement for Build:
+Source code  (present in workspace)
+Compiler  (Remote/central repo -> Local repo -> workspace)
+Dependency  (Remote/central repo -> Local repo -> workspace)
+
+
+POM (project object model)       # in maven lifecycle if got any issues then we can edit pom.xml file also and pom.xml exist in src or root dir.
+POM refers to the XML files that have all the information regarding project and configuration details.
+pom.xml file is main configuration file of maven.
+it contains Metadata, dependency, Kind of project, Kind of output, Description.
+
+POM.xml file       # it is hart of the maven.
+<project>
+  <modelVersion>4.0.0</modelVersion>       # object model version
+  <groupid>no.uio.inf5750</groupid>        # Group/orgainzation id
+  <artifactid>projectA</artifactid>        # id/name of the project itself
+  <version>1</version>                     # Version of the project
+  <packaging>war</packaging>               # packaging type
+  <name>Assignment 2</name>                # Display name of the project
+  <dependencies>                           # Dependency
+     <dependency>
+         <groupid>commons-logging</groupid>        # Group/orgainzation id
+         <artifactid>commons-logging</artifactid>        # id of the project itself
+         <version>1.4</version> 
+         <scope>testing</scopt>
+</project>
+
+Each module has pom.xml file
+
+One project have only One Workspace and one pom.xml
+
+Architecture OF Maven:
+.M2 (local repository)
+
+----------------
+Standard directory layout:
+Src/main/java                # java source file goes here
+src/main/resources           # Other Resources your application need
+src/main/filters             # Resources filters (properties files)
+src/main/config              # Configuration files.
+src/main/webapp              # Web application directory for a WAR project
+
+src/test/java                # Test sources like units tests (not deployed)
+src/test/resources           # Test resources (not deployed)
+src/test/filters             # Test resource filter files (not deployed)
+src/site                     # Files used to generate the Maven project website
+------------------
+
+MAVEN BUILD LIFE-CYCLE:     (Default 6 sequence steps follow)
+Goals - (command)
+1) Validate              # validate pom.xml ( pom.xml content)
+2) Compile               # it compile all .java file in main dir and generate .jar file into .class file and puth them main dedicated folder
+3) Test                  # maven execute the specified test cases
+4) Package               # it validate, compile, test and package code into jar/war/ear Archive in target folder.
+5) Install               # install or generate dependency files, pom.xml and .jar file into local repository (.m2/repository folder)
+6) Deploy (to servers)   # upload jar/war file into remote repository (nexus)
+
+For each step, all previews steps are execute repeatedly.
+m2. it is local repository that keeps all dependency artifactory.
+
+------
+7) Clean (delete all run time/ generated files)     (it won't allow sequence)
+ex : mvn test           # test code
+     mvn clean install package        # clean up target dir and again generated .jar/war and dependency file in target folder and local repository (.m2) 
+in local dir. package is create target dir.
+
+
+* Build Lifecycle consist of a sequence of build phases and each build phase consist of a sequence of goals.
+* Each goals is responsible for a particular task
+* When a phase is run all the goals related to that phase and its plugins are also compiled.
+
+# yum update -y ; yum install java-jdk..... ; yum update -y ; yum install maven
+
+# USING below command complete java project package created with directory structure, which have java file, pom.xml file, test class file and supported file. so will use maven command.
+
+TestClass file is used for test cases.
+
+mvn archetype:genrate -Dgroupid=com.ip.app -Dartifactid=core-app -DarchetypeArtifactid=maven-archetype-quickstart -DinteractiveMode=false
+
+tree core-app/               # list dir structure  (core-app is application name)
+cat core-app/pom.xml         # listed content
+cd core-app/
+
+
+mvn -f pom.xml validate           # successed
+mvn -f pom.xml compile           # compiled as .java file into .class file
+mvn -f pom.xml test              # test the code and found test cases
+mvn -f pom.xml package           # genarated .jar file in /target dir (local path) and as well downloaded dependency
+
+cd .m2/repository/ ; ls        # downloaded all artifact dependency  at maven local repository
+rm -rf .m2                   # deleted maven local repository
+mvn -f pom.xml install         #   again downloaded all dependency at local repository using pom.xml file
+
+mvn clean install              # clean up generated file and again validate,compile,test, package into .jar/war and also genrate pom.xml into 
+local .m2/repository.
+
+mvn clean deploy               # clean up generated file and jar/war file uploaded into remote repository. (like nexus repo) 
+mv clean deploy -p release     #  it will deploy to remote release repository in nexus.     (release is repository name)
+
+# it failed because didn't found distributionManagement in pom.xml file so edit pom.xml file add <distributionManagement> tag. but again filed due to where will store the jar file. So will create nexus repository as bleow.
+==================================
+
+# need to make nexus repository first. So upload artifact ie .jar file to this repository. nexus repository is used to store uneditable file and without versioning like ja/war
+
+Create ec2 instance with t2.medium   for run nexus server container .   yum update -y; yum install docker.io -y
+docker run -d -p 8081:8081 --name nexus sonatype/nexus3          # goto docker hub and search nexus and found this nexus docker container command.
+docker log nexus       # show started
+
+copy ec2 dns and URL ec2 dns:8081     # nexus server working fine and login (take some time)
+docker exec -it nexus cat /nexus-data/admin.password            # found pass    user admin
+
+AFter login nexus server, goto repository and create repository, type: select maven host, name: coreapp-snapshot, version policy: snapshot, deployment policy: Allow redeploy then create
+
+create one more repository name:coreapp-releases
+ 
+1) create nexus role, privileges: search coreapp and all move right side using ">"     then create role
+2) create user  and select created role   then create user.
+3) in .m2 folder create setting.xml for username and password  # search in google and same past in setting.xml
+
+----------------
+edit setting.xml              # user/pass should be as per pom.xml file
+<server>
+ <id>coreapp-releases</id>
+ <username>coreapp-user</username>
+ <password>coreapp-user</password>
+</server>
+<server>
+ <id>coreapp-snapshot</id>
+ <username>coreapp-user</username>
+ <password>coreapp-user</password>
+</server>
+
+# below code for where want to publish shapshot repo   (below details should be as per pom.xml file)
+<profile> <id> snapshot </id> <repositories>       # this is for "snapshot" and same code for "release" repo also
+<id> nexus-sanpshot-repo </id>
+<name> your custom repo </name>
+<url> http://localhost:/repository/maven-snapshot </url> </repository> </profile> 
+--------------
+
+copy snapshot repository url AND then on github in pom.xml, snapshot tag, <url> past repo url <url>  and id, name tag use coreapp-snapshot
+and Distributionmngmt tag, <url> past repo url <url>  also and id, name tag use coreapp-releases
+finally commit changes
+
+cd /core-app
+git pull
+mvn clean deploy         # now jar file uploaded on nexus server/repository  ( same release upload only one time, but snapshot uploaded many time)  
+or mvn clean deploy -p release       #  publish to release repo in nexus
+
+and if this version is on pom.xml <version>1.0-SNAPSHOT</version>    # upload many time on nexus repo
+and if this version is on pom.xml <version>1.0</version>    # same uploaded only one time on nexus repo, if change version then upload again.
+
+=====================
+
+
+

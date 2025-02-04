@@ -1,0 +1,2744 @@
+learning-ocean.com/tutorials
+Imp: Ec2, Vpc, Elb, AutoScaling, CloudWatch, Rout53, IAM, S3, Ebs, Efs, Rds, dynamoDB | Eks, Ecs, Radis (Elastic cache), cloudFront(cdn, static contant),
+Lambda, 
+SQS/SNS/SES, RedShift(dataware house), WAF (web access firewall), KMS (key management system), ACM (amazon certificate manager)
+
+Global Services: Billing, IAM, Route53, S3, Cloudfront
+Region basis:    Dynamo DB, VPC, Elb;
+AZ basis:        Ec2, Rds, EBS
+=======================================================
+Cloud computing is an internet-based computing service in which large groups of remote servers are networked to allow centralized data data storage, 
+and online access to computer services or resources as rent.
+Type of cloud - Three type of cloud(public, private, hybrid)
+
+public : In public cloud, the third-party service providers make resources and services available to their customers via Internet. Customer’s data and 
+related security is with the service providers’ owned infrastructure.
+
+Private: A private cloud also provides almost similar features as public cloud, but the data and services are managed by the only organization or 
+Enterprise by the third party only for the customer’s organization. In this type of cloud, major control is over the infrastructure so security related
+issues are minimized.
+
+Hybrid :  A hybrid cloud is the combination of both private and public cloud. The decision to run on private or public cloud usually depends on various 
+parameters like sensitivity of data and applications, industry certifications and required standards, regulations, etc.
+
+AWS SERVER MODEL
+IAAS Infrastructure as a service
+PAAS Plateform as a service
+SAAS Software as a service
+
+IAAS : NETWORK->STORAGE->SERVER->VIRTUALATION->OS   # Before O.S managed by Cloud. And ownward O.S ( middleware, runtime,data, application) managed by me.
+PAAS : NETWORK->STORAGE->SERVER->VIRTUALATION->OS->MIDDLEWARE->RUNTIME      # Till RunTime managed by Cloud. Only Data, Application managed by me.
+SAAS : NETWORK->STORAGE->SERVER->VIRTUALATION->OS->MIDDLEWARE->RUNTIME->DATA->APPLICATION        # All managed by Cloud.
+
+
+Important ports:
+
+FTP: 21	
+
+SSH: 22
+
+SFTP: 22 (same as SSH)
+
+HTTP: 80
+Apache: 80
+
+HTTPS: 443
+
+JENKINS : 8080
+TOMCAT  : 8080
+
+vs RDS Databases ports:
+
+PostgreSQL: 5432
+
+MySQL: 3306
+
+Oracle RDS: 1521
+
+MSSQL Server: 1433
+
+MariaDB: 3306 (same as MySQL)
+
+
+================================
+We can create 20 EC2 per Region. And one EC2 support max 25 EBS volume. In AWS console "Limit" option is there to check default how many resource 
+we can create.
+
+Type of Instance    7 types
+1) General purpose - Balanced memory & cpu.
+2) Compute optimized - More cpu then RAM.
+3) Memory optimized - More RAM.
+4) Accelarated Computing/Gpu - Graphic optimized
+5) Storage optimized - Low latency.
+6) Instance features - 
+7) Measuring instance performance -
+
+
+* General purpose  - general purpose instance provide balance, compute, networking. 
+        There is 3 series in general purpose.
+	a A series A1 (medium, large size)
+
+        b M series ( M4, M5, M5a, M5ad, M5d) (Large size)B
+        c T Teseries (T2, T3, T3a)  (Nano, Small, Medium, Large size)
+
+* Compute optimized - it is compute bound application and it has heigh perfomance processor.
+        Three  type are available.
+         a C4  - instances are optimized for compute instensive workload and delivery very cost effective heigh performance at low level price per compute rate.
+                  VCPU 2 to 36, RAM 3.75 to 60 GB, Storate EBS only, Network bandwith 10 GBPS.
+                  Use case Web server, Batch processing, MMO Gaming, Video encoding.
+         b C5  - optimized for compute-intensive workloads and delivery cost-effective high performance at low level price per compute ratio. Powered by Nitro system.
+                 VCPU 2 to 72, RAM 4 to 192 GB, Network bandwidth upto 25 gbps., instance storage EBS only & NVM SSD.
+                 Use cases High performance webserver, Gaming., Video encoding. 
+   
+* Memory optimized - memory optimized instance are designed to delivery fast perfomance for workload that process large data set in memory, prefered in banking.
+        Three type are available.
+           a R series - High performance Relational (MYSQL) and NO SQL(mangoDB, databases.
+                VCPU 2 to 96, RAM 16 to 768GB, instance storage EBS only and NVM SSD.
+		R4, R5, R5a, R5ad, and R5d instances.
+           b X series - X1, X1e instances.
+                         Well swited for heigh performance database, memory instance enterprise, VCPU 4-128, RAM 16-384GB, Storage NVM SSD.
+           c Z series - Z1d instances heigh frequency delivers, VCPU 2-98, RAM 16-384, Storage NVM SSD..
+
+* Storage optimized - This instances are designed to workloads, that Requir high sequential READ and WRITE to access very large data.
+         They are optimized to delivery tens of thousand of low latency.
+         Three type of searies are available.
+
+         a I series this is I3 and I3N instances, No sql database, Database file system, Data warehouse application. VCPU 2-96, RAM 16-768GB, local storage NVMe SSD, 		Networking performance 25Gbps to 100 Gbps, Sequential Throughput READ 16 GB, WRITE 6.4GB (i3), 8gp(i3n) per second.
+         b D series this is D2 instances. This is massive parallel processing data warehouse. Map reduce and hadoop distributed computing. Data processing app.
+                VCPU 4 to 36, RAM 30 -244GB, Storage SSD.
+         c H series this is H1 instances and family feture up to 16TB of HDD based loacal storage. App requiring sequential access to large amount of data and direct 		attached instance storage. VCPU 8 to 64, RAM 32 to 256GB, Storage HDD.
+
+* Accelerated Computing Instance - This instance families use Hardware acceleraters, or co-processors to perform some functions such as floating point number 	calculation, graphic processing or data pattern matching more efficiently than is possible in software running on cpu. used for ML,DS,AI
+     
+          a P series    (P2 & P3 instances)
+               P2 instance   VCPU 4 to 64, GPU 1 to 16, RAM 61 to 732 GB, GPU RAM 12 - 192 GB, Network 8 - 25GBPS
+               P3 instance   VCPU - 8 to 96, GPU 1 to 8, RAM 61 - 768 GB, Storage SSD & DBS
+          b G series   (G2 & G3 instances)
+               G2  instance VCPU 4 to 64, GPU 1 to 4, RAM 30.5 to 488GB, CPU Memory 8 to 32 GB, Network performance  25 GBPS. Used in Video Creation Services, 3D 			visualisation, Streaming, Graphich intensive application.
+          c F series   
+               F1 instance offers Customizable Hardware acceleration with field programable Gate Arrrays (FPGA)
+                VCPU 8 - 64, FPGA 1-8, RAM 122 to 976 GB, Storage - NVM SSD (Used in Genomics Resharch financial analytics, real time video processing & Big data 				search)
+
+* Heigh Memory Instance - This instance are bare metal instances and do not Run on a Hypervisor. Only availble under Dedicate Host Purchasing Category 
+(minumum For 3 Yr Term). O.S directly installed on Hardwar. Dedicated host means this host provide to only one user, not virtually provided to other 
+user also. This provide only U series.
+
+          Features:
+             1) Latest Generation Intl Xeon Pentiom 8176M processor
+             2) 6,9,12 TB of instance memory, the largest of any EC2 Instance
+             3) Powered by the AWS Nitro System, a Combination of dedicated Hardware & Lightwaight Hypervisor.
+             4) EBS Optimized by default at no additional cost.
+             5) Network performance - 25GBPS and Dedicated EBS Bandwidth - 14 GBPS.
+             6) Each Instance offer 448 Logical Processor.
+
+* Previous Generation Instances
+         T1, M1, C1, CC2, M2, CR1, CG1, I2, HS1, M3, C3 and R3.
+
+
+======================
+Purchase : when instance is started then bill is started till instance is terminate/shutdown. But when instance is STOPED then still bill is started for 
+storage.
+
+Pay Per Second is available for only Linux and Ubuntu. For windows Pay Per hour is available.
+------------
+EC2 instances Purchasing option.
+
+OnDemand Instance : It purchase at fixed Rate Per Hour. It used during testing and development of application.
+Dedicated Instance : Run in VPC on Hardware that is dedicated to a Single Customer.
+Dedicated Host  :  Run as in Physical server with EC2 instance capacity fully dedicated to your use only.
+Spot Instance :     - very Low price instance, and any time bring back instance, save upto 90%.
+Schedule Instance  : it used during at any prticular fixed billing time .
+Reserved Instances : it used for minimum 1 to 3 years and it is chef in comparsion OnDemand instance. in case suppose we need to extand hardware in future 
+then we can extend hardware on Reserved Instance but it will be chargable according to the hardware price. Save upto 70%
+
+vvi) Root device type : EBS and Instance store.
+EBS Backed EC2 :- mans EBS is root volume in instance and EBS is network attached storage. 
+Instance store Backed EC2 :- means instance is root volume in instance and data deleted when instance is terminated, it is fast rather then EBS.
+
+Elastic Block Storage :    (NAS) Network attached storage.
+            1) Most common Replicate with A-Z. After make snapshot we can easly move image between AZ.
+            2) EBS Volumes attached at launch and are deleted when instance terminate bydefault, but we can also peresist root EBS using 
+checked "delete on termination". when another EBS is attached then need to delete manually.
+            3) EBS volumes attached to a running instance are not deleted when instance is terminated, but are detached with data interact. 
+EBS Block Instance
+
+Instance Storage:          (DAS) Direct attached storage, this is Fast.
+
+            1) Physically attached to the host server
+            2) Data not lost when OS is Rebooted.
+            3) Data lost when Underlying drive fails.
+            4) Instance is stop or terminated
+            5) You Can't detach or attach to another instance.
+            6) Do not Rely on for valuable long term data.
+
+Instances User data:
+data supplied by the user at instance launch in the form of a script to be executed during the instance boot. 
+User data is limited to 16KB. you can change user data, by stopping EC2 first. USer data is not encrypted EC2 Bare metal instances.
+
+To view instance Metadata: http://169.254.169.254/latest/metadata 
+To view user data: http://169.254.169.254/latest/user-data (exaple of user data)
+
+Elastic Network Interface : - it contain private/public/Elastic IP and security group. Used for computer connect to internet. (Eth0)
+Network Interface can be: created to an instance, Attached to an instance, Detached from an instance, Re-attached to an another instance.
+
+--------------------
+User Data script:  (when instance launched then immediately ready to use static httpd server.)
+#!/bin/bash
+yum update -y
+yum install httpd -y
+service httpd start
+chkconfig httpd on
+cd /var/www/html
+echo "<html><h1>This is static Apache server_1</h1></html>" >index.html
+
+************************************************************************************
+## LAB 1 INSTALL WEBSERVER IIS and Create webpage in Windows Server
+
+First create EC2 instance ( select MicroSoft Windows Server 2012 R2 based. security group RDP,HTTP, HTTPS anywhere)
+After created windows instance.
+GO to Server Manager from task bar. And click on Add roles and fetures > Next>Next>Select server, Next> In Roles List, select "Web server", click Add feture and Next 3 time> click on Install and completd.
+
+Go to C drive > InetPub >wwwroot> in this folder, delete all files. And crete index.html, write " THIS IS MY FIRST STATICE WEB IN MUMBAI"
+
+Type windows server IP in URL  then run this web.  come message "THIS IS MY FIRST STATICE WEB IN MUMBAI"
+************************************************************************************
+## LAB 2 How to Attach Extra Volume in window server.
+
+First create EC2 instance ( select MicroSoft Windows Server 2012 R2 based.) while creating, in Add storage > Add New Volume (automatic create D drive)
+After created windows instance.
+GO to Server Manager from task bar >File and Storage Service> Disk (to check new volume is online or not)
+MY Computer> Now D: drive is there.
+
+OR Create New Volume after created Windows instance.
+GO to VOLUME (left side) AWS > Create Volume (enter configure) > Next (created) Then select volume and goto Action > attached volume.
+GO to Server Manager from task bar >File and Storage Service > Disk > Right click on New volume > Bring online     # take time to show on Disk offline
+GO to Server Manager from task bar >File and Storage Service > Disk > Right click on New volume > Create New volume > Enter configure, ENter Drive Name > Create
+MY Computer> Now New drive is there
+**********************************************************************************
+## LAB 3 Create LINUX machin and Install APACHE server.
+
+First install puttyGen and putty in my system   (using puttygen save private key using select download key while creating linux instances)
+Created EC2 linux instance
+login using putty (Enter IP and click + SSH then select Auth and then select private Key using browser> open). use public IP.
+loging ec2-user
+sudo su
+yum install httpd -y   # installed.
+service httpd status   #
+service httpd start   #
+type IP in URL   # runing fine apache
+------------
+yum install httpd -y
+systemctl enable httpd
+systemctl start httpd
+echo "RANJIT hello world">/var/www/html/index.html
+URL public IP in AWS instance then message come "hello world"
+--------------
+**********************************************************************************
+## How to Retrive Metadata/ user data in Linux.
+Ec2 linux instances created
+login ec2-user using putty.
+sudo su
+curl http://169.254.169.254/latest/meta-data   # retrive all details of instance
+curl http://169.254.169.254/latest/meta-data/instance-id   # show instance id
+curl command: This command is used for download or upload the data to or from Server.
+
+************************* VPC **********************************************
+###   VPC  (virtual private cloud)
+
+Two type of VPC : default vpc and custome vpc. Only differences is internet getway already exist in default vpc however in customer vpc, we need to create 
+internet gateway.
+
+A virtual private cloud is a virtual network that closely Resembles a traditional Networking that you operate in your Own data center, with the
+Benefirs of Using the Scalable Infrastructure of AWS.
+or
+vpc is virtual network or Data Center inside AWS for One Client. And this is region specific, so can not extend between two region.  
+
+It is logically Isolated from other virtual N/W in the AWS Cloud. Max 5 VPC can be created in one region and 200 Subnets in 1 VPC.
+We can allocate max 5 Elastic IP free per Region, but shuld be runing instance otherwise take charges. Once we created VPC then DHCP, NACL and 
+security group will be automatically Created.
+
+A vpc is confined to a AWS Region and does not extend Between Regions.
+
+Once the VPC is created , you cannot change its CIDR Block Range.
+if you need  a different CIDR size, create a New VPC. The different subnets within a VPC connot overlap.
+
+You can however expand your VPC CIDR by adding New/Extra IP address Ranges ( EXcept GovCloud & AWS China).
+Private IP Range is 10.,192.,172.
+
+Components of VPC:
+------------------
+CIDR & IP address subnets,
+- Implied Router & Routing Table
+- Internet Gateway
+- Security Groups
+- Network ACL
+- Virtual Private Gateway
+- Peering Connections
+- Elastic IP
+
+VPC is virtual network or Data center inside AWS for one client.
+Create VPC manually.  VPC is also behave as Router, because VPC also communicate between two different network/subnet.
+
+Subnet: its complete block of IP. And it dividing a large network into multiple smaller logical network.
+
+Public Subnet:
+Public subnet has internet gateway associated with it. If you want your instance in a public subnet to communicate with the internet Over IPv4, 
+it must have a public address or an Elastic IP address.
+
+Private Subnet:
+If a Subnet does not have a route to the internet Gateway, the Subnet is known as a Private Subnet.
+When you create a VPC, you must specify an IPv4 CIDR Block for the VPC The allowed block size is Between /16 to /28 netmask.
+private ip is used for internal communication.
+
+The first four and last IP address of subnet cannot be assigned. Elastic IP is static IP it cannot change.
+
+Note:
+Four IP not used.     ( 65,536 - 5 = 65531 use only)
+10.0.0.0 - Network Address
+10.0.0.1 - Reserved by AWS for VPC Router
+10.0.0.2 - Reserved by AWS for DNS Server
+10.0.0.3 - Reserved for future Use
+10.0.0.255 - Broadcast Address.
+
+In a VPC, all subnet can communicate to each other without internet Gateway. Internet Gateway use for when need to internet access from outside.
+
+CIDR: Classless internet domain routing.
+
+Router: It is the Central Routing Function, it connect the different AZ together and Connects the vpc to the internet Gateway.
+
+you can have upto 200 Route tables per vpc.
+you can have upto 50 Router Entries per Route Table. Each subnet must be associated with only one Route table at any given time.
+you can also edit the main route tabble if you need, but you cannot delete main Route Table.
+
+Internet Gateway:
+An Internet Gateway is a virtual Router that Connects a VPC to the internet. it horizontaly scalled and highly availability.
+Default VPC is already attached with an Internet Gateway.
+If you create a new VPC then you must attach the Internet Gateway in Order to access the internet.
+Ensure that you subnets Route table points to the internet Gateway.
+It performs NAT Between your private and Public IPv4 address.
+It support both IPv4 and IPv6
+
+NAT Gateway:
+You can use a Network address translation Gateway to enable instance in a private subnet to connect to the internet or other AWS Services, but prevent the 
+internet from initiating a connection with those instances.
+You are charged for creating and Using a NAT Gateway in your account NAT Gateway hourly Usage and data processing rates apply Amazon EC2 charges for data 
+transfer also apply.
+To Create a NAT Gateway, you must create NAT Gateway in a Public subnet (while create NAT must select public subnet), But use for private subnet to go to the outside internet.
+
+You must use one Elastic IP address to associate with NAT Gateway When you create it. But in NAT instance use public ip aswell Elastic IP also
+No need to assign to your private instance.
+
+After you have created a NAT Gateway you must update the Route Table associated with One or more of your Private subnets to point Internet Bound traffic 
+to the NAT Gateway This enables instances in your private subnet to communicate with outside internet.
+
+Delteing a NAT Gateway, disassociates its Elastic IP address, but does not release the address from your account.
+
+
+SECURITY Groups:
+It acts as a virtual firewall for your instance to control inbound and outbound traffic rules(protocols). Operate at Instance lavel. And Support allow rules
+only. This is Stateful, means if allow traffic protocols in inbound then automatically allow outbound traffic also. Applies to an instance Only.
+
+It is a virtual Firewall works at ENI level.  (elastic network interface)
+Upto 5 security Groups per EC2 instance interface can be applied. There is only allow Rules, cannot have deny Rule.
+And this is Stateful, Return traffic, of allowed inbound traffic then automatically allowed outbound, even if there are no rules to allow it.
+
+NETWORK ACL:
+Operate at the subnet level or VPC level. It support allow and Deny Rules. Stateless, Return traffic must be explicitly allowed by Rules.
+Applies to all instances in the subnet.  
+
+NACL is an Second Layer of Security for your vpc that acts as a firewall for controlling traffic IN and OUT of one or more subnets.
+You can create a custom network ACL and associate it with a subnet and by default are all are denies rule in inbound and outbound, but can edit allow 
+rule also, NACL check both inbound and outbound protocol rules and work accordingly. 
+you add rules.
+
+A network ACL contains a Numbered list of Rules that we evaluate in order, starting with the lowest numbered Rule.
+The highest number that you can use for a Rule is 32766 Recommended that you start by creating Rules with Rule Numbered that a multiple of 100, 
+So that you can insert new Rules where you need later.
+NACL are stateless, Outbound traffic be explicitly allowed too. You can have permit and deny Rules in a NACL.
+
+WAF (web access firewall): used to block any ip,network,country,data,city    # block ip application lavel.
+NACL inbound rule denied: we can block any particular ip incoming traffic infra lavel.      
+(firwall, security group, WAF, application load balancer denied ip)    # block ip incoming traffic application level.
+
+Flow logs: it Capture information about the IP traffic going to and from network in VPC.
+
+VPC Peering:
+A vpc peering connection is a networking connection between two vpc that enables you to route traffic between them Using private IPv4 address or IPv6
+address, without any internet Gateway or NAT gateway.
+Instance in either VPC can communicate with each other as if they are written the same Network.
+You can create a VPC peering connection between your own VPC, or with a VPC in another aws account the VPC can be in different Region.
+
+Transitive Peering:
+There is one Transitive Gateway and multiple VPC is connected with Transitive gateway. Just like star connection.
+
+
+
+## LAB 4
+
+1) click on create vpc >
+enter name: myvpc1
+CIDR block : 10.0.0.0/16
+Tenancy : default       (two options: dedicated and shared hardware)
+click on "yes create"    created.
+
+2) click on create subnet >
+enter name: subnet_new
+vpc : myvpc1   (select)
+availibility zone : any select
+IPv4 CIDR block : 10.0.0.0/24
+click on "create"
+
+3) click on InternetGetway >
+Name tag : internetgetway1   (need to attached this with vpc, select vpc> goto Action > attached vpc > vpc: select myvpc1 > click on attach)
+
+4) click on Routing table > create route table >  OR bydefault route table created, can use this.
+Name tag : VPC-route      (click on "yes create")
+
+click on  "subnet Association"  > edit > select subnet > save.
+click on "Routes" > edit > add route> 0.0.0.0/0  > select internetgetway1 > save.
+
+Now create EC2 instance (windows server 2012 R2 Base)
+Step 3: Network - select myvpc1
+        Auto-assign-public IP : enable  (if disable then public ip not create)
+Step 5 : enter tag.
+Step 6 : may enter security group.
+RDP  anywhere
+created instance
+cmd > ping 8.8.8.8   if run then working fine internet with my vpc.
+-------------------------------------------------------
+
+## LAB 5 Create VPC Access internet inside private subnet Using NAT Getway
+
+1 Create VPC     Name tag : vpc1     CIDR block : 10.0.0.0/16    Tranancy : default          Create
+
+2 Create subnet    Name tag : public_subnet    VPC : vpc1  (select)    Availbility Zone : No preference    CIDR block : 10.0.0.0/24   Create
+
+3 Create subnet    Name tag : private_subnet    VPC : vpc1  (select)    Availbility Zone : No preference    CIDR block : 10.0.1.0/24  (another IP)     Create
+
+4 Create Internet Getway    Name tag : igwvpc1  Create   (attach this,select igwvpc1, goto action > attach to vpc> select vpc1 > Attach)
+
+5 Create Route Table    Name tag : publicroute    vpc : vpc1  
+6 Create Route Table    Name tag : privateroute   vpc : vpc1     Create
+
+a Select publicroute > subnet Association > Edit subnet association > select public subnet ID > OK
+ 	Go to Route > Edit route > 0.0.0.0/0 > select internet getway > save routes.
+
+# b Select privateroute > subnet Association > Edit subnet association > select private subnet ID > OK
+ 
+7 Create EC2 instance  (window server 2012)
+       Step 3 Network : select vpc1
+              Subnet : private_subnet
+              Auto-assign Public IP : disable   (Next..)
+
+       Step 6 Security group name
+              HTTPS       anywhere
+              HTTP        anywhere           
+
+8 Create EC2 instance  (window server 2012)
+       Step 3 Network : select vpc1
+              Subnet : public_subnet
+              Auto-assign Public IP : enable    (Next..)
+
+       Step 6 Security group name
+              HTTPS       anywhere
+              HTTP        anywhere
+                            Launch
+
+
+First connect to Public instance using RDP   ( private RDP not open first)
+and then open remote desktop (private) use private IP
+      user administrator     (!-&T36Y(3q%HV6Bgvlz$oV&ALs)*pd(          (!-&T36Y(3q%HV6Bgvlz$oV&ALs)*pd(
+      pas ....(private key)   (now opened private remote from public remote instance)
+
+open CMD from private remote desktop
+ping 8.8.8.8   # now Reqest time out  (now not go to internet)
+
+Go to VPC > NAT getway > create NAT getway> select public subnet > create elastic IP (manadatory) > create NAT getway > close. ( take time to status Available )
+
+Go to Private Rout Table > Route > Edit > 0.0.0.0/0 > select NAT getway > save route.
+
+Now come Reply form 0.0.0.0 in CMD. Now goto internet.  # when status available of NAT getway.
+-------------------------------------------------
+## LAB 6 VPC, Peering Connection between 2 VPC within same region.
+
+1 Create VPC  ( name vpc1, CIDR block 10.0.0.0/16, Tenancy default)
+Create Subnet ( name vpc_subnet, VPC select vpc, availity zone any, CIDR 10.0.0.0/16 )    # /28 upto
+create Ingernat getway ( name intgetway1, goto action attache vpc, select vpc1, attach)
+Create Rout Table ( name vpc_rout1, VPC select vpc1, create, route edit rout 0.0.0.0/0 , select vpc1 getway, go to subnet association select vpc_subnet, save)
+
+2 Create another VPC  ( name vpc2, CIDR block 192.168.0.0/16, Tenancy default)          # classless 192.168.0.0/16
+Create Subnet ( name vpc_subnet2, VPC select vpc, availity zone any, CIDR 192.168.0.0/24 )    # /28 upto
+create Internat getway ( name intgetway2, goto action attache vpc, select vpc2, attach)
+Create Rout Table ( name vpc_rout2, VPC select vpc2, create, route edit rout 0.0.0.0/0 , select vpc2 getway, go to subnet association select vpc_subnet2, save)
+
+4 Create Peering connection ( name peer_con1, vpc request vpc1, vpc accept vpc2, create peering )
+   Goto action > Accept Request.      # (peering connection status should be Active)
+
+below create two instance
+5 Create instance windows 2012  ( network vpc1, Autoassign public IP enable, security only RDP anywhere)    # created
+
+6 Create another instance windows 2012  ( network vpc2, Autoassign public IP enable, security only RDP anywhere )    # created
+
+CMD on first_inst ping second instance private IP      # but now not pinging..
+CMD on second_inst ping first instance private IP      # but now not pinging..
+
+       Goto instance and select instance and in security add rule "all icmp ip-v4", anywhere in both instance.
+Now  Goto first Rout Table and edit inbound CIDR 192.168.0.0/16, select vpc peering)    # oposite VPC CIDR     
+And again Goto second Rout Table and edit inbound CIDR 10.0.0.0/16, select vpc peering) # oposite VPC CIDR      
+
+Now finally pinging to each othere instances.
+----------------------------------------------------
+## LAB 7 VPC, Peering Connection between 2 VPC and two different region
+
+Select Tokio Region  (any)
+1 Create VPC  ( name vpc_tokio, CIDR block 10.0.0.0/16, Tenancy default)
+Create Subnet ( name vpc_tokio_subnet, VPC select vpc, availity zone any, CIDR 10.0.0.0/24 )    # /28 upto
+create Ingernat getway ( name intgetway_tokio, goto action attache vpc, select vpc1, attach)
+Create Rout Table ( name vpc_rout1, VPC select vpc1, create, route edit rout 0.0.0.0/0 , select vpc1 getway, go to subnet association select vpc_subnet, save)
+
+2 Create first instance windows 2012  ( network vpc_tokio, Autoassign public IP enable, configure security  RDP and All ICMP IP-v4 anywhere)    # created
+
+3 Another VPC, Select Mumbai Region  (any)
+1 Create VPC  ( name vpc_mumbai, CIDR block 192.168.0.0/16, Tenancy default)
+Create Subnet ( name vpc_tokio_subnet, VPC select vpc_mumbai, availity zone any, CIDR 192.168.0.0/24 )    # /28 upto
+create Ingernat getway ( name intgetway_tokio, goto action attache vpc, select vpc_mumbai, attach)
+Create Rout Table ( name vpc_mumbai, VPC select vpc_mumbai, create, route edit rout 0.0.0.0/0 , select intgetway_tokio, go to subnet association select vpc_subnet, save)
+
+4 Create secnd instance windows 2012  ( network vpc_mumbai, Autoassign public IP enable, configure security  RDP and All ICMP IP-v4 anywhere)    # created
+
+5 Create Peering connection from any Region ( name peer_tokio_mumbai, vpc request vpc of current region, vpc accept pest another region vpc ID, create peering )
+   Goto another region and action > Accept Request.      # (peering connection status should be Active) 
+
+CMD on first_inst ping second instance private IP      # but now not pinging..
+CMD on second_inst ping first instance private IP      # but now not pinging..
+
+Now  Goto first Region and Rout Tables and select routes, add another Routes, enter another Region CIDR 192.168.0.0/16, select vpc peering and save. #example Tokio
+And again Goto second Region and Rout Tables and select routes, add another Routes, enter another Region CIDR 10.0.0.0/16, select vpc peering and save. # example mumbai
+
+CMD on first_inst ping second instance private IP      # but now pinging..
+CMD on second_inst ping first instance private IP      # but now pinging.. 
+-----------------------------------------------------
+ 
+## LAB 8 VPC, Configure Network ACL in my VPC. (to access internet using configure inbound and outboud Rules)
+
+1 Create VPC  ( name vpc1, CIDR block 10.0.0.0/16, Tenancy default)
+Create Subnet ( name vpc_subnet, VPC select vpc, availity zone any, CIDR 10.0.0.0/24 )    # /28 upto
+create Ingernat getway ( name intgetway1, goto action attache vpc, select vpc1, attach)
+Create Rout Table ( name vpc_rout1, VPC select vpc1, create, route edit rout 0.0.0.0/0 , select vpc1 getway, go to subnet association select vpc_subnet, save)
+
+2 Create Network ACL > name tag customeACL, VPC select vpc1, Create> select customeACL, Subnet Associations > edit subnet association and select subnet, 
+click on edit to save.
+
+Goto inbound > Edit Inbound Rules
+Rule# 100, Type select RDP, Save.
+
+Goto Outbound > Edit Outbound Rules
+Rule# 100, Type select HTTP
+Rule# 200, Type select HTTPS, Save.
+
+3 Create instance windows 2019 Base ( network vpc1, Autoassign public IP enable, in security delete RDP and add rule All trafic ALLOW, anywhere )  # created
+
+Now not connect to RDP.
+
+Again goto Network ACL > select custome_ACL > Outbound Rule> Edit outbound Rule> Add Rule > 
+Rule# 100, Type custom TCP rule, Port range 1024-65535, Save.
+
+Now connect to RDP.  ( but internet not working like google.)
+
+Again goto Network ACL > select custome_ACL > Inbound Rule> Edit Inbound Rule> Add Rule >
+Rule# 100, Type custom TCP rule, Port range 1024-65535, Save.    ## Now internet like google.com is working.
+
+FOR DELETE NACL, first need deassociate subnet in networkACL then delete NACL, instance.
+--------------------------------------------------
+
+## LAB 9 VPC, VPC Endpoint | Private access to S3 service. (vpc endpoint is free service insted of NAT)
+
+vpc endpoint use insted of NAT Gateway because endpoint has very less bill charges then NAT Gateway and vpc endpoint use for access supported AWS services 
+privately without going to internet. vpc endpoint connect from private subnet. Go from public to private . A VPC endpoint enables you to privately 
+connections between your VPC and supported AWS services (s3, dynmodb,RDS instance). Instances in your vpc do not require public IP address to communicate 
+with resources in the AWS. VPC Endpoint is a virtual Device.
+
+
+1 Create VPC  ( name vpc1, CIDR block 10.0.0.0/16, Tenancy default)
+Create Subnet ( name public_subnet, VPC select vpc1, availity zone any, CIDR 10.0.0.0/24 )    # /28 upto
+Create Subnet ( name private_subnet, VPC select vpc1, availity zone any, CIDR 10.0.1.0/24 )    # /28 upto
+create Internat getway ( name intgetway1, goto action attache vpc, select vpc1, attach)
+Create Rout Table ( name vpc_rout1, VPC select vpc1, create, route add rout 0.0.0.0/0 , select internet getway, go to subnet association select public_subnet, save)
+
+2 Now create Two instances, one for public subnet and one for private subnet.
+  create instance (select amazon linux), subnet select private subnet, Assign Public IP Disable, security only SSH, anywhere, launch.
+  create instance (select amazon linux), subnet select public subnet, Assign Public IP Enable, security select existing group (SSH), select preview security group, launch. Also select exist key paire.
+
+  Endpoint > create endpoint > select ..S3, type getway.
+  select myvpc > select private subnet > Create Endpoint.
+
+  open puttygen   #
+  open putty use public ip (public server)
+  login ec2-user   # logined
+  sudo su - 
+  vi privat_key (new file) #copy of key.pem content (while instance creation download key) and pest privat_key 
+  chmod 700 privat_key
+  ssh -i privat_key ec2-user@10.0.1.195    (login using private server ip)
+     # now logined in private server through public server. Now need to access AWS through vpc endpoints.
+     
+      sudo su -
+      aws configure  # enter access ID ( from go to myaccount > my security credentials> Access key (key id, access key) > create new access key > download keyfile)
+         region name - empty enter
+         output format - empty enter
+         aws s3 ls  # list file of s3 files.  ( when we goto S3 then found no any bucket)
+         aws s3 mb s3://ranjit123    # now create file in S3 bucket.    ( when we goto S3 then found ranjit123 bucket. and then create file in this bucket)
+         aws s3 ls s3://ranjit123    # now exist file.
+         aws s3 rb s3://ranjit123    # now remove this file.   (first delete file in s3 then delete bucket)
+         aws s3 mv,copy,rm
+          when goto s3 then found no any bucket.
+          If  i delete vpc endpoint then nothing any work (aws s3 mb s3://ranjit123 ) not work.
+
+# yum install awscli           (if aws command not found)
+---------------------------------------------------------------
+## LAB 9 VPC, VPN connection in AWS. Access EC2 instance through VPN.
+
+1 Create VPC  ( name vpc1, CIDR block 10.0.0.0/16, Tenancy default)
+Create Subnet ( name public_subnet, VPC select vpc1, availity zone any, CIDR 10.0.0.0/24 )    # /28 upto
+Create Subnet ( name private_subnet, VPC select vpc1, availity zone any, CIDR 10.0.1.0/24 )    # /28 upto
+create Internat getway ( name intgetway1, goto action attache vpc, select vpc1, attach)
+Create Rout Table ( name vpc_rout1, VPC select vpc1, create, route add rout 0.0.0.0/0 , select internet getway, go to subnet association select public_subnet, save)
+  
+ 2 Now create Two instances, one for public and one for private subnet.
+  create first instance (first select AWS marketplace, then search openvpn, select OpenVPN Access server), Network myvpn, subnet select puplic subnet, 
+Assign Public IP enable, security,all type anywhere, launch.
+ 
+create second instance (select windows 2012 Base), subnet select private subnet, Assign Public IP Desable, security group select only RDP anywhere, launch.   
+
+Use puttyGen to key generation.
+
+login using public ip of first instance in putty login: openvpnas and Enter, type yes, after that alway Enter.
+finally came one URL link "https://13.232.239.243:943/".  # use this link in google crome.  enter user and password in this vpn.
+sudo passwd openvpn    # first change password.
+Enter new pas :   
+
+Use URL link # click on "OpenVPN connect for windows".  # installing...  # open vpn icon present in task bar
+click on openvpn and enter user : openvpn, pas : abc123   # connected.
+
+Now connect windown instance. # connected even private server. if want to use internet in windown machin then use in security add rule inbound http, 
+anytrafic, anywhere.
+======================================END VPC ==================================================
+------------------------------------------------------------------------------------------------
+
+S3 is a high storage service for the internet it has simple webservices interface for simple storing & retreving of any amount of data, anytime from anywhere on the 
+internet.
+S3 is object based storage. You cannot install operating system on S3. S3 has a distributed data-store architecture where objects are Redundantly stored 
+in multiple location (min 3 location in same Region).
+
+Infinite Data Stored in Bucket. A Bucket is a flat container of objects. S3 Objects can be up to 5 terabytes in size. By default 100 buckets we can create in one 
+account (may expand on Request). you cannot create nested Buckets.
+Bucket ownership is Non-transferable. S3 Bucket is Region Specific.
+Amazon keep 3 copy of S3 objects in different availability zone in same Region.
+
+S3 Buckets- Naming Rules:
+S3 bucket names (key) are globally Unique across all AWS Regions. Bucket Names cannot be change after they are created.
+Bucket names must be atleast 3 and no more 63 characters long. Bucket names can container lowercase, numbers and hypen. but cannot use uppercase leetter.
+Bucket name should not be and IP address. By default buckets and its objects are private by default, only owner can access the bucket.
+
+
+S3 Buckets Sub resources:
+a) Lifecycle
+b) static Website
+c) Versioning
+d) Access Control List - bucket policy
+
+S3 Bucket Versioning:
+Bucket versioning is a S3 Bucket sub-resources used to protect against accidental Object/data deletion or Overwritten. Deleted data recover 
+using "delete marker" indicator.
+Versioning can also be used for data Retention and archive. Once you enable versioning on a bucket, it cannot be disabled, however it can be suspended.
+When enabled, Bucket versioning will protect existing and new objects and maintains their versions as they are updated.
+
+Five Type of STORAGE in AWS:
+
+1) Simple Storage Service S3  :  object level storage, any object can store and object has globaly uniq ID, it can not be c, d drive like. And can not 
+install operating system in S3. Data is store in Bucket and max size of bucket/S3 object is 5TB. and maximum data store 256TB in S3.
+
+S3 bucket subresouces are :
+	a) Lifecycle : s3 after 30 days --> S3 IA ----after 90 days--> S3 Glacier.
+	b) Website : static website host.
+	c) Versioning : we can enable versioning in S3 storage, and file name should be same, once enable then can not disable, but can suspend. 
+if version is enable then can not delete permanent in case by mistake delete. indicate delete marker for restore, just work as recyclebin. 
+Bucket versioning state (Enabled, Suspended, Un-versioned)
+
+ * Copy S3 object : The copy operation creates a copy of an object that is already stored in amazon S3. You can create a copy of your object upto 5 GB in size in a single atomic operation. However to copy an object greater than 5 GB, you must use the multipart upload API. And take charges of movement in case if copy from one region to another region.
+
+2) Elastic File System (EFS)  : it is sharable location for updating software file or patching files between servers and it is only for linux. Multiple EC2 
+instances can be attached with same EFS and its sharable between them. EFS is high performance, shared File system, Highly available and Elastic(grow and shrink as per add adn remove files). EFS is useful for Saas application (Every things is managed by cloud).
+
+
+3) Elastic Block storage (EBS): this is block level storage and this is transactional data. it store data index wise/Sequenc wise and used with EC2 instances. It offers higher performance then regular file storage. This EBS used with EC2 instance only (sequencely store C, D drive). EBS attached with only one instance at time. EBS and instance must should be in same availability zone.
+
+4) Glacier  :  Now it is S3 Glacier and it keep very old data as need some time access. And it is cheapest storage.
+5) Snowball : This is biggest and portable storage. To use for transportation large amount of data. (snowball device movement using like truck)
+
+==========================
+S3 Storage. [ Storage classes of Amazon S3 ]  (except "Amazon S3 One-Zone-IA" it contain Three copy of each storage type.)
+
+a) Amazon S3-Standard (frequently  access ,it durability is 11 time 9 and availability 99.99, very less charges for data fetching, and 1 obj store max 5 GB, storage cost heigh and working fast)
+
+b) Amazon S3 Standard Infrequent Access.   	(Access some time. it put 30 days old data and minimum charges for data fetching, storage cost is chef and 								it durability is 11 time 9)
+c) Amazon S3 Glacier.        			(when need to access 3-4 time in a month, it store old data and heigh charges for data fetching and also slow working, its chep to store data, availability is 99.9, durability is 11 time 9. S3 glacier provide time to retrieve data in minute/hour/second depends on me)
+
+d) Amazon S3 Glacier Deep Archive.  		( when need to access one time or not in a month, it store very oldest data and very heigh charges for data fetching, availability is 99.9. and it take much time to retrieve data, retrieval time within 12 hours. and very chep to store data, store like old elctronic media musics and durability is 11 time 9)
+
+e) Amazon S3 One-Zone-IA          		( it has only one copy in availity zone, and its very chef to store data. it can use s3 life cycle policy and 							durability is 11 time 9. availability is 99.5)
+f) Amazon S3 Intelegent Tiering.		( it monitor which kind of data is existing like frequently used or long time not used and accordingly 
+decide in which S3 type is data contain and accordingly move data in S3 type, no charges for data fetching and availbility 99.9 and it less 					then 128 kb data can not contain. we can store data in case unpredictable time store data)
+
+
+## LAB 10 S3 Bucket creation using GUI. (Bucket name creation is gloably, automaticaly region area into globaly). Bydefault 100 bucket can create in one account.
+
+First ensure Region>click on S3 > create Bucket > Bucket Name "ranjit123", Region select> Next>Next> Create Bucket. 
+click on exist bucket name > upload any file and add files.> we can direct upload or Next > if Next then ask some basic parametr like Read/Write/> Next>Next> upload.
+click on file>click on open> file is opened.
+But if i click on provided link then direct file not opened, come access denied. Need first make public then any person can open this file using link.
+
+Select on Bucket then two option come "Delete Bucket, Empty Bucket"     # first empty bucket then Delete bucket.
+------------------------------
+## LAB 11 S3 Bucket creation Using aws CLI. (Bucket name creation is gloably)
+ 
+Create first ec2 linux instance.
+aws configure   # enter key
+aws s3 ls     # list bucket name
+aws s3 ls s3://ranjit123 # list files
+aws s3 mb s3://ranjit123
+aws s3 rb s3://ranjit123
+cd dir1  # no of files there
+aws s3 sync . s3://ranjit12345  # current all files copy to this bucket ranjit12345.
+aws s3 sync s3://ranjit12345 .  # copy from bucket into current dir.
+finally terminate instance
+-----------------------------------
+## LAB 12 S3 versioning, How to enable versioning on S3 Bucket.
+
+Go to S3 > simply create bucket 
+create text file file1 in desktop # write "THIS IS VERSION 1" and upload this file in bucket.
+MAKE public and now any person can open file using link. Then
+
+Go to Properties >> click on versioning >> click on Enable versioning >> save.   # version is enabled (once enable then can't desable again)
+Again open same file1 and add line " THIS IS MODIFIED VERSION 2" Save And upload again. And open this file in S3 and will show both line. By default latest version is open, but in List Versions both version is available. if i open old version then show only this line "THIS IS VERSION 1"
+Now by mistake deleted this file in S3, and need to recover this file. THEN Go to Bucket >> click on List Versions. file1 "delted marker" (latest updated file) is listed. 
+Click on "delete marker" >> goto Action >> click on delete. >> now deleted file again restored in Bucket. And open this file in S3, will be open latest updated file.
+
+## LAB 13 S3, How to enable S3 Cross Region Replication/Data Replication.
+
+* Cross-region replication (CRR) enables automatic, asynchronous coping of objects across buckets in different AWS Regions. Buckets configured for 
+cross-region replication can be owned by the same AWS account or by different accounts.
+cross-region replication is enabled with a bucket-level configuration. we add the replication configuration to source bucket with destination bucket. 
+Using this we can fast access file at destination. when file copy in source location then automatically copy in anothere region location.
+
+GoTo S3 > create bucket > bucket name, region ohaio > Next > Tick on version option > next >create bucket.   # version enable while creating bucket.
+GoTo properties and check whether version is enabled or not.
+
+Create Another Bucket
+GoTo S3 > create bucket > bucket name, region mumbai > Next > Tick on version option > next >create bucket # version enable while creating bucket.
+# Both bucket exist in both region. because bucket is gloable.
+Now any one file uploaded in ohaio region bucket.  # now file uploaded in ohaio region, not uploaded in mumbai region bucket.
+
+# Apply Cross Region Replication.
+GoTo ohaio region > click on bucket > Management > Replication > Add Rule > select Entire Bucket > Next > Select Destination Bucket "Mumbai" >Next > 
+Rule name,> select new role > Create New Rule Name " CRR-ohaio to mumbai" > Next, Save.  ## Now Cross Region updated successfuly.
+
+Now ownward if uploaded any file in ohaio region bucket then automatically uploaded mumbai region bucket also.
+GoTo ohaio region and upload any file. Then check in mumbai region bucket, file is exist there also.
+---------------------------------
+## LAB 14 S3, AWS S3 object life cycle management | AWS Glacier
+
+* Some documents are frequently accessed for a limited period of time. After that, they are infrequently accessed. At some point, you might not need real-time access to them, but your organization or regulations might require you to archive them for a specific period. After that, you can delete them after days.
+S3 object move in S3 storage type after certain period. 
+
+GoTo S3 > create bucket > bucket name, region ohaio, UNCHECK Block all public access, CHECK I acknowledge >create bucket.
+
+I may uploaded one file in bucket.
+GoTo Management > Add Lifecycle Rule OR Get started > Enter rule name, check Apply to all objects in the bucket > Next > check current/previews version > click Add transction. For Current version of Objects
+object creation				Days after creation
+Transaction to standard IA after	30
+Transaction to One Zone-IA after	70
+Transaction to Glacier After		180 
+   check i acknowledge.
+
+For preview version of objects:
+Transaction to standard IA after	30
+Transaction to One Zone-IA after	60
+Transaction to Glacier Deep archive	120
+check i acknowledge > Next
+check preview version, check permanently delete previous version, after 365, check cleanup expired object delete marker, check cleanup incomplete multiparts update.
+After 7 > Next > check i acknowledge > save.
+-------------
+
+Presigned URL: we can configure URL to access limit time to user. Even object not public accessable
+
+create bucket > click on buket > click on ojbect > goto "object action" > "Share with a presigned URL"
+number of minutes: enter any time.    > create presigned URL.
+Now generated  "presigned URL",  copy and use in URL    # it working for limit time as per define.
+
+----------------------------------
+## LAB 15 EFS (Elastic file system)
+
+* it is sharable location for updating software file or patching files between servers and it is only for linux. Create file systems that are accessible 
+to Multi Amazon EC2 instances via a file system interface(using standard operating system file I/O API).
+
+GoTo EFS > Create file system > VPC select default vpc,> customize >select all availability ZONE with all default 3 subnet > Next > Key Name, Value EFS1 > 
+Next > Next > Create File System.          
+# One link is there or click on link or Attach, all command is there what need to execute..
+
+Now create Two linux EC2 Instances one by one. (per EC2 instance select per SUBNET. Define same subnet as above creating EFS time.) public IP Enable, 
+security only SSH, NFS anywhere. Created.    # in second instance can take exist security.
+
+Two Ec2 instance created with different subnet. 
+
+Select first instance, GoTo Action > Security > Change security Group > select same security of ec2 instance and also default security group > Add security
+ Group > click on Assign security group.
+
+Select second instance, GoTo Action > Security > Change security Group > select same security of ec2 instance and also default security group > 
+Add security Group click on Assign security group.
+Connect first instance using putty. 
+
+sudo su -
+sudo yum install -y amazon-efs-utils  or  sudo apt-get install -y nfs-common (ubuntu) 
+sudo mkdir efs  #
+sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-b1f28760.efs.ap-south-1.amazonaws.com:/ efs  ( all copy command from above link)
+cd efs , touch file1, file2, file3
+
+---------------- below for Red Hat linux
+sudo yum -y install git rpm-build make
+$ git clone https://github.com/aws/efs-utils
+$ cd efs-utils
+$ make rpm
+$ sudo yum -y install build/amazon-efs-utils*rpm
+sudo mkdir efs
+sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0fbbadde.efs.ap-south-1.amazonaws.com:/ efs
+-----------------
+
+Connect second instance using putty.
+sudo su -
+sudo yum install -y amazon-efs-utils   # 
+sudo mkdir efs  #
+sudo mount -t nfs4 -o nfsvers-4.1.rsize=...  ( all copy command from above link or Click on Attach)
+cd efs and ls  #  exist all file1 file2 file3 is there also. However i am not created these files in this instance.
+touch ranjit.txt sanjay.txt  # now this file existing in another instanse also. ( all files present in both instance)
+
+
+NFS protocols:  Using the NFS protocol, you can transfer files between computers running Windows and other non-Windows operating system, such as Linux or UNIX.. Client for NFS allows a Windows-based computer running Windows Server to access files stored on a non-Windows NFS server.
+
+----------------------------
+## LAB 16 Static Website Hosting    # ranjitmoonup@gmail.com/ranjit123
+
+You can host a static website (html, css, java script) on amazon simple storage service (S3) . On a static website individual webpages include static content. They might also contain client-side scripts. It has not any API or endpoint. A dynamic website relies on server-side processing. including servier-side scripts such as PHP, JSP, or ASP.NET.
+
+1 GoTo freenom or hostenger/Godaddy in google and make domain name first. (one link sent to gmail account and click on link to verify. And it will take time to send password in gmail account) after got paas GoTo my domain in freenom. domain name found. ranjit.ml
+
+2 GoTo S3, Enter bucket name=domain name (ranjit.ml), select Region and direct click on Create. # bucket created.
+Create text file and save in index.html and error.html  # type " THIS IS STATIC WEBSITE " and after save internet explor file created with index name.
+This index.html and error.html file upload in bucket >> click on file and make it public.
+
+3 GoTO properties > Static website hosting > Enable > Host a static website > index document enter index.html, Error doc: error.html > save.
+4 GoTo permission > Bucket policy > edit > past there      # in google find sample s3 bucket policy or create using Generator policy. copy from " Granting Read only permission to 
+an Anonymous User. edit our bucket name (:::ranjit.ml/*) in policy.
+
+5 GoTo Route53 > DNS Management > Create Hosted Zone > Doman name ranjit.ml, select public hosted zone > Created hosted Zone.  # copy all 4 name server of my domain.
+6 GoTo freenom >Services> My Domains > Manage Domain > management tolls> Name Servers > select Use custome name servers and all 4 name_server past there (last . removed)
+and click on change name server.
+7 GoTo Route53 >Record Set > Create Record > routing policy: simple routing > enable Alias > Record type : default, Route trafic to: 
+select "Alias to S3 website endpoint" (many resources is there like loadBalancer), zone Mumbai, search in box : choose S3 bucket 
+(s3-website.ap-south-1.amazonaws.com  (ranjit.ml)).  > Create Records
+
+URL type: www.ranjit.ml   # work fine. message come " THIS IS STATIC WEBSITE "
+
+------------------------------
+Two Type of Block Storage.
+1 ELASTIC Block Storage
+2 INSTANCE Storage.
+
+1 Instance store Backed EC2 basically the virtual hard drive on the host allocate to the EC2 instance. Instance Store Backed EC2 means installed O.S. 
+there. And this is none-persistant data, means data will be deleted if Ec2 instance stoped/terminated but not in rebooted. Instance store is much faster 
+than elastic block storage. limited to 10GB per device.
+
+2 Elastic block storage is block storage device and this is persistant, means after Ec2 instance stoped/terminated/reboot system data will not be deleted. 
+And this is network attached virtual drive, EBS not directly attached to Ec2 instance. An EBS volume can attach to the single EC2 instance only at a time. 
+But in New feture multiple instances can be attached with single EBS volume. Both EBS volume and EC2 instance must be in the same AZ.
+EBS volume data is replicated by aws across multiple server in the same AZ.
+
+* EBS Volume Types :
+
+a.) SSD Backed Volume: (Solid static drive) there is two type, General purpose SSD (gp2) and Provisioned IOPS SSD (i01). This is bootable device, 
+         C drive created and installed OS. SSD is root volume.
+
+General purpose SSD (gp2):
+GP2 is the default EBS volume type for the amazon EC2 Instance. GP2 volumes are backed by SSD. General purpose, balances both price and performance. 
+Boot volume having low latency. Volume size - 1GB - 16TB. price - $0.10GB/month
+
+Provisioned IOPS SSD (i01):       
+There are Multi attach volume option. i01 volume has option Enable multi-attach ec2 and select volume and Action, attach same volume in more then one instance.
+These volumes are ideal for both IOPS, intensive and throughput intensive workloads that Require extermely low latency or for mission Critical applications.
+Designed for I/O intensive applications such as large relational or NoSql Databases. 
+
+
+b.) HDD Backed Volume: (Hard device drive) Throughput mbps optimized HDD(st1), Cold HDD (sc1). And this is Non-Bootable device, D/E drive created and 
+       can't install OS. HDD is never root volume. HDD is object storage.
+
+Throughput optimized HDD(st1): it is backed by hard disk drives and ideal for frequently accessed. Used for Big data, Data Warehouse, log processing. volume size 500GB - 16TB.
+
+Cold HDD (sc1):  sc1 is also backed by HDD and provides the lowest cost per GB of all EBS volume types. Lowest cost storage for infrequent access workloads. Used for file servers. Cannot be a Boot volume. volume size 500GB - 16TB.
+
+
+c.) Magnetic Standard : This is bootable device and old type.
+---------------------------------------------------------------
+# create ec2 linux and create EBS volume then attached volume with runing Ec2. (EBS and instance should be same availability zone)
+
+lsblk  :  it show all the block devices mounted or not .      # xvdf  (recently created volume)
+sudo file -s /dev/xvdf   : it will show filesystem type(ext4) and /dev/xvdf: data. (means now free)
+mkfs -t ext4 /dev/xvdf   : create file system.
+mkdir ebsvolume    : 
+mount /dev/xvdf ebsvolume   :  mount the filesystem with ebsvolume directoy. # Now we can create any file there.
+lsblk     : now show filesystem xvdf mounted with ebsvolume directory.
+df -h  :      # actualy refelected volume size  
+umount /dev/xvdf  :     unmount the filesystem.  (created file not show and can't create any file)
+
+# growpart /dev/xvda 1   # incase increase Root volume (First goto Action and modify volume, increment size)
+
+resize2fs /dev/xvdf :   How to resize ebs volume.  # First goto Action and modify volume, increment size, can't decrement the execute this.
+# xfs_growfs /dev/xvda 1         # incase filesystem type xfs
+
+## Now create snapshot of this EBS volume. Then delete this EBS (first detach and unmount). And create new volume using this snapshot. Then mount /dev/xvdf ebsvolume.
+ls  # all preview files there.
+
+
+#### EBS Snapshots ##########  (Used to backup data and EBS volume). 
+
+EBS Snapshots are point-in-time images copies of your EBS volume. Any data written to the volume after the snapshot process is initiated, will not be 
+included in the resulting snapshot (but will be included in feture, in case incremental update). Second time create snapshot only of incremental data will 
+be snaped, not whole data. Using EBS only create Snapshot, not AMI directly. Using snapshot, created volume then AMI , then launch instance.
+Per AWS account, upto 5000 EBS volumes can be created. Per account, upto 10,000 EBS snapshot can be created.
+EBS Snapshots are stored on S3 (another), however you can not access them directly you can only access them through EC2 APIs.
+
+EBS volume are AZ specific, shanpshots are Region specific. Any AZ in region can use snapshot to create EBS volume. You can create a snapshot to an EBS 
+volume of the same or larger size then the original volume size, from which the snapshot was initially created. The snapshot will only include data 
+that is already written to your volume. All snapshot are incremental backups except for the first one.
+The Snapshot is created immediatly, but it may stay in pending status until the full snapshot is completed. This may takes few hours to complete specially for the first time shanpshot of a volume. To create a snapshot for a Root EBS volume, you must stop the instance first then take the snapshot. EBS is AZ specific and Snapshot is Region Specific.
+
+## Lifecycle manger : Using this we can take snapshot as per scheduled time, lifecycle policy and frequency option is Daily, weekly, monthly, yearly and hourly. 
+## Snapshots > "Manage fast snapshot restore"    (using this restore very fast). Restore from Internal S3 to EBS
+
+EBS Encryption:
+From many way to create encrypted.
+EBS encryption is supported on all EBS volume types and all EC2 instance families. Snapshots of Encrypted volume are also Encrypted 
+Creating an EBS volume from and Encrypted snapshot will result it an encrypted volume.
+Use Encrypted file system on the top of the EBS volume.
+Encrypted volume are accessed exactly like Unencrypted Once, basically encryption is handled transparently.
+You can attach encrypted and Unencrypted volumes to the same EC2 instance.
+
+To encrypt a volume or a snapshot you need an encryption key, these keys are called customer master key (cmk) and are managed by AWS key management 
+service (kms). when encryption the first EBS volume, AWS KMS create a default CMK key.
+
+=====================================================  i can create image two way instance's root volume and Ec2.
+If create AMI of Ec2 then parallely Shapshot also will be created (AMI and Snapshot).
+
+## LAB 17 How to create AMI From EC2. ( we can create instance in same Region as well another Region also, using this AMI images)
+
+First create instance (windows R2 based 2012), can add EBS also while creating. (must save password in text file) After connect windows instance, 
+create folder/file on desktop/D drive.
+GoTO Action > Images and Templet > Create Image > Enter image name and image description > Create Image.
+GoTo AMI   # found windows AMI images.  ( if want to share this images in other Region then need to COPY first.
+
+COPY : GoTO AMI > select image > Action > Copy AMI > select Region (where you want to copy) > OK
+Then 
+Terminate current Running Instance. Then
+Create instance in same Region using this AMI images. And connect using preview saved pass. ( for verify check folder/file which i created on window server)
+For Other Region
+GoTo Region (where you copyied AMI images) and create instance using this images, and connect using preview saved pass. ( for verify check folder/file which i created on window server)
+--------------------------
+
+## LAB 18 How to create AMI From EC2. and copy images to other Account also. ( share AMI images between two accounts)
+first both account's copy account ID and save in text file. using myaccount
+
+First create AMI image of windows server. # follow steps of LAB 17
+Select images > Action > Modify images permission > AWS Account Number "enter account no" of other account (preview saved account ID)  > Add permission >
+checked Add create volume.
+
+Now exist this AMI image in other Account's AMI and same region. check in private images.
+(optional) COPY : GoTO AMI > select image > Action > Copy AMI > select Region (where you want to copy) > OK  # make copy of this image in this Account and 
+Region for seprate purpose.
+
+And Now we can create instance using this AMI images.  # connect using preview whatever you saved password very first time
+And after connect windows instance, all files/folder exist on this server, whatever i created on server before created images.
+----------------------------------
+
+## LAB 19 How to Attach Root Volume with another EC2 instance | How to take snapshot of EC2.
+
+Create EC2 instance windows 2012 R2 Based   # while creating ec2, in Add Storage > copy /dev/sda1 of Root volume and saved in text file.
+Security > only RDP anywhere
+save decripted password in text file also. And connect windows and create files/folder on desktop for testing purpose.
+
+GoTo Snapshot > Create Snapshot >select instance option > select Instance ID (of Runing instance), Enter description > Create Snapshot.
+OR I may take volume snapshot also. as below option
+GoTo Snapshot > Create Snapshot >select volume option > select Instance ID (of Runing instance), Enter description > Create Snapshot.
+
+Now Terminated of Runing window Instance   # because already snapshot/volume created of Runing instance
+
+Using this created snapshot, we can create volume OR image also.
+Now create Volume as below steps:      # AZ should be same of instance and volume.
+GoTo Snapshot and select created snapshot > Action > Create volume > volume type : General purpose, size 30 (minimum original image size) > Create volume   # route volume created.
+
+GoTo Instance > Launch Instance > select windows 2012 base and finally created window server  # Another Instance
+GoTo volume then found now two volumes. one is in-use and other is available, so will attach of free volume.
+First need to stop window server to attach volume.
+GoTo instance and need stoped this runing server.
+
+First need to DeAttached of In-Used volume. using goto volume > select In-Use volume >  Action > Deattach
+Then will attach volume of available volume. using goto volume > select Available volume >Action > Attach volume > select instance, Device /dev/sda1  >Attach  # now this volume is In-Use.
+GoTo Instance and start the stoped server. Action > start
+Now connect this window server using preview saved password.     # now same server created of snapshot, same files/folder is there.
+=============================================================
+
+* AWS Autoscaling 
+
+Creating group of EC2 instances that can scale up or down (increse no of instance and descrese no of instances) depending on conditions you set. Enable 
+elasticity by scaling horizontally through adding or termination EC2 instances without manual interventaion.
+Autoscaling ensure that you have the right number of AWS EC2 instances for your needs at all time. Autoscalling helps you same cost by cutting down the 
+number of EC2 instances when not needed, and scaling out to add more instances only when it is required.
+
+* Horizontal scaling: Adding/removing instance automatically
+* Vertical scaling:    adding/removing only hardware (like increase/decrease volume size, change instance type t2 micro to t3 large manually by myself.)
+
+Autoscaling Components :
+a) Launch Configuration : Like Instance type, AMI, keypare, security group.
+b) AutoScaling Group    : Group name, Group size, VPC, Subnet, Health check prod.
+c) Scaling Policy       : Metric type ( like one of the CPU utilization), Target value
+
+
+Autoscaling Group: 
+It contain a collection of EC2 instances that are exactly the same.
+While creating an autoscaling group, the launch configuration must be specified. After specified, the launch configuration cannot be changed.
+New instances are launched using a new configuration. Ec2 instance are launched and terminated using scaling policies.
+
+Launch Configuration/Templeates:
+Launch configuration is a template that is used to launch EC2 instance for the autoscaling purpose.
+Autoscaling groups (the next topic) use launch configration to launch instances. Launch configuration cannot be modified after creation.
+It can be created in two ways:
+From Scratch: image ID, instance type, storage device, etc.
+From an Ec2 instance: attributes from teh instance are copied. block device mapping of the AMI is included any additional device that was attached after launching the instances is not considered in the launch configuration.
+------------
+
+Merging AutoScaling Group :
+Can only be done from the CLI (not AWS console).
+you can merge multiple, single AZ, AutoScaling Group into a single, One Multi-AZ autoscaling group.
+
+Scale-Out : means launching more EC2 instances.
+Scale-In  : means terminating One or more EC2 instances by scaling Policy.
+It is always Recomended to create a scale-in event for each scale-Out event you create.
+
+Standby State :
+You can manually move an instance from an ASG and put it in standby state.
+Instances in standby state are still managed by autoscaling.
+Instances in standby state are changed as normal, in-service instances.
+They do not count towards available EC2 instances for workload/App use.
+Autoscaling does not perform health check on instances in standby state.
+
+Scaling Policy :
+
+* Dynamic Scaling:
+    Target Tracking Policy
+    Simple Scaling Policy
+    Step Scaling Policy
+
+a) Cool down period : A time set by the user (default 300 sec.) where during this time all the alerts will be ignored, so autoscaling does not launch 
+or terminate any more instance untile a specified period is completed . Scaling activity is suspended until the cool-down period is in effect.
+
+b) Warm up period :  Time taken by a newly launched instance to be ready and contribute to the cloud watched metric. so when warm-up time has expired, 
+an instance is considered to be a part Auto Scaling group and will receive traffic
+
+*** Scaling Policy :
+Scaling policies mention how to scale, and alarms decide when to scale. CloudWatch alarms are set to monitor individual metrics, e.g., CPU utilization, etc.
+When the threshold is breached, scaling policies are execute. A scaling adjustment can't change the capacity of the group above the max group size or below 
+the min group size. 
+Increase 2 instance at a time. Decrease 1 instance at a time.
+
+Alarm:
+if CPU utilization > 80% for more than 10 mins, ring the bell. 
+* Minimum capacity: 2
+* Desired capacity: 4
+* Maximum capacity: 10
+
+Predictive scaling : it looks at historic pattern and forcast than into the further to schedule change in the no of EC2 instances. It was machine learning model to forecast daily and weekly pattern.
+
+Target Tracking Policy : 
+Increase or decrease the current capacity of the group based on a target value for a specific metric This is similar to the way that you thermostic 
+maintain the temperacture of your home.
+
+Step Scaling :
+Increase or decrease the current capacity of the group base on a set of scaling adjustment known as step adjustmetn, that are based on the size of the 
+alarm breach.
+Does not support/wait for a cool-down timer.
+Support a Warm-uptimer Time taken by newly launch instance to be ready and contribute to the watched metric.
+
+example of Step scaling policy
+Take the action : Add, 1, instances, when 60, CPU Utilization= 70
+		: Add, 2, instances, when 70, CPU Utilization= 75
+		: Add, 2, instances, when 75, CPU Utilization= 80
+		: Add, 4, instances, when 80, CPU Utilization= infinite
+		 Add Step
+
+
+
+* Simple Scaling :
+Single adjustment (up or down) is response to an alarm (cooldown timer -300 sec default).
+
+* Schedule Scaling:
+you need to configure a schedule action for a scale out at a specific date/time and to a required capacity. And must have a unique date/time you can not configure two schedule activities at the same time/date. 
+Increase the instances by 2 at 2:30 pm today
+Decrease the instances by 1 at 12:00 am tomorrow
+
+* Demand scaling: 
+Here scaling occurs when the CPU utilization of the current running instances grows beyond a fixed usage limit.
+if CPU utilization > 80% for more then 10 minuts, increase the instance by 1.
+if CPU utilization < 50% for more than 5 mins, decrease the instance by 2.
+
+
+Scale group size :
+Name : any name
+Metric Type : Average CPU utilization/Application load balancer/Average Network IN/Average Network OUT. # Now select CPU utilization
+Target value: 60    # if exceed CPU utilization 60 % then 2 more instance created, if again CPU load exceed then till 10 instance created.
+Instances Need : 300        # after 300 seconds load distributed on instances.  (Warm up after scaling.)
+Disable Scale : Unchcked.         # when unchecked then if CPU load decrease then instance decreased also. otherwise took instance charges, even load is down.
+
+--------------------------
+Create Alarm :
+Uncheck : send a notification to
+Whenever : "Average" of, select "CPU utilization"
+IS >>: 60        # cpu load percent
+For a least : 1, consecutive period : 1 minut       # means instance will be created when CPU load heigh continue 1 min and 1 time.
+Name of alarm : any name
+Click on "Create Alarm"     #Alarm created.	
+
+## LAB 20 Autoscaling  ************
+
+----------------
+AutoScaling Lab (New):
+1. create window ec2 2012 instance (security RDP and may http anywhere).  download RDP and decript password and save password first.
+2. select instance and Action > image Template > Create Image.
+# Got to AMI and found created Image.
+
+# as recomended we can directly create 'Launch Templete" insted of "Launch Configuration" .
+
+3. Launch Configurations > Create Launch Configuration > Name : any name, AMI : select created image.
+Instance type: search t2 micro and select this.
+Security groups : select same security while creating instance time.
+Key pair option : Choose an existing key pair
+select same exists key.
+
+checked I acknowledge.
+Create Launch Configuration.
+
+4  Create Auto Scaling Group.
+Name: ASG1. 
+Launch template: click on "Switch to launch configuration".  and select created image one.  > Next
+VPC : select all subnet. > Next
+Load Balance : select No load balancer.  (or first will create load balancer and select created load balancer also)
+Health check grace period : 60 seconds. > Next
+Desired capacity : 2
+Minimum capacity : 1
+Maximum capacity : 4
+
+5 Select Target tracking scaling policy:
+Metric type : Average CPU utilization
+Target value: 50
+Instances need: 60  (seconds warm up) >  Next > Next > Create Auto Scaling group.
+
+Now automatically created 2 instances. (according to Desired capacity)
+and connect instance  with saved password.
+
+create a.bat file in desktop on both server. (open text file,write a.bat and save as using a.bat, save as type all files) and double click to run    # no of time double click to multiple open to run on both server, so cpu load will be heigh, and when load heigh then another 1 instance is created automatically to manage load. when load is low then removed one instance.
+
+After practical, need to delete autoscaling group and go to instance and terminate.
+
+-------------------------
+
+AUTOSCALING LAB 2
+
+1) create windows ec2 instance and connect RDP and change password, then install ISS server and put index.html file
+2) create image : select instance > ACTION > create image.
+3) create launch Template > name : , AMI : select created image > instance type: t2 micro (must) > Rule : RDP, HTTP anywhere > key paire > existing keypaire, check : i acknowledge. > create
+4) Create auto scaling Group. > lauch tamplete : click on "switch to lauch configuration", select created launch configuration. (configure max, min, desire) and cpu .
+# then automatic created anothere instance and copy public ip of this and past in url then work website fine in this instance also.
+--------------------------------------
+** on Linux server, if you want forcely give cpu load then use as below
+sudo yum update -y
+sudo amazon-linux-extras install epel -y
+sudo yum install stress -y
+stress -c 5
+========================================
+
+Elastice Load Balancer :    [ 8 IP reserve for load balancer ]
+
+Load Balancer distributes the only incoming traffic to the group of available Server in same/different AZ. Load balancing refers to efficient distributing 
+traffic across a group of backends server. Outbound traffic from EC2 instance to direct internet.
+it provide fault tolerance and High availability. Load balancer is immediater between frontend(user) and backend (server). There is not mandatory to every 
+traffic come through load balancer, this is depend on type of load balancer. If application load balancer then only http/https protocols traffic come 
+thorough load balancer.
+
+# We can connect two load balancer also with same EC2 instance. 
+
+Application load balancer distributes incoming application traffic to mltiple targets group's EC2 instances in multiple availity Zone.
+Blue Target Group and Green Target Group. Target type is instance, IP, Lambda function, Application LoadBalancer. Bydefault enable Cross-zone load balancing.
+
+1) Application load balancer    - HTTP/HTTPS protocols supported and work on 7th layer of OS  (it work related to webserver application, immediatly open 
+application.) And mostly used in production. It support Lambda function as target also. it support path based, host based, http header and source ip 
+based routing
+EX: abc.com/path1/path2        #  So path1 routing to Target-group1 servers and path2 routing to Target-group2 server2. and rendering image also.
+
+
+2) Network Load Balancer        - TCP/UDP/TLS protocols supported and work on 4th layer/transport layer of OS (it has altra high performace, handling 
+milions of request per second securly.)  This is used for handling sudden and violent site traffic. it support High throughput, low latency. it preserve 
+source ip address for none-http apps. it used for keeping long session and long-runing connections that are very usefull for websocket type application.
+This is not support path/host/etc.. based routing traffic. Bydefault desable Cross-zone load balancing
+
+3) Classic load balancer        - HTTP/HTTPS/TCP protocols.  work on 4th and 7th layer. Used for existing running application.
+Every microservices need to create seprate ClassicLoadBalancer, means not support path/host/source ip based routing.  # preview generation
+
+4) Gateway load balancer :     When you need to deploy and manage third party virtual application That support GENEVE. it enable you to improve security,
+compliance, and policy control.
+
+ELB Listener:
+is the process that checks for connection Request. You can configure the protocol/port no on which your ELB listener listen for connection Request.
+frontend listeners check for traffic client to the listener.
+Backend listeners are configured with protocols/port to check for traffic from the ELB to the EC2 instances.
+
+ELB only has to do with inbound traffic destined to EC2 requested instances as the destination and the respective return traffic.
+
+When the ELB detect an Unhealthy instance, it stops routing traffic to that instance. An Unhealthy instance show as Unhealthy under the ELB.
+
+By default, AWS console user ping HTTP(port 80) for health check. Registered instance must respond with a http "200 ok" message within the timeout period 
+else consider Unhealthy.
+
+Target : is a ec2 instance.
+
+Target Group:  Logical grouping of targets instances registered behind the load balancer. Target can be associated with an autoscaling group.
+target group can contain upto 200 targets.
+
+An internet facing load balancer routes request from client over the internet to target. Requiers a public subnet.(use public IP)..
+
+AWS API uses ping TCP (port 80) for health check. REsponse Time-Out is 5 seconds (Range is 2-80 sec). Health check internal. 
+Period of time between health check. Defaults 30 (Range is 5 to 300 sec).
+
+Unhealthy Threshold:
+Number of consecutive failed health check that should occur before the instance is declared Unhealthy Range is 2-10 (Default -2).
+Healthy Threshold :
+Number of conssecutive successful helth checks that must accor befor the instance considerd Unhealthy Range 2-10 (default 10).
+
+By default, the ELB distributes traffic evenly between the AZ it is defined in, without considered to the number of Registred EC2 instance in each AZ.
+If i do Cross Zone Load Balancing then ELB will distribute traffic evenly between Registred EC2 instances.
+
+If you have 7 instances in One AZ, and 3 in another AZ, and you enabled Cross Zone Load Balancing, each Registered EC2 instance will be getting around 
+the same amount of traffic load from the ELB. ELB name is unique within the account. And ELB is Region Specific, all Registred instances must be in same 
+Region but in different AZ.
+
+Internal ELB: Internal loadbalancer routes requests from client to targets using private ip address. Not accessed from outside internet,
+only accessed internally, means accessed in private network only.
+
+Q. suppose ELB is configured. and we want to server accessed only from ELB DNS, Load balancer's server directly should not be access from server IP.
+And Create security group with HTTP protocol and same attached in ELB.
+
+Ans: So goto every Ec2 security group and edit inbound rule, Add rule, type: HTTP with source: select ELB securitygroup only. Now user will access 
+server from loadbalancer DNS only, not from server IP.
+
+# ELB Round Rebion: Bydefault ELB follow round rebion algorithm,  means first request goes to first server, second request goes to second server...
+
+# For specific configuration ELB, goto Action > Edit load balancer attribute > .  (ex: store log in S3,remove client ip in webserver log, etc)
+
+To store client ip in nginx log, need to configure nginx.conf
+vi /etc/nginx/nginx.conf
+log_format main ' $remote_addr - $remote_user - $http_x_forwarded_for';   # http_x_forwarded_for return client ip
+access_log /var/log/nginx/access.log main;
+service nginx reload
+
+tail -f /var/log/nginx/access.log error.log          # to check runing logs
+
+Suppose we want send request to only on server for specific time using ELB, then goto Listner, View/Edit rules, "Group level stickiness On"
+------------------------------------------------
+
+
+## LAB 21 Application Load Balancer ******
+
+First create EC2 windows instance ( select subnet AZ1, security RDP,HTTP, HTTPS anywhere, download key)
+create another EC2 windows instance ( select subnet AZ2, security exists, download key)
+
+connect server 1.
+GoTo Server Manager > Add role and fetures.>next>next>next> webserver IIS >add feture>next..> installed.
+GoTo C drive > initpub > wwwroot> delete all file here > create file " SERVER 1 HELLO AVAILBILITY ZONE A" and save as file name index.html and save as type all file.
+
+connect server 2.
+GoTo Server Manager > Add role and fetures.>next>next>next> webserver IIS >add feture>next..> installed.
+GoTo C drive > initpub > wwwroot> delete all file here > create file " SERVER 2 HELLO AVAILBILITY ZONE B" and save as file name index.html and save as type all file
+
+
+GoTo LoadBalancer > Crete LoadBalancer> Application LoadBalancer > Name anyname, schema select internet facing, IP address ipv4 (may select dual stack),
+loadBalancer protocol HTTP.
+Configure LOAD BALANCER :
+Availibility ZONE > select 2 AZ (same where AZ define while crating instance). > Next> select (exist)  security group created one >next >
+
+Target GROUP:
+target group : new target group
+Name : TG1(blue application)
+Target Type : instance, IP, lambda (load distribute on which one basis, select anyone) select instance > next>
+
+Register Targets :
+select all instance and "add to registered". > NEXT > create.
+Now Load balancer created.
+
+GoTo Target Group > target group exist automatically. # take some time to become status healthy.
+copy DNS name (found from load balancer > description) past in URL and refereshed, come server1 and server2.
+
+
+# if we want LOAD BALANCING IN ONE MORE INSTANCES then create on more EC2 windows instance.  (select subnet AZ3 , security existing)
+GoTo Server Manager > Add role and fetures.>next>next>next> webserver IIS >add feture>next..> installed.
+GoTo C drive > initpub > wwwroot> delete all file here > create file " SERVER 3 HELLO AVAILBILITY ZONE C" and save as file name index.html and save as type all file
+
+GoTo LoadBalancer > Edit subnet Availity Zone > select AZ C > SAVE.
+GoTo Target Group > Target > Edit > select 3rd instance > add to Registered.  # if refereshed again then found server 3 also.
+
+After LAB delete loadbalancer, target group and terminate instances.
+--------
+# If there is one target group in loadbalancer then bydefault loadbalancer 100% route traffic to one target group only.
+
+# BLUE GREEN Deployment : it is deployment where devide the traffic on the basis of target group. suppose 80% redirect trafic to target group1 
+(blue application) and 20% traffic redirect to target group2 (green application) . 
+Each target group has no of ec2 instances registred. 
+
+Goto ALB "Listeners" and Edit Rules. Add rule, insert rules, select "path based": /test and in Add action: select "Forward to": target-group2
+option is there for 80% and 20%, 
+means 8 request handle target group1 and 2 request handle target group 2. 1 time referesh URL means 1 request.
+URL: elb_dns/test       # now route traffic to target group2 only.
+URL: elb_dns            # Now route traffic to target group1 only.
+
+--------------
+
+
+## LAB 22 Network Load Balancer (NLB) ********
+
+Load balancer is work on Region specific.
+
+First create EC2 windows instance ( select subnet AZ A, security RDP,HTTP, HTTPS anywhere, download key)
+create another EC2 windows instance ( select subnet AZ B, security exists, download key)
+
+connect server 1.
+GoTo Server Manager > Add role and fetures.>next>next>next> webserver IIS >add feture>next..> installed.
+GoTo C drive > initpub > wwwroot> delete all file here > create file " SERVER 1 HELLO AVAILBILITY ZONE A" and save as file name index.html and save as type all file.
+
+connect server 2.
+GoTo Server Manager > Add role and fetures.>next>next>next> webserver IIS >add feture>next..> installed.
+GoTo C drive > initpub > wwwroot> delete all file here > create file " SERVER 2 HELLO AVAILBILITY ZONE B" and save as file name index.html and save as type all file
+
+GoTo LoadBalancer > Crete LoadBalancer> Network LoadBalancer > name NLB1, schema internet facing.
+ Availibility Zone > select 2 AZ.> Next 
+
+Configure Routing:
+Target Group > Name NLB1, Target type select "IP(private)" or Instnace, protocol TCP, port 80 (for windows TCP,port 80,but linux TCP/IP, 8080)
+Health check : protocol TCP.
+
+Advance Health check : interval 10 seconds > Next
+IN REGISTER TARGET :
+select Network: select other private IP, Availibility zone: select AZ1, IP enter private ip of instance1 > add to list. > 
+select Network: select other private IP, Availibility zone: select AZ2, IP enter private ip of instance2 > click on Register
+it take some time to become status HEALTHY in Register Target.   
+
+## we can enable Cross Zone Load Balancer. goto load balancer> Edit Attribute > cross-zone load balancing Enable > save. but charges.
+
+
+Now copy DNS name and past in URL . after refereshed come message server1 and server 2.
+
+--------------------------------
+## LAB 23 How to Establish a Application Load balancer betwen two VPC. | ALB vs NLS vs CLS
+
+1 Create Two VPC ie vpc1 and vpc2
+2 Create Two subnets in vpc1 and one subnet in vpc2.   # it should be min 2 subnet in main vpc)
+3 Create internet Getway for vpc1 and vpc2.
+4 Edit default Route Table and add 0.0.0.0/0  in vpc1/2
+5 Create Peering connect, & Update Route Table.
+6 Create Three EC2 instances, One in each subnet.
+7 Install webserver IIS and Create webpage in 3 server.
+8 Create Application Load Balancer, Target type - Server Private IP.
+9 Registered Private IP's of EC2's in Target Group.
+10 Copy DNS of Load Balancer and paste in web browser.
+
+Create VPC (vpc1, CIDR 10.0.0.0/16, create), Create Subnet (AZ 1, ipv4 CIDR block 10.0.1.0/24 , create), One more create subnet ( AZ 1b, ipv4 CIDR 10.0.2.0/24, create)
+Create internetGetway (create, action attach), Create Rout Table (edit of default created route, Route, add route 0.0.0.0/0, Target select internetGetway vpc1, save route).
+GoTo Subnet Associates > edit subnet association, select both subnet and save).
+
+Create VPC (vpc2, ipv4 CIDR 192.168.0.0/16, create), Create Subnet (vpc select vpc2, availability Zone anyone, ipv4 CIDR 192.168.1.0/24, create).
+Create internetGetway (create, attach vpc2), Create Route Table (edit default created rout, Rout, edit add route 0.0.0.0/0, Target select internetGetway vpc2, save)
+GoTo Subnet Associates > edit subnet association, select subnet and save).
+
+Create peeringConnection > VPC Requester select vpc1, VPC accepter vpc2, Create vpcconnection, goto action>accept.
+GoTo RoutTable > select vpc2 Route , edit, add route 10.0.0.0/16, Target select peeringConnection, save Routes.   # edit to each other CIDR
+                 select vpc1 Route, edit, add route 192.168.0.0/16, Target select peeringConnection, save Routs.
+
+Create EC2 instance windows 2012 R2 base(network vpc1, subnet vpc1A, public IP Enable, security RDP, all icmp-ipv4, HTTP anywhere).
+Create another EC2 instance windows 2012 R2 base(network vpc1, subnet vpc1B, public IP Enable, security existing )
+Create another EC2 instance windows 2012 R2 base(network vpc2, subnet vpc2A, public IP Enable, security RDP, all icmp-ipv4, HTTP anywhere)
+Save all server private IP. And all server connect through RDP.
+
+Install webserver IIS using server manager and create index.html c/initpub/wwwroot/   # On All server
+
+Create LoadBalancer > Application LB >name anyname, direct select VPC vpc1 with select 2 AZ. > Next > SecurityGroup name ----, description ---, 
+select All ICMP-v4 and HTTP anywhere> Next > Target Group Name TG1 , Target Type select "IP".
+
+Advance HealthCheck timeout 2, interval 5 > Next > Register Target Network: select created VPC1 (which have 2 subnet), IP : add to list, both private ip
+of both server1/2 one by one (of vpc1).  Now select "Other private address" in Network, Availablity Zone "All" , IP : enter third server private IP
+(of vpc2) add to list.> Next>create.
+
+It will take some time to become status Healthy. # from LB: copy DNS name and past in URL and refereshed, it will change all web server
+
+==========================================================
+
+AWS Identity Access Management  ********************  # No charges for IAM.
+
+AWS Identity and access Management is a web service that helps you securely control access to AWS Resources you use IAM to control who is authenticated 
+(Signed-in) and authorized (has permission) to use resources. IAM is not region specific.
+
+AWS Strongly Recommends that you do not use the root used for your everyday task, even the adminnistrative Ones. 
+
+IAM user limit is 5000 per AWS account you can add upto 10 Users at one time. Your are also limited to 300 groups per AWS account. Default limit of managed
+policies attached to an IAM Role and IAM user is 10. IAM user can be member of 10 groups(max). We can assign two access keys(max) to an IAM User. IAM user 
+don't have account ID, only have  root account.
+
+AWS IAM has 8 fetures :
+
+1) Shared access to your AWS account : you can grant other people  permission to administer and use resources in your AWS account without having to share 
+your access credentials (password or access key).
+
+2) GRANULAR PERMISSIONS : You can grant different permission to different people for defferent Resources. For instances you can allow some user complete 
+access to EC2, S3, dynamoDB, Redshift. While for Other you can allow read only access to get some S3 bucket, or permission to adminstrator get some EC2 
+instances or to access your billing.
+
+3) Secure Access to AWS Resources for applications that run on Amazon EC2 :
+you can use IAM fetures to securely give application that run on EC2 instances the credentials that they need in order to access other AWS Resources 
+like S3 buckets, and RDS or DynamoDB databases.
+
+4) Multifacter Authentication(MFA) :
+you can add two factor authentication to your account and to individual users for extra security you can use physicals hardware or virtual MFA(for example
+ Google Authenticator, microsoft).
+
+5) Identity Fedration :
+You can allow users who already have user and passwords for other domain/company for ex : facebook, google or authentication through your corporate 
+network, provider to get temporary access to your AWS account. A User who has already logged to the corporate using their corporate identity.
+
+6) Identity information for assurance :
+if you use AWS Cloudtrail, you Receive Log Records that include information about those who made request for Resources in your account. That information 
+is based on IAM identities (user, group, role).
+ 
+7) PCI-DSS Complaince : IAM support the processing, storage and transmission of credit card bya merchant or service provider, and has been validated as
+being compliant with payment and industries (PCI) Data Security Standard (DSS).
+
+8) Eventually Consistent :
+If a request to chnge some data is successful, the change is commited and safely stored however the change must the rreplicated acress IAM, which can take
+some time.
+IAM achives high availability by replicating data across multiple servers within AWS data center across the world.
+
+Only Root account create IAM user. And authontication and authorization. Authorization means what level of permission provide to user.
+root manage billing also. Track IAM user activity also.
+
+Programmatic access: use for access key and secret key.
+
+-------
+AWS IAM has 6 Components: 
+
+1 Principle : This is person or applicant that can make a request for an action or operation on an AWS Resosurces,
+Administrator IAM user is first principle. You can allow users and services to assume a Role. IAM Users, Roles, Fedrated Users and application are 
+all AWS principle.
+
+2 Request :  Principle sends a request to AWS The request includes the following information ( Actions, Resources, Principle, Enviornment, Resources).
+
+3 Resources : A Resources is an entity that exist within a service. Examples are EC2 instances, S3 bucket, IAM User, DyanmoDB table. Each AWS service 
+define a set of actions that can be performed on each resource. After AWS approves the actions an your request, those action can be performed on the 
+Related resources within your account. If you create a request to perform an Unrelated action on a Resource, that Request is denied.
+
+
+4 Authentication : Aprinciple sending a request must be authenticated. To authenticate from the API to CLI, authentication means sign in account
+using access key and secret key.
+You might also be required to provide additional security information like MFA (ex: Google Authenticator, token, OTP).
+
+5 Authorization : To authorize Request, IAM Users has permission/ policies to access resource or not. And determine whether to allow or deny the 
+ request. IAM policies store in JSON document and specify that permission that are allow or Denied. There are User based policies and Resources based 
+policies.
+
+5 Action : Action are define by a service, and are the things that you can do to a resource, such as viewing, creating, editing and deleting that resources. IAM support approx 40 actions for a User Resources including create User, Delete User etc.
+
+
+We can create 3 way policy :
+JSON : java script policy. Effect is ALLOW and DENAY.
+Visual Editor : We need not understand json syntex. Visual editor we can construct new policy easy way.
+Import : copy policy from exist user policy.
+
+IAM Users and SSO (single sign on):
+IAM users in your account have access only to the AWS resources that you specify in the policy that is attached to the User or to and IAM Group that the 
+User belongs to.
+
+SSO make it easy to centrally manage access to multiple AWS account and business application with single user from one place.
+you can easily manage access and user permission to all of your account in aws organizaiton centrally. AWS SSO configures and maintains all the necessary 
+permission for your accounts automatically. SSO call Organizaion service internally.
+
+IAM Identities: ( User, Group, Role)
+
+Identities represent the user and can be authenticated and then authorized to perform action in AWS.
+
+IAM User : An IAM User is an entity that you create in AWS it represent the person or service who user the IAM user to intract with AWS. You can create
+10 User at a time. An IAM user can represent an actual permision or an application that requiers AWS access to perform actions on AWS Resources. 
+IAM user are gloable entities not any reagion specific. One IAM user associated with only one account, not other account.
+
+A New IAM user has no permission to do anything. Has no password and no access key.
+
+IAM Groups: An IAM group is a collection of IAM Users. It is way to assign permission/policies to multiple users at once.
+
+IAM roles is set of permission or policies that grant access to actions and resources in AWS.
+These permission are attached to the Role, not to an IAM user or Group, a role is accessible by anyone who need it. 
+
+It determine what the identity can and cannot do in AWS.
+
+Permission and policies :
+Permissions are granted through polices that are created and then attached to Users,groups or roles.
+
+Policies: policies is resources based, User based, group based, role based.
+
+Policies and USers :
+By default, IAM Users can't access anything in your account. You grant permission to a User by creating a policy. 
+
+IAM Multiple Policies:
+Users or groups can have multiple policies attached to them that grant different permission.
+In case of multiple policies attached to a user (or group). The users permission are calculated based on the combination of policies.
+
+
+AWS Recomends that you don't use root user credentials for everyday access. Also AWS Recomends that you do not share your root user credentials with anyone, because doing so gives them Unrestricted access to your account. Create an IAM User for yourself and then assign yourself adminstrate permission for your account.
+
+AWS managed policies:
+An AWS managed policy is a standalone policy that is created and administered by AWS. Standalone policy means that the policy has its own Amazon Resource
+Name (ARN) that includes the policy name. For example, arn:aws:iam::aws:policy/IAMReadOnlyAccess is an AWS managed policy.
+it provide permissions for many common use cases. Full access AWS managed policies such as AmazonDynamoDBFullAccess and IAMFullAccess.
+
+IAM Group Limitations:
+Attach the managed policy to the IAM user instead of the IAM group. You can attach up to 20 managed policies to IAM roles and users.
+Groups Can't be nested.
+You have a limit of 300 groups in an AWS account. A user can be a member of upto 10 IAM groups.
+
+Cross account access with a resource-based policy has an advantage OVer a Role with a Resouce that is accessed through a Resource-based policy, 
+the User still works in the trusted account and does not have to give up his or her user permission in place of the role permission.
+
+IAM User - The Root User:
+When you first create an AWS account, you create an account (or root User) identity, which you use to sign-in to AWS.
+The 'account root User' credentials are the e-mail address used to create the account and a password, which can be used to sign-in to the AWS management 
+console as the Root User.
+
+
+Then trusted and trusting account can be any of the following :
+The same accounts.  Two accounts that are both under your organisation's control. Two account owned by defferent organisation.
+
+Cross Account Permissions : You might need to allow users from another AWS account to access resources in your AWS account. To access resources of
+other aws account, we will use IAM Role insted of security credentials or access key. you can define a role in the trusting account, that specifies 
+what permission the IAM Users in the other account are allowed.
+
+Inline Policy/Customer manged policy:
+Inline policies are policies that you create and manage and embed directly into a single user, group, or role. it is very smallest policy assig to user, 
+group, or role.
+
+## LAB 24 AWS IAM USERS , How to create IAM user.
+
+# Access Managements: Groups, Users, Roles, Policies, Identity providers, Account settings.
+
+IAM > Create individual IAM user > add user user_name, checked AWS management console, checked custome password, enter anypas, checked user must 
+create new passwd in next sign-in >
+NEXT permission> click Attach exist policy, search "ec2full access", select. > next tag, name, any name> create User.  # download .csv (credential)
+copy link from this csv file and past in URL : and enter user name and password. first time prompt change password than logined
+
+OR later give permission. GoTo permission> Add Permission > Attach exist policy and search ec2full access, select > next > Add permission. # after lab i can delete policy also using X click.    After remove policy i can not create ec2 instance.
+
+# Now we can create EC2 instance only in this created user.           
+
+another user : add user user_name, checked AWS management console, checked Autogenerated paas >Next > click "Copy policy from existing User", select User > Next tag>
+>create user        # download .CSV file.  copy link, past in URL:  and login user and pass
+
+
+Use group to assign permission > Create new group group_name> next > select policy type > NExt > Crate group.
+Apply an IAM Password policy > managed password policy > select pasword combination according to me. > save changes.
+
+Now group is empty, so GoTo User and select username > Group > Add user to Group > select group name > Add to group  # user added to group.
+finally delte user/group also
+ 
+---------------
+
+## LAB 25, How to create IAM Group and Inline Policy AND Billing Dashboard
+
+inline policy : as in this policy we can provide very smallest permission. smallest permission is not in default policy.
+
+GoTo IAM > add user > add another user, checked AWS management console, select autogenerated password > NEXT permission > Attach exist policy, 
+search ec2read only, and select this > Next >add tags anyname > Crate user     # download .csv
+GoTo Group > Create group, name: S3bucket > Next >Attach policy, search Amazon s3full access, and select this> create group.
+
+# OR Later attach policy.
+# click on group name > permission > Attach policy >search s3full access, and select this > attach policy.
+
+GoTo Group > Add user to group > select both user > add user
+now copy url and past in URL and logined    # only READ EC2 images
+GoTo S3> create bucket >   # bucket created.   because attachd policy s3full access in group.
+GoTo user>click on user > delete policy s3full access   # now when i try to create s3 bucket than come Access denied.
+
+# for Billing dashboard access.
+Create new group, group name billingTeam > search Billing policy, and select this > Next step >Create group .
+click billingTeam group >User > Add user to group > Select any user > Add users 
+click on another user > Group >add user to group > select bilingTeam > Add to Group
+
+goto root myaccount > "IAM user and ROLE access to Billing info" > edit > checked "Activate IAM Access", click update.     # Than access billing info of IAM persion 
+Now login user (which billingTeam group user) in URL  # now we able to see billing dashboard info details.
+
+IAM >user > click on any user > click " Add inline policy" > choose service > search EC2 and select > in action search smallest policy/permission 
+(read, write, delte, etc like create snapshot, create bucket, read EFS, EBS). and can apply.
+
+GoTo Security Credentials > console passowrd, manage> enable, autogenrate/custom pass > apply, download new pass    # regenrate password if user forget hist password
+
+# Create Access Key is for CLI.
+--------------
+
+## LAB 26, Cross Account Access using IAM Role | Example: AWS IAM Federated User and Role
+Theory LAB steps:
+# There should be Two account name (first note : account_name: chhaya, account_id 84737373 and copy IAM user link. another account_name naksh, 
+account_id 83726262 and copy IAM user link) .  
+
+1) login its chaaya account. 
+2) Create one group and then create two IAM user in it (user1 and user2).
+3) Attach policy to group (EC2 read only access).
+
+4) Now login to second account (Nakash account)
+5) Create one S3 bucket.  
+6) Create a role > Another AWS account > insert (account ID of chhaya) > Attach policy > S3 readonly access > Role Name: S3read.
+
+7) Now login back to Chhaya account. click on group > permission > Inline Policy > select AWS security token service, Service > assume role. Click on 
+Add statement > apply policy.
+
+8) Now login as IAM user1. 
+9) Switch role, now check whether you are able to see the bucket of another account or not.
+10) Request setup  8&9 but with user2.
+
+11) Now login into Nakash account > Role, trusted relationship edit, past ARN of user 1 > update policy.
+12) Now login again in user1 > switch role > besed s3 bucket. 
+13 ) Now login as user2 > swith role.         # Both user able to access S3 bucket
+
+======= Real LAB steps:
+
+Now logined CHAAYA account first
+
+1 Groups > create new group , chayaGroup > Next > Attach polich, search policy "ec2read" and select this >Next > Create Group
+2 User > add user, user1 and user2, checked "AWS management console access" , checked "customer password" india123 > Next permission > 
+Select "Add users to group" ,checked chayagroup > Next Tags > Next review > Create User .    
+# created both users in chayaGroup with EC2 readonly policy.  and download .csv file for password.    
+
+Now Logined to NAKSH account
+S3 > create bucket, nakshbucket2 > Create         # bucket create for testing
+GoTo IAM > Role > Create Role >Select "Another AWS account" >Enter Account ID 84737373 (chhaya account, which use this role) > Next permission > 
+search "S3ReadOnlyAccess" policy and select this > Next Tags > Next Review > Role_name s3read  > Create role    
+# This S3 read accessed to chhaya account, user1,user2.
+
+Now copy Role ARN and save in text file (arn:aws:iam::83726262:role/s3read
+
+# if Click on " Trust relationship" than show Trusted relationship (chhaya account ID)
+
+THAN GoTo chhaya account 
+Group > click on group > permission > Inline policy (to create temp credential) > create >Select "policy generator"> select >
+Effect: Allow, AWS service: "AWS Security Token Service" , Action : checked AssumeRole, Amazon Resource Name: * (all user can accesss of chhaya account) 
+> Add statement > Next > Apply policy 
+
+GoTo user > show all user here
+URL: chhaya "IAM user link" > Enter user_name: user1, pass: .... and bring change password and finally logined
+After logined user1 nothing can do anything. (only read ec2)
+Click on user1 account (top Right) > switch role > enter Account_ID: 83726262 (naksh), Role: s3read (from Role ARN) > Switch Role
+AFTER SWITHED : NOW direct logined in Naksh account and can access s3 bucket. (as per policy created)  
+
+
+Now logout and logined from user2 , bring change password and finally logined from User2
+Directly we can not access anything. Click user2 account > Swith Role > enter Account_ID: 83726262 (naksh), Role: s3read (from Role ARN) > Switch Role
+AFTER SWITHED : NOW direct came in Naksh account and user1 and user2 able to access s3 bucket.
+
+# we are able to use cross account and now both user1 and user2 can access s3 bucket from chhaya account. but i want only user1 can access s3 bucket
+not user2 as below.   Now signed out
+ 
+GoTo Naksh account > Roles > click on s3read role > Trust Relationship > Edit trust relationship
+goto chaya account > IAM > click User > click user1 > copy User ARN and edit in  " Edit trust relationship"> AWS: "arn:aws:iam::8372533356:user/user1"  
+of Naksh account > Update TrustPolicy
+And Logout
+
+Now login from user1 > After login goto user1 account(top) and > Switch Role > Enter Account no (Naksh), Role s3read > Switch Role
+Now we able to see s3 bucket.   # logout
+
+Now login from User2 using IAM user link > Switch Role > enter Naksh account id, Role s3read > when click Switch Roles Then got error. 
+not permission for user2.
+
+------------------------
+## LAB 27, How to connect windows server to AWS AD ID Connector (another domain user can access AWS resources)
+
+Below is Theory steps :
+1 Create one window server 2012 base. 
+2 change its password and then install AD DS in "Add Role & features". 
+3 Now Create one forest ie "guptgu.in"
+4 Now Go to server manager Tools->DNS->Reverse lookup Zone. 
+5 Now ->DNS->forward Lookup Zone -> checked "Update associate pointer" -> Apply
+6 Now in Ethernet setting-> Enter private IP of server in preferred DNS Server. 7 Now, click on Server Manager-> Tools -> AD User and Computers 
+Create two Users " Madan & vikas, Give Password - india@123.  8 Now go to AWS Management Console, Search "Directory Services" -> AD connector
+9 Directory DNS NAme - guptgu.in
+  DNS IP address - private IP of AD Server
+  User Name - Administrator
+  Passowrd - Same as AD Server Password
+10 Go to IAM -> Role-> Directory Services-> EC2full access -> Create Role
+11 Create One more Role per Billing. 12 Add User Madan & vikas to Above Role. 13 Copy the URL and paste in InCognito tab.
+-----------------
+
+LAB steps :  Region vergenia
+1 First create window 2012 server instance (security All traffic and RDP anywhere) and connect RDP.   172.31.56.179
+2 Change password, control pannel > User Account > Administrator > change the password.     # ranjit@123
+
+3 GoTo Server Manager > Dashboard > Add roles and fetures >Next>select Role-Based or feture based > Next >Next> checked Active Directory Domain services > Next ..> install   # after installed, came notification (top) click on "Promote the server to a Domain controlar" 
+4 Came Dialog Box Deployment Configuration > checked Add a new forest, Root domain name: guptgu.in > Next> Enter Password: india@123 >Next ....> install.    # came green tick " All prerequisit checks passwd successfully. than fine.
+
+After install server rebooting automatically.  And connect again RDP
+GoTo Server Manager > Tool (top right) > DNS > expand, 
+Right click on "Reverse Lookup Zone" > New Zone> Next>Next> check "To all DNS servers running on domain controller..> Next >Next > Network ID: enter server private IP (begning 3 octed)> Next ..> finish
+Click on Forward lookup Zone > click on guptgu.in >right click on win.cmgi..(right side), properties > checked Update associated porter (PTR)> Apply.
+
+GoTo Run: ncpa.cpl > double click ethernet 2 > properties > unchecked TCP/Ipv6 and double click on TCP/Ipv4 > 
+Enter perfered Server : enter server private IP > Ok and close.
+
+GoTo cmd nslookup   # came Default server : guptgu.in and Address: server private ip. (if not came then do again lab.)
+
+GoTo Server Manager > Tool > Active Directory Users and Computers > guptgu.in > users > right click, New, User >
+first Name : madan, User logon name: madan > Next > pasword: india@123 > checked User can't chanage pass, passwd never expired> Next > finish
+first Name : vikash, User logon name: vikash > Next > pasword: india@123 > checked User can't chanage pass, passwd never expired> Next > finish
+
+GoTo AWS > find directory services > Set up directory > select AD Connector > Next > select Small > Next > Next> directory DNS name : guptgu.in, DNS IP : server private IP, Service account username: Administrator , Service account password : ranjit@123 > Next> Create Directory  # should active
+
+# goto myaccount > IAM User and Role Access to Billing Info, click Edit > checked Active IAM Access > Update.
+
+GoTo IAM > Roles > Create Role > select Directory service > Next permission > select ec2full access, select >Next > role name: ec2full access > create.
+GoTo IAM > Roles >Create Role > Directory service > Next permission > select Billing > next> Role name : billing user > create role.
+
+Goto Directory services > click directory > Application management > Create application access URL https://guptgu > create.
+AWS Management Console, click Enable   >    # then showing my both role.
+click billinguser > Add > Specify which users or groups to add, search madan and checked madan > Add.
+click ec2full access > Add > Specify which users or groups to add, search vikash and checked vikash > Add.
+
+GoTo Directory and Management > Application management > copy Access URL : guptgu.awsapps.com
+URL: guptgu.awsapps.com/console              # open in New incognito window
+
+login from madan    # madan access only billing info, not access other services. 
+login from vikash   # vikash access only full EC2 , not access othere services.
+After LAB delete role, user,connecter, directory, instances.
+==================================================================================
+
+What is NoSql Database in Hindi | None Relational Databases | AWS Database |AWS DynamoDB
+
+None Relational Databases store data without a structured mechanism to link data from different tables to One another. Require low cost hardware.
+Much faster performance(Read/Write) campared to Relational DB. Horizontal Scaling is Possible. New provide table with flat fixed column Records, 
+it means schema-free. But suited for Online Analytical Processing. Ex of NoSQL Databases- MongoDB, Cassandra, DynamoDB, Padge, Redius.
+
+Types of No-SQL Dababases :
+
+a) Columnar Databases (Cassandra, HBase)  : 
+   A columnar databases is a DBMS that store data in columns insted of Rows Ina a columnar DB, all the column 1 volues are physically together. 
+In a Row oriented DBMS, the data would be stored like this (ranjit,30,30000),(sanjay,40,50000).
+To column based DBMS, the database would be stored like this (ranjit,sanjay),(30,40),(30000,50000). Benefit is that because a column-Based DBMS is 
+self indexing, it uses less disk space that a RDBMS containing the same data. It easly perform operation like min, max & Avg.
+
+b) Document Database ( mongoDB, CouchDB, RavenDB) json : 
+   Document DB make it Easier for Developers to Store and querying Daba in a DB by Using the same document model format they use in their application code.
+ Document DB are effecient for storing catalogue. Store sem-structure data as document typically in JSON or XML format. In the following example 
+A JSON like document describe a book. A document database is a great choice for caontain management application such as blogs and Video platforms.
+
+c) Key Value Database (Redis, Risk, DynamoDB, Tokyo cabnet) :
+   A key-value DB is a simple DB that users an associative array (think of a dictionary) as a fundamental model where each key is associated with one and 
+only one value in a collection. It allows horizontal scaling. Used cases - Shopping cart, and session store in app like facebook and twitter. 
+They improve application performance by storing critical process of data in-memory for low latency access. Amazon Elasticache as an in-memory key-value 
+stores.
+
+d) Graph Based (Neo4J, FlockDB) :
+   A graph DB bassically a collection of Nodes and Edges Each node represent an entity (like person) and each edge represent a connection or relationship
+ between two Nodes.
+
+* Amazon RDS (Relational Database Service) is used to set up, manage, and scale a relational database instance in the cloud.
+* RDS is fully managed RDBMS service. 
+* Amazon RDS manages backups, software patching, failure detection, and many more tasks.
+* With RDS, CPU memory, storage, and IOPS are all independent and hence can be scaled independently.
+* RDS offers mainlay six database engins as below
+
+1) MS SQL Server 
+2) MySQL
+3) Oracle 
+4) AWS Aurora - Heigh Throughput  (it maintain two copy of database in each AZ)
+5) PostgreSQL - Heighly Relable & Stable
+6) Maria DB 
+
+
+There are Two Licensing Options:
+1) BYOL - Bring your own license.
+2) License from AWS an hourly basis
+
+RDS Limits :
+Upto 40GB instances per account. 10 of this 40 can be oracle or MS-SQL. Server under license included Model. Under BYOL model, all 40 can be any DB 
+engine you need.
+
+RDS instance Storage :
+Amazone RDS use EBS volumes (not instance-store) for DB and logs storage. 
+1) General purpose - Use for DB workloads with moderate I/O Requirment, Limits - min 20GB and Max 16384 GB.
+2) Provisional IOPS RDS storage - Use free heigh performance OLTP workload Limits - min 100GB, Max 16384GB.
+
+Templates Available in RDS :
+1) Production : Use defaults for Heigh availability and fast, consistent performance.
+2) Dev/Test : This instance is intended for devlopment use outside of a prod Env.
+3) Free-Tier : use free-Tier to Develop new app test existing app, or given hands-on, Ex : with Amazon RDS.
+
+DB Instance Size :
+1) Standard Class max 96CPU, 384 GB RAM, EBS 14000 Mbps.
+2) Memory-Optimized Class : (include r and X classes) max 768GB RAM, 96 CPU, EBS 14000 Mbps.
+3) Burstable Class : include t classes Max 8 cpu, 32GB RAM, EBS 1500 Mbps.
+
+When Multi-AZ RDS Failover Trigger:
+1) in case of failure of primary DB instance failure.
+2) In case of AZ failure.
+3) Loss of Network, connectivity to Primary DB.
+4) Loss of Primary EC2 instance failure.
+5) EBS Failure of Primary DB instance.
+6) The Primary DB instance setting is changed.
+7) Patching the OS of the DB instance.
+8) Manual failover (incase of Rebooting).
+
+In Case of : OS Patching, System upgrades, DB scaling. These thing happens on Standby first, then on Primary to avoid Outage.
+In Multi-AZ Snapshots and Automated backups are done on standby instance to avoid I/O Suspension on Primary.
+
+RDS Multi-AZ Deployment - for Maintenance
+
+In case multi-AZ deployment
+Data redundancy, Elimination of I/O freezes, Less latency spikes during system backup.
+
+
+What actually encrypted when data at Rest :
+1) All its Snapshots. 2) Backups of DB (S3 storage). 3) Data an EBS volume. 4) Read Replica Created from the Snapshot.
+
+Some Points Related to RDS Billing :
+You have to pay Only for :
+1) DB instance runing hours.
+2) Internet Data transfer.
+3) Backup storage (ie S3).
+
+AWS also charge for :
+1) Multi-AZ DB hours.
+2) Provisioned Storage (Multi-AZ).
+3) Double write I/O.
+You are not charged for DB data transfer during Replication from Primary to Stand by.
+
+Features of Amazon RDS:
+performance and scalability, High availability,security, Backup and restore, maintenance and Upgrades.
+
+Read Replica: 
+*Read replica is an exact replica of the primary DB instance.
+*RDS users DB engin's built-in replication functionality to create these read replicas.
+*Replication happens asynchronously.
+*Read replicas can be created in the same or a different region. Automatic backup has to be enabled.
+
+Lab:
+database-1 created > Action > create read replication another region (define other Region  and all fields) > create.  (first get error binlog then follow 
+below) then created.  (created in other region also)
+RDS > parameter Grp > search "binlog_format" default value "OFF" > edit > select MIXED > save changes
+parameter groups > create parameter group > Type select "DB cluster Parameter group" > group name "database1-Group" > create
+select "database1-Group" > edit parameter > search binlog-format > in value select MIXED > save changes
+RDS > database > database-1 > modified
+Database option > select "database1-Group" > continue
+select database and reboot. 
+Then
+both Reader and Writer Endpoint created. suppose connect from reader endpoint then only read the table not insert data.
+
+---------------------
+## LAB 28, AWS RDS LAB | How to access MySQL Instance from Linux machine          # ranjit123
+
+GoTo RDS > Create database > select Standard Create > MySQL > MySQL Community > select version mysql 5.7.22 > Templete: Production > Master username: "admin" > Master password  > DB instance size: Burstable classes > select db.t2.micro > storage: General Purpose > Availability & durability : Do not create a standby instance > select default VPC > 
+
+Click on Additional Connectivity Configuration : Subnet group default > Public accessible: Yes > VPC security group : Create New "mysgforRDS" > 
+select avilibilty ZONE > Database authentication: select password authentication > Click on Additional Configuration: database name "db1" > 
+Backup : Enable automatic backup > Backup retention period : 7 days > Backup window : No perfrence > Backup desable > Maintenance: desable >
+Maintance window : No perference > Deletion protection : desable > Create Database.
+
+Click on database (created) > GoTo securityGroup >GoTo inbound > edit > Add Rule SSH, MYSQL/Auror anywhere > SAVE.
+# if not connect then use all traffic anywhere inbound in security group
+
+Create Linux EC2 instance (security group : select existing security group, checked "mysgtoRDS" (same is DB creation time) > Review Launch.
+logined  this instance, ec2-user, sudo su -
+yum install -y mysql   # to installed packaged.
+mysql -h endpoint name -u admin -p db1   # goto RDS > database> Connectivity & security > copy Endpoint  
+Enter password :
+
+came MySQL prompt$
+-----------------
+
+## LAB 29, AWS RDS | How to access MySQL DB From windows Server
+
+GoTo RDS > Create database > Standard > MySQL > Free Tier> Master username : admin > master password: ranjit1234 > Storage : General pupos SSD > 
+Click "Additional Configuration" :
+database Name: db1
+Backup : Unchecked Enable automatic backups
+Maintenance : Unchecked Enable auto minor version upgrade.
+checked No perference. > Create Database.
+Click on databse (what now created). > Click on Security Group > Inbound > Edit > Add Rule > RDP, HTTP, HTTPS anywhere > Save 
+
+GoTo EC2 instance launch (window server 2019). ( In security Group, select existing security group and also select created security group (which is created db instance time). And connect this instance.
+
+GoTo Server Manager > Local server > IE Enhance Security Configuration : click On > both Off, Ok> Window Defender Firwall OFF .
+GoTo google and search web plateform installer, install this extension, Run, checked and accept term and condition > install> finish
+
+GoTo Start > open Microsoft Web Plateform Installer > Application > search mysql > MySQL Window 5.5 : Add > install > Enter new password > continue
+Accept > Finish.  ( exit and close)
+
+GoTo cmd > mysql -h past endpoint (from ec2 databse) -u admin -p db1   enter
+password: ranjit1234
+mysql> 
+
+------------------------------------------
+WHAT IS DynamoDB : 
+Database Types is Unstructured Data is information that either does not pre-defined data model or is not Organised in a pre-defined manner.
+
+Unstructured information is typically test-heavy but may contain data such as data number, and facts as will example include e-mail messages, 
+word processing documents, videos, photos, audo files, presentations webpages.
+
+Semi-Structured data -> data is information that does not reside in a relational database but that does have some organistional properties that make it 
+easier to analyse eg XML & JSON.
+
+Structured data referes to information with a high degree of Oraganisation, such that inclusion in a Relational database is seamless and readily Searchable
+ by simple straightforward search engine algorithms or other Search Operation. All data which can be stored in database SQL in table with rows and Columns 
+They have relational key and can be easly mapped into pre-defined tables.
+
+DynamoDB Table :
+A Table is a collection of data items like all other DB, dynamoDB store data in tables.
+Items : Each Table contains Multiple items, An item is group of attributes that is Uniquely indentitable among all of the other items. Items in dynamoDB 
+are similar Records in other DB.
+
+DyanmoDB limits 256 tables per account per Region . No limits on the size of any table.
+Component of DynamoDB:
+Table, Items, and attributes. 
+primary key, secondry index, DynamoDBstream, 
+-------------
+
+## LAB 30, AWS RDS| Create Table,item in dynamo DB
+
+Databases > DynamoDB > Create table > Table Name: name, primary key: RollNumber, select Number > Unchecked default setting >
+checked provisioned(free-tier eligible).
+
+OR checked Use default setting. > Create.  # now studentdata table created.
+----------------------------------
+## insert data into dynamodb table using json file.
+Using CLI command
+create ec2 linux,install AWS CLI(if aws command not work), aws configure (enter access key, secret key), aws s3 ls
+aws dynamodb ls # list tables (first create dynamodb table)
+aws  dynamodb batch-write-item --request-items file://C:\Users\Lenovo....\.product.json  # data inserted into table 
+# create backup of table option also, restore table from backup, export data to .csv file also.
+-------------
+
+ElastiCache : 
+ElastiCache is a web service that provides high-performance, cost-effective and scalable caching solution. it easy to manage and scale a distributed 
+in-memory data store. it improves the load and response timeas it allows to retrive data from a fast in-memory system. it automated some administrative 
+task, such as hardware provisioning, failure recovery, backup, software patching.
+LAB:
+elasticache > select Redis (database) > fillup all field with define no of DB replica, multi AZ, import data to S3. > create
+## one primary and 2 replica node created with endpoint.
+# connect database using endpoint. first download redis-cli client
+redis-cli -h endpoint -p port.
+--------------
+
+Redshift database :
+it fully manged data warehouse services in the cloud. it scaled up to petabytes or more. To create a database, a set of nodes called as amazon Redshift 
+cluster has to be launched. Used for run analytical query and huge transaction data process. Redshift delivery fast query performances. AWS provisions the 
+infrastructure of  the data warehouse automatically. It also backup the data in the data warehouse to Amazone S3 automatically.
+Lab:
+redshift > create cluster > fillup fields > Create.
+# DB node created.
+Connect to database option is there
+connection: new connection
+cluster: redshift-cluster
+databse name: dev
+database user: awsuser
+database password: ******
+# Editor
+create database db1;
+user db1
+select * from table;
+
+
+==============================================================
+AWS Route 53 | What is AWS Route 53
+
+You can use Amazon Route 53 to register new domains, transfer existing domains, route traffic for your domains to your AWS and external Resources, 
+and monitor the health of your Resources. Rout 53 is global services, not region basis. And it also suppport ipv6.
+
+Route 53 functions:  
+1) DNS Management   		(Create Hosted Zone)
+2) Traffic Management  		(Create Policy)
+3) Availability Monitoring   	(Create Health Check)
+4) Domain Registration.      	(Register Domain)
+
+Route-53 performs three main functions:
+1) Register a domain.
+2) As a DNS, it routers internet traffic to the resources for your domain.
+3) Check the health of your Reosources. 
+
+Raoute-53 sends automated requests over the internet to a resource ( can be a webserver) to verify that the serves is reachable, functional or available.
+Also you can choose to receive notifications when a resource becomes unabailable and choose to route internet traffic away from unhelthy resources.
+You can use Route 53 to route internet traffic for a domain that you registered with another domain Register.
+
+When you register a domain with Route 53 the device automatically makes itself the DNS service for the domain by doing the following :
+It creates a hosted zone that has the same name as your domain.
+it assigns a set of four name servers to the hosted zone, unique to the account.
+when someone uses a browser to access your website, these name servers inform the browser where to find your resources, such as a web server or 
+an Amazon s3 Bucket.
+
+It gets the name servers from the hosted zone and adds them to the domain.
+AWS supports:
+1) Generic Top level domains.  (.org, .com, .net)
+2) Geographic Top Level Domains.  (.in, .cn, .pk)
+
+Registring a domain with Route-53.
+You can register a domain with Route53. if the TLD is included on the Supported TLD list. If the TLD is not included, you can't register the domain
+ with Route53.
+
+Each Amazone Route 53 account is limited to a maximum of 500 Hosted zones and 10000 resource record set per hosted zone you can increase this limit 
+by requesting to AWS.
+
+STEPS To configure Route-53 :
+1) You need to register a domain, this can be Route 53, or another DNS Registrar, but then you connect your domain name in that registrar to Route 53.
+2) Create Hosted Zone on Route 53, this is clone automatically if you registred your domain using Route 53.
+Inside the hosted zone you need to create Record sets.
+
+Delegate to Route 53:
+This step connects everything and make it works.
+Connect the domain name to the Route 53 hosted zone - this is called delegation.
+update your domain registrar with the correct name server for your route 53 hosted zone. No other customer hosted zone will share this delegation 
+set with you.
+
+Transferring a domain to Route 53:
+you can transfer a domain to Route 53 if the TLD is included on the following list.
+if the TLD is not included, you can't trnsfer the domain to Route 53. For most TLD, you need to get an authorization code from the current registrar 
+to transfer a domain.
+
+
+Network latency is the amount of time taken to deliver some amount of data over N/W.
+
+Route 53 Hosted zone:
+A route 53 hosted zone is a collection of records for a specified domain. You create a hosted zone for a domain and then you create records to tell the domain name system how you want traffic to be routed for that domain. Bassically a hosted zone is a container that holds information about how you want to route traffic for a domain and its subdomain.
+you can create public (internet) hosted zones or private (internal DNS) hosted zones.
+For each public hosted zone that you create Amazone Route 53 automaticaly creates a Name Server record and a start of authority records. Don't change these records.
+
+Route 53 automatically creates a Name server (NS) record with the same name as your hosted Zone.
+It list the four name server that are the authoritative name servers for your hosted zone. Do not add, change, or delete name server in this records.
+
+Route 53 Hosted zone default Entries:
+Inside the hosted zone by default you have two entries-
+NS entry : contain the unique sets of name servers for this hosted zone.
+SOA entry : Contains information about the hosted zone.
+
+Supported DNS Record types by Route 53:
+
+1) AAAA Record - IPv5 address Record Maps domain name to an IPv6 address (www.techgugtgu.com IN AAAA 200284)
+2) Root Server: It keep information about TLD server.
+3) TLD server: it keep information about authoriative name server.
+4) NS (Name server):  it container information about IP addresses for individual domains.
+5) Authority Name server:  The server component in Domain Name system (DNS) that holds acutal DNS records such as A Name, CNAME, Alias, etc.
+6) 'A' NAME Record: It maps the domain name to the IP address of the backend host. 'A' is for address. Ex www.apple.com <-------> 54.28.14.6
+7) CNAME (Canonical Name) Record: it maps one name to another name insted of an IP address.  Ex www.fruits.com <-----> www.apple-orange.com
+
+----------------------
+AWS ROUTE 53 Routing Policy :
+when you create a record, you choose a routing policy, which determines how Amazon route 53 respond to Query.
+Routing Policy:
+1) Simple Routing (Default)
+2) Failover Routing
+3) Geolocation Routing
+4) Multi value Answer Routing
+5) Latency Based Routing
+6) Weighted Routing
+7) Geo-Proximity
+
+Public Hosted Zone : it contain information about how the traffic on the internet should be routed for a domain.
+
+Private Hosted Zone: it contain information about how to route the traffic for a domain within one or more VPCs. To use private hosted zone , following VPC setting have to be set to TRUE.
+enableDnsHostnames
+enableDnsSupport
+
+SOA (Start of Authority) record set: Contain the base DNS information about the domain.
+
+Failover Routing Policy:
+Failover Routing lets you route traffic to a Resources when the Resource is healthy, if the main Resource is not healthy, then route traffic to a different
+Resource.
+The primary and Secondary Records can route traffic to anything from an Amazone s3 bucket that is configured as a website to a comples tree of Records.
+Failover Routing Policy is applicable for Public hosted Zone Only.
+
+Geolocation Routing :
+Geo location routing lets you choose the resources that servers your traffic based on the Geograhic location of your Users ie the location that DNS Queries Originate from.
+for Ex: you may have presence in Europe and Asia Now you want users in the Asia to be served in the Asia and those in Europe to be served by servers in Europe. Benefits is
+
+Latency Based Routing:
+If your application is hosted in multiple amazone EC2 regions, you can improve performance for your users by serving their request from the Amazon 
+Ec2 region that provide the lowest latency.
+To use latency-based routing, you create latency records for your resources in multiple EC2 regions.
+
+
+Weighted Routing Policy:
+lets you associate multiple resources with a single domain name or subdomain name, and choose how much traffic is routed to each resource.
+this can be useful for a variety of purposes, including load balancing and testing new versions of software.
+weights can be assign any number from 1 to 255. Weighted Routing policy can be applied when there are multiple Resource that perform the same function for example : webserver saving the same website.
+
+Geo proximity Routing Policy:
+Use when you want to route traffic based on the location of your resources and optionally, shift traffic from resource in one location to resources in another.
+You can also optionally choose to Route more traffic or less to a vigen Resource by specifying a value, known as a bias. A bias expand or shrinks the size of the geographic region from which traffic is related to a resources.
+
+## LAB 31, How Routing Policy works in Route 53   # No lab
+=============================================================
+
+What is Cloudfront | Creating amazon cloudfront distribution |AWS CDN (content delivery network)
+
+Amazon cloudfront is a webservice that gives business and Web application developers and easy and cost effective way to distribute content with low 
+latency and high data transfer speed.
+SERVER->EDGE->USER
+
+Cludefront is a gloabal service. Amazone coudfront is a webservice that speeds up distribution of your static and dynamic web content, such as html, .css, 
+.js, and image files to your users.
+
+Cloudfront delovers your content through a worldwide network of data centers called edge locations.
+When a user request content that you are serving with cloudfront, the user is routed (via DNS Resolution) to the edge location that provides the lowest 
+latency, so that content is delivered with the best possible performance.
+
+If the content is already in the edge location with the lowest latency, cloudfront delivers it immediately.
+This dramatically reduces the number of networks that your users request must pass through which improves performance.
+if not, cloudront retrives it from an amazon S3 bucket or an HTTP/webserver that you have identified as the source for the definitive version of your 
+content (origin server).
+
+cloudfront also keeps persistent connection with origin servers so files are fetched from the Origines as quickly as possible.
+You can access Amazon cloudfront in the following ways -
+1) AWS Management Console.
+2) AWS SDK.
+3) Cloudfront API.
+4) AWS command line Interface.
+
+cloudfront Edge locations:
+Edge locaton are not tied to availability zones or Regions.
+Amazon cloudfront has 216 points of presence (205 edge locations and 11 Regional edge caches in 84 cities across 42 countries.
+
+cloudfront - Regional edge cache :
+Amazon cloudfront has added sevral regional edge cache locations globally at close proximity to your viewers.
+They are located between your Origin webserver and the global edge locations that serve content directly to your viewers.
+
+CloudFront Regional Edge Cache- Working:
+When a viewer makes a request on your website or through your application, DNS routes the request to the cloudfront edge location that can best serve the 
+users Request.
+This location is typically the nearest cloudfront edge location in terms of latency. In the edge location, cloudfront checks its cache for the Requested 
+files.
+If the files are in the cache, cloudfront returns them to the User. If the file are not in the cache, the edge servers go to the nearest regional 
+edge cache to fetch the object.
+
+Regional edge caches have feature parity with edge locations fro eg: a chache invalidation request removes an object from both edge caches and Regional 
+edge cache before it expires.
+
+The next time a viewer Request the object, cloudfront  returns to the Origin to fetch the latest version of the Object.
+Proxy method PUT/POST/PATCH/OPTIONS/DELETE go directly to the origin from the edge locations and do not proxy through the regional edge Caches.
+
+## LAB 32, AWS Cloudfront Demo
+
+1 )First create bucket in S3. And upload any image/files. ( while uploading image, give read permission in Manage public permission.
+bucket name : any name, unchecked Block all public access, checked I acknowledge that the current setting. > create bucket.
+
+2) click on CloudFront > Create Distributions > Get Started > Origin Domain Name: bucket_name, origin ID: custome-image, origin Protocol policy: HTTP only
+ , (TTL is in seconds)
+
+Distribution Setting : Edit > price class: Use All Edge Locations > Create Distribution. (it will take some time)
+
+GoTo Distributions, copy domain name and pest in URL:     ../image (abc.jpg)/file name # now image come very fast. (this is accessed through CDN)
+
+Note: Bill generate in case (1. DATA TRANSFER OUT(INTERNET/ORIGIN) 2. HTTP/HTTPS REQUESTS 3. INVALIDATION REQUESTS 4. FIELD LEVEL ENCRYPTION REQUESTS
+5. DEDICATED IP CUSTOME SSL CERTIFICATES ASSOCIATED WITH A CLOUDFRONT DISTRIBUTION. 
+
+=====================================================================
+
+AWS SQS (Simple Queue Service) How SQS Works | AWS SQS used Cases | SNS vs SQS Comparison
+
+SQS is a Fast, Reliable, Fully managed message Queue services. It is a Webservices that gives you access to message Queues that store messages waiting 
+to be processed.
+It offers a reliable, highly scalable, hosted Quest for storing messages between Servers. It allows the decoupling of application Comparents such that a 
+failure in one Components does not Cause a bigger problem to application functionality (like a coupled app).
+
+Using SQS, you no longer need a highely available message cluster or the burden of running it. You can delete all the messages in an SQS Queue itself.
+You can use applications on EC2 instances to read and process the SQS Queue messages.
+You can use Autoscaling to scale the EC2 fleet processing the SQS messages, as the Queue size increase. These applications on EC2 instances can process 
+the SQS messages/jobs then post the results to other SQS Queues or Other AWS Services.
+
+a) AWS Queues Type:
+1) High (unlimited) throughput.
+2) At least One delivery.
+3) Duplicacy is possible.
+4) Best effort Ordering.
+
+b) FIFO Queue:
+Limited throughput (300 TPS).
+Exactly One processing.
+Duplicacy not possible.
+Strict Ordering, first-in first-out.
+FIFO Queue are limited to 300 transactions per second(TPS), but have all the capabilities of standard Queue.
+
+SQS Pricing:
+The first 1 million monthly requests are free, after that pricing is according to regions for eg:
+In mumbai Region, Standard Queues- $040/million request. FIFO Queue- $050/million request.
+5) Interaction with Amazone S3. 
+6) Interaction with AWS KMS.
+
+How Amazone SQS charges.
+a) API action- Every Amazone SQS action count as a request.
+b) FIFO Request- API actions for sending, Receiving, deleting and changing visibility of messages from FIFO QUEUES are charged at FIFO Rates.
+c) Contents of Request- A single Request can have from 1 to 10 messages, upto a maximum total paylaod of 256KB.
+d) Size of Payload is billed as 1 Request (for eg, API action with 256KB payload is billed as 4 request.
+
+Short Polling:
+A request is returned Immediately even if the queue is empty.
+It does not wait for messaes to appear in the queue.
+It Queues only a subset of the availabile servers for messages (based on weighted random distribution)
+Default by SQS.
+RecentMessagewait time is set to 0.
+More request are used which implies heighly cost.
+
+Receive messageWaitTime is set to a non-zero value max 20 seconds).
+Billing is same for Both polling.
+
+SQS - Retention Period:
+SQS messages can remain in the queue for upto 14 days (SQS retention period).
+Range is 1 min to 14 days (Default is 4 days).
+Once the maximum retention period of a message is reached, it will be delted automatically from the Queue.
+Maessages can be sent to the Queue  and read from the Queue simultaneously.
+SQS can be used with DynamoDB, EC2, ECS, Redshift, RDS, lambda, S3 to make distributed/Decoupled applications.
+You can thave multiple Queue with different priorities.
+
+SQS- Visibility Timeout :
+Is the duration of time a message is locked ofr Read by Other servers.
+Max is 12 hours and default is 30 sec. A server that read a message to process it, can change the message visibility timeout if it need mot time to process the message.
+After a message is read, there are the following possibilities:
+1) An ACK is received that a message is processed, so it must be deleted from the Queue to avoid duplicates.
+2) If a fail is received or the visibility timeout expores, the messsage will there be unlocked for read, such that it can be read and processed by another servers.
+
+Delivery Delay:
+AWS SQS provides delivery delay options to postpone the delivery of new messages to a Queue if delivery delay is defined for a Queue, any new messages will not be visible to the server for the duration of delay The default (min) delay for a Queue is 0 seconds The maximum is 14 minuts.
+
+Receive MessageWaitTime - The default time is 0 seconds - This is max amount of time that a long polling Receive call will wait for messsagge to become availabe befor returning an empty response (Max value is 20 sec).
+
+Dead Letter Queue:
+The main task of a dead letter Queue is handling message failure A dead letter Queue lets you set aside and isolate messages that can't be procesed correctly to determine why their processing didn't succeed. 
+Don't use a dead letter Queue with a FIFO Queue, if you don't want to break the exact order of messages or operatons.
+DLQ must be of the same type as the source queue (Standard or FIFO).
+
+## LAB 33, AWS SQS Triggers on Lambda function
+
+GoTo Application Integration> Simple Queue service >Get started now >queue name: TestQueue, select Standard Queue > click on Configure Queue
+Queue Action > Send a message > message in body " PROCESS IP4 FILE" > send message.  # and close, and will show 1 msg.
+again goto: Queue Action > Send a message > message in body "Publish video" > send message.  # and close, and will show 2 msg.
+
+goTo Service > compute> Lambda > Create function > Use a blueprint >Blueprint search: SQS > check sqs-poller > configure
+function name: lambdaqueue > check create a new role from AWS policy templates > Role name: myrole > SQS queue filter: select testqueue> batch size: 5, 
+checked Enagle trigger > create function.   # mesg come " Congratulation your lambda function has been creation successful.
+# it will take some time to become from creating to Enabled.
+
+GoTo Simple Queue Services than see both mesg readed and gone.
+select testqueu (what i created) > monitoring > click on " NumberOfMessageSent" > move cursor on Point and click. then will see 2 value readed. # closed
+now click " NumberOfMessagesReceived" > move cursor on Point and click. then will see 2 value readed. # closed
+
+After LAB finally delete queue and goto function and delte lambda function.
+
+===========================================================
+AWS Simple Notification Service Complete Theory | AWS SNS Features | SNS vs SQS
+
+SNS is a fast, flexible, fully managed pushed based notification service. It is a cloud based notification service. it provide pushed based and many 
+to many messaging. it is easy to set up operate and send notification from the cloud to subscribing endpoints or clients.
+It allows for sending individual messages or message to a large number of recipents or to other distributed AWS Services. Messages published to an SNS 
+Topics will the delivered to the Subscriber immediatley.
+ 
+Inexpensive, pay as you go model with no upfront Cost. 
+Reliable - At least threee copies of the data use store across multiple AZ in same region.
+It is a way of sending message when you are using Autoscaling, it triggers an SNS service which will email, you that your EC2 instance is growing.
+Publisher -> SNS Topic -> Lambda, SQS, HTTP/S, email, SMS.
+
+Publisher - publishers are also known as producer that produce and send the message to the SNS which is a logical access point.
+Subscriber - Subscriber such as webservers, email address, Amazon SQS Queue, AWS Lambda, receive the message or notification from the SNS over one the 
+supported protocols ( Amazon SQS, email, lambda, HTTPS, SMS).
+
+SNS TOPIC :
+is a logical access point and communication channel. Each topic has a Unique name . A topic name is limited to 256 alphanumeric characters. The topic 
+name must be unique within the AWS account.
+Each topic is assigned an AWS ARN Once it gets created. A topic can support subscribers and Notification deliveres over multiple protocols.
+
+Message/request published to a single topic can be delivered over multiple protocols as configured when creating each subscriber.
+Delivery formats/transport protocols (endpoints).
+SMS, e-mail, email-JSON for applications, HTTP/ HTTPS, SQS, AWS Lambda.
+
+---------------------------
+## LAB 34, AWS Simple Notification Service (SNS)
+
+goTo Application Integration > Simple notification service >topic name : COVID-19-WARNING > next step > select all bydefaul...> create topic.
+Click "Create Subscription" > protocol: email, Endpoint : ranjitmoonup@gmail.com > Creation Subscription   # come notificatin on gmail. can check.
+
+goto gmail account and click "confirm subscription"  THEN in Subscription got status Confirmed.
+if click on unsubscribed then subscription ID deleted.
+Again click "confirm subscription"  THEN in Subscription got status Confirmed.
+
+We can add more gmail ID, click topic > creation subscription > add info....   # to send notification.
+
+select Topic > publish message > Subject: Covid19-warning, message body : stay at home and make social destancing. > publish message.  # mail come in gmail.
+-----------------------
+
+## LAB 35, SNS : How to send Text message to any number
+
+left side : click on Text message(SMS) > public text message > Transactional> enter phone no : +919999813124 , message: This is warning message. > public message. # mesage come in mobile.
+
+-----------------------------
+Configuring NAT instance for private subnets and internet access | NAT Gateway vs NAT instance
+
+You can Use a NAT instance insted of NAT Getway in a public subnet in your VPC to enable instance in the Private Subnet to initiate Outbound IPv4 traffic
+to the Internet or Other AWS Services, but prevent the instances from Receiving inbound traffic initiated by someone on the internet.
+Note :- NAT is not supported for IPv6 traffic, use an egress only internet gateway. NAT Getway is High Cost then NAT Instance.
+
+## LAB 32 Configuring NAT instance for private subnets instance and internet access *****************
+
+First create VPC vpc1 (10.0.0.0/16)
+Create Subnet public_subnet, VPC: select vpc1, CIDR 10.0.0.0/24 
+Create Subnet private_subnet,VPC: select vpc1, CIDR 10.0.1.0/24 
+Create internetGetway.   and attach
+Create Rout Table, name: Rout1, VPC : select vpc1 , edit rout, Add route: 0.0.0.0/0, select internetgetWay. Edit subnet associations, select public subnet, 
+SAVE.
+
+GoTo EC2, (left side) Community AMIs, search nat instance and select first,  ( Network select vpc1, subnet public subnet, enable, sucurity new security 
+group, SSH, All ICMPv4, anywhere)  create.  # This is NAT instance
+
+Create simple another Linux EC2 instance ( network vpc1, Subnet: select private subnet, public IP desable, security: select Existing security grp and 
+checked which i made preview)
+
+copy public ip of NATinstance. connected in putty.
+sudo su -
+ping 8.8.8.8  # pinging..., net connecting in public subnet instance.
+vi ranjit.pem    # pest there of downloaded instnace creation time pem file content
+chmod 700 ranjit.pem
+ssh -i ranjit.pem ec2-user@private ip ( of second linux instance)   Connected private instance from public instance.
+
+ping 8.8.8.8  # not responding ( not internet connecting in private subnet instance).
+
+GoTo Your vpc > Route Tables >  Select default RoutTable (vpcID will be same), route > edit route> add route table, Add 0.0.0.0/0, Target: select instance, (nat instance) > SAVE route.
+
+Select NAT EC2 instance > Action > Networking > Change SourceDest Check.> Checked Stoped. 
+
+ping 8.8.8.8  # Now pinging in private subnet instance. ( internet connecting)
+===============================
+
+AWS Site to Site VPN Configuration-Theory (communication between VPC cloud (Data center) and customer Getway, in another Region) 
+
+# communication between datacenter and customer through private IP only.
+
+By default, instance that you launch into an Amazon VPC can't Communicate with your own network To enable the comm with company datacenter. 
+you have to establish site to site VPN connection.
+
+VPN Connection: A Secure connection between your on-permises equpment and your VPC's (datacenter).
+VPN Tunnel : An encrypted link where data can pass from the customer network to or from AWS Each VPN connection include two VPN tunnels which you conn 
+simultaneously use for high abailability.
+
+Customer Gateway : An AWS resource which provides information to AWS about your Customer Gateway device.
+Customer Getway device : A physical device or software app on customer side.
+
+1) Create two vpc - one in mumbai datacenter and another in Singapur(customer end)
+2) create One linux machine in both VPC, take RDP of it (security group SSH,TCP,ALl ICMPV4).
+3) Now go to Mumbai Region - Create virtual private gateway.
+4) Now Create customer Gateway- enter public IP of Singapur EC2 instance.
+5) Create Site to Site VPN connection Add subnet of customer-end (singapur).
+6) Now go to Route table - Route Propagation.
+7) Site to Site VPN - Download configuration (tick).
+8) Now go to Singapur region, Take access of EC2 using putty.
+Commands:
+login as - ec2-user, sudo us -
+yum install openswan -y
+vi /etc/ipsec.conf, /etc/sysctl.conf, /server network restart, vi /etc/ipsec.d/aws-vpn.conf, vi /etc/ipsec.d/aws-vpn secrets, chkconfig ipsec on, service ipsec start, service ipsec status.
+
+## LAB 36, Site To Site VPN Configuration (connection between vpc and CustomerGetway)
+
+GoTo Mumbai region :   #  DataCenter
+Create vpc, CIDR 10.1.0.0/16  create; Create subnet name: AWS-SIDE-SUBNET, select vpc, CIDR 10.1.0.0/24 create. Create internetGetway name: AWS-SIDE-IGW create and attach. create Route table name: AWS-ROUTE create. Edit routes : 0.0.0.0/0, select iGetway. Save routes. Edit subnet associations select and SAVE.
+
+GoTo Singapur Region :  # CustomerEnd
+create vpc name: CUSTOMER-END, CIDR 10.2.0.0/16 create. create sunet name: CUSTOMER-SUBNET, select vpc, CIDR 10.2.0.0/24 Create, Create IGateway name CUSTOMER-IGW, and attached. Create Rout Table name: CUSTOMER-ROUTE, vpc select vpc, Create. Edit Route 0.0.0.0/0, select Igetway save route. Edit subnet association and select, SAVE.
+Ceate EC2 linux instance (singapur) ( network: select vpc, IP : enable, create security : SSH, ALL TCP, All ICMPv4) launch.
+
+GoTo mumbai Region (AWS site):
+1) Create Virtual private Getway > name: AWS-SIDE-GW > Create virtual private getway and attach vpc.
+2) Create Customer Gateways > name: CG-AWS-SIDE, Routing: static, IP: singapur instance public IP > Create customer getway.
+3) GoTo Site-to-Site VPN Connections > Create VPN Connection > Name: MUMBAI-SINGAPUR, Target Getway : virtual private getway > select virtaul_private_getway > Customer Gateway : Existing, Customer Gateway ID: select same, Routing Options: Static, Static IP Prefixes : enter singapur subnet (10.2.0.0/16). > Create VPN connection.  # Now both Tunnel Status is DOWN.
+
+GoTo Route Tables > select created, route table > Route Propegation , Edit Rout Propegation and checked > SAVE.
+GoTo Site-to-Site VPN connection > Download configuration, vendor: Generic, Download.
+
+GoTo Singapur Region :
+connect putty using public IP. (singapur instance)
+ec2-user, sudo su 
+yum install openswan -y
+vim /etc/ipsec.conf   # uncommented include /etc/ipsec.d/*.conf
+vim /etc/sysctl.conf  # past 3 net.ipv4.conf.all.accept_redirects=.. . (from nat instance command)
+service network restart
+
+vim /etc/ipsec.d/aws-vpn.conf  #( past all content, first edit as below from NAT instance command)
+leftid=IP  # copy customer Gateway IP of Outside IP Address from downloaded file.
+right=IP   # cpy copy virtual private Gateway IP of Outside IP Address from downloaded file.
+leftsubnet=10.2.0.0/16
+rightsubnet=10.1.0.0/16
+
+vim /etc/ipsec.d/aws-vpn.secrets   # pest ("customer Gateway IP of Outside IP" "virtual private Gateway IP of Outside IP": PSK "Pre-Shared Key from downloaded file")   # Ex: 3.0.147.38 13.126.17.63: PSK "gWiLXzwrcLxXQF2lFVtGcjEMktZOla9Z"
+
+chkconfig ipsec on  #
+service ipsec start
+service ipsec status     # showing Active Running)
+
+GoTo mumbai Region to check Site-to-Site VPN connection, tunnel Details (Now UP)   # Now connection is up between both)
+Create Ec2 linux instance (mumbai) (select vpc created, ip enable, security SSH, anywhre > review and Launch.
+
+From singapur instance ping private IP (of mumbai instance private ip)
+Now not pinging...
+GoTo mumbai instance and Security group > edit inbound rule > Add rule All ICMPv4, anywhere and SAVE.
+Now pinging...... fine.
+
+=========================================================
+AWS Lambda || Serverless compute on AWS | What is AWS Lambda
+
+AWS lambda is a serverless Computing that lets you run Code without provisioning or Managing Servers or without managing infrasturcture. With AWS lambda, you 
+can run code for virtually any type of application or backend service- all with Zero Administration.
+AWS Lambda is used only for running and executing our backend code. it is stateless system.
+it balance of mamory, CPU, network and other Resources. Servers and OS maintenance.
+
+AWS lambda runs your code on a high-availability compute infrastructure. AWS lambda execute your code only when needed and scales automatically, from a few requests per day thousands per second.
+you pay only for the compute time you consume, no charge when your code is not running.
+All you need to do is supply your code in the from of one or more lambda functions to AWS lambda. One of the languages that AWS lambda supports currently( node js, java, pwoershell, C#, Ruby, python & Go). And the service can run the code on your behalf.
+
+Typically the lifecycle for an AWS Lambda based application includes authoring code, deploying code to AWS lambda and then monitoring and troubleshooting.
+This is in exchange for flexibility, which meand you cann't log into compute instances or customize the operating system or language Rountime.
+If you do want to manage your Own Compute, you can use EC2 or Elastic Beanstalk.
+
+How Lambda Works:
+First you upload your code to lambda in one or more lambda function. AWS Lambda will then exeute the code in your behalf.
+After the code is invoked, lambda automatically take care of provisioning and Managing the Required servers.
+
+AWS Lambda:
+AWS lambda is platform-as-a service. It supports only limited languages like Node JS, Python, java, C#, Ruby, Go and Powershell).
+Write your code and push the code into AWS lambda. You cannot log into Compute instances, choose customized or languaged platform.
+
+AWS EC2:
+AWS Ec2 is an Infrastructure as a Service. No Environment Restrictions, you can Run any code or language.
+for the first time in EC2, you have to choose the OS and install all the software rquired and then push your code in EC2.
+You can select variety of OS, instance types, network & Security Patches, RAM, & CPU etc.
+
+Function:
+A function is resource that you can invoke to run your code in AWS Lambda, A function has code that processes Events, and a runtime that passes Request and Responses between lambda and the function Code.
+
+Runtime:
+Lambda Runtime allow functions in different languages to run in the Same base execution Enviornment. The runtime sets in between the lambda service and your function code.
+
+Event : is a JSON formatted document that contains data for a function to process.
+
+Event Source/Trigger : An AWS Service such as Amazon SNS, or a custom service that triggers your function and Executes its logic.
+
+Downstream Resource : An AWS Service, such as DynamoDB table or S3 Buckets, that your lambda function calls once it is triggered.
+
+Concurency : No of Request that your function is serving in any given time.
+
+When Lambda Triggers:
+You can use AWS lambda to run your code in response to. Events such as changes to data in an Amazon S3 bucket or an Amazon DynamoDB table.
+To run your code in response to HTT request using Amazon API Gateway. With these capabilities, you can use lambda to easly bild data processing triggers for AWS services like amazon S3 and Amazone DynamoDB, process streaming data stored in Kiness or Create you own bulked data operate at AWS scale performance and Security.
+
+Here is a list of service that invoke lambda function asynchronously:
+Amazon S3
+Amazon SNS
+SEE
+Cloud formation
+Cloudwatch logs
+Cloudwatch event
+AWS CodeCommit
+AWS Config
+
+Poll-Based Invokes:
+The invocation model is designed to allow you to integration with AWS stream adn Queue based Service with no Code or Server Management Lambda will poll the following service on your behalf, retrieve Records and invoke your function.
+The following are supported service.
+Amazon Kinesis (for real time data/video streaming)
+Amazon SQS
+Amazon DynamoDB Streams.
+----------------------------------
+
+## LAB 37, Setup S3 Trigger with Lambda and dynamoDB |Lab on Latest AWS Console
+
+GoTo IAM > Roles > Create role> select "AWS service" > Lambda > Next permission > search dynamodb full access,select > Next >Role name: lambda-for-dynamodb > create role.
+
+GoTo Compute >Lambda > Create function > Author from scratch > Function name: lambda1, Runtime: select Python 3.6 > Click Execution role > select Use and existing role > Existing role: search lambda-for-dynamodb (preview created role name) > Create function   # lambda1 created.
+
+#  goto permission to check all permission exist to lambda.
+
+GoTo Configuration > lambda_function: past python code > SAVE.
+
+Create Bucket > name: bhupender56 > Uncheck Block all public access> checked I acknowledge.... > Create bucket.
+
+GoTo lambda > click lambda1 > click "+ Add trigger" > search s3, select > Bucket: select bhupender56 (bucket name), Event type: 
+select "All object create events" > Check Enable trigger > Add.
+
+GoTo DynamoDB > Create table >name: newtable, primary key: unnique > Create.    # table created.
+
+GoTo S3 > bucket > upload any file.  # metadata of file inserted in table.  ( whenever upload any file in s3 bucket then data inserted in table)
+GoTo DynamoDB > Table > click newtable (table name) > item > entry found in table.
+
+finally delete s3, lambda function, role, dynmodb
+------------
+USer -> website -> Amazon S3 -> AWS Lambda -> multi microservices
+
+================================================END==========
+Intellipat
+
+Module5:
+
+Problem statement:
+You work for XYZ Corporation. The company has decided to mode its infrastructure to AWS to leverage the storage services offered by AWS.
+
+While migrating, you are asked to perform the following taks:
+1. Ensure that any amount of data can be stored on the cloud and can be retrived at anytime from anywhere on the web.
+2. Managing the lifecycle of the data that is being stored on the cloud so that it gets deleted automatically after 75 days.
+3. Retrieve the old version of a file if the content of the current version of the file is compromised accidentially.
+4. Host your static website on the AWS cloud using the domain name created in the Module 3 Route 53 assignment.
+5. Display an error page if the proper domain name is not used while attempting to access the company's website.
+6. Create an S3 access point for the created bucket, and upload a file to the bucket from the CLI.
+----------------------------------
+
+Intellipaat
+Let's Create an RDS DB instance:
+
+1) Create a custom VPC with a public subnet and two private subnet (to facilitate multi-AZ)
+2) Create an internet Gateway and attach it to the custom VPC
+3) Create a route table consisting of the route toward the internal through the internet gateway.
+4) Associate the above route table to the one of the available subnets( one that should be your public subnet)
+5) Create and configure two seprate security groups - one for the EC2 instance and another and another one for the RDS instance.
+6) Create and configure a DB subnet group
+7) Launch a MySQL RDS instance in the private subnet of the VPC (while applying the pre-existing RDS security group and DB subnet group)
+Note: USe MySQL version 5.7.x(older than version v 5.7 .30) and create a database
+
+8) Launch an Amazon Linux EC2 instance while using the bootstrap script. (user data script)
+9) Complete the wordpress installation by putting in all the details and click "submit" . (after open ec2 ip in URL)
+10) Copy the text to be inserted manually into wp-config.php file
+11) SSH into your Amazon EC2 Linux instance and go to /var/www/html directory
+12) Run following command nano wp-config.php
+13) Paste the entire text you've copied before save and exit.
+14) Run the installation.
+15 pull in all information to complete wordpress installation.
+------
+USR DATA
+#!/bin/bash
+yum install httpd php
+cd /var/www/html
+wget https://wordpress-5.1.1.tar.gz    # download
+tar -xzf wordpress-5.1.1.tar.gz
+cp -r wordpress/* /var/www/html/
+rm -rf wordpress
+rm -rf wordpress-5.1.1.tar.gz
+chmod -R 755 wp-content
+chown -R apache:apache wp-content
+service httpd start
+chkconfig httpd on
+
+===========================================================
+Migrating data from MySQL to S3  (DMS)
+--------
+1) Create an empty Amazon S3 bucket
+2) Create a custom VPC with a public subnet and two private subnets(2 private subnet use for facilitate multi-az) #  (EC2- public subnet, RDS- private subnet)
+3) Create an internet Gateway and attach it to your custom VPC
+4) Create a route table consisting of the route towards the internet through the internet gateway
+5) Associate the above route to the one of the available subnets(one that should be your public subnet)
+6) Create and configure two seprate security groups - one for the EC2 instance and another one for the RDS instance #  (EC2: SSH myip,HTTP and HTTPS anywhere) (RDS: mysql/aurora custome select ec2 securityGroup) 
+
+7) Create and confiugre a DB subnet group. (collection of private subnet)      
+
+# goto RDS > create subnet group > select custome vpc >  multi AZ and select both private subnet  .
+
+8) Launch a MySQL RDS instance in the private subnet of the VPC (while applying the pre-existing RDS security group and DB subnet group)   
+
+#securityGrp mySQL/Aurora custom select of ec2 security.
+# mysqldb (Test/Dev), security RDS,  5.7.17, Brustable class, Unchecked Enable storage autoscaling, select custome vpc
+ 
+9) Launch an Amazon Linux EC2 instance in the public subnet of the VPC (while applying the EC2 instance sucurity group)# securityGrp SSH ip, HTTP/HTTPS anywhere
+10) SSH to you EC2 instance and change to the root user
+11) install the MySQL client using the following command : sudo yum install mysql
+12) Connect to the RDS database instance using using following command: mysql -h database_endpoint -P 3306 -u mymasteruser -p
+13) Create database called LIBRARY: CREATE DATABASE LIBRARY;
+14) Search database: SHOW DATABASES;
+15) Go to the LIBRARY database: use LIBRARY;
+16) Create a new Table named as 'books'
+17) Use following command to verify that the table exists: SHOW TABLES;
+18) Now, start inserting rows or entries to the table 'books';
+19) Verify that rows : SELECT * FROM books;
+
+----- Now, Below is start MIGRATION process   arn:aws:iam::026055501964:role/rdsands3fullAccess
+
+1) Create an IAM role that provides read-write access to S3 and RDS. And please make note of ARN  # create role > DMS> AmazonRDSfullAccess and S3fullAccess.
+2) Go to AWS DMS and create a subnet group                                   # DMS > subnet group> create subnet group  (select all subnet)
+3) Launch a replication instance and applying the EC2 security group.        # DMS > Replication instance , select custome vpc, select Ec2 security group
+
+4) Create a source endpoint for MySQL table and test the MySql endpoint.  # DMS, create endpoint, source endpoint, select RDS DB Instance, select private access information manually. ( enter user/password)
+5) Craete a target endpoint for S3 bucket. (Note: copy ARN of IAM role )       # DMS > create endpoint target (not select database). enter ARN of IAM role, created
+
+6) Test the connection S3 endpoint and database-1 endpoint (select replication instance)
+7) Create database migration task the data select MYSQL as the source endpoint and S3 as the target one. # select replicatioin instance, database name, table name
+8) A .CSV file should be created in S3 bucket under the folder.  # LAB completed
+
+============================================================End
+arn:aws:iam::026055501964:role/rdsS3Role
+
+FSx file system: (used for windows and Lustre(linux);  But EFS for Linux only
+
+1) Create and configure two separate security groups: one for EC2 instance and other one for Amazon FSx for Lustre file system.
+2) Launch two EC2 instance while using the Amazon Linux 2 AMI while applying the preconfigured EC2 security group.
+3) Create your Amazon FSx for Lustre file system while applying the same preconfigured security group.
+4) SSH to both the EC2 instances.
+5) Install the Lustre client using following command: sudo amazon-linux-extras install -y lustre2.10
+6) make the directory for the mount point with the following command: sudo mkdir -p /mnt/fsx
+7) Now, mount the amazon FSx for the lustre file system to the directory you created using the following command.
+    sudo mount -t lustre -o noatime,flock file_system_dns_name@tcp:/mountname /mnt/fsx
+    Note: Replace the file system dns name and mount name
+8)  Repeat steps 5,6,7 with another EC2 instance.
+9) Go to the fsx directory by typing the following command: cd /mnt/fsx
+10) Create a new file with some txt in it.
+11) Access and retrieve the same through the second instance
+12) Clean up.
+--------------------------------------------------
+ 
+
+AWS DMS :- AWS Database Migration Service (AWS DMS) is a web service that you can use to migrate data from a source data store to a target data store. 
+These two data stores are called endpoints. You can migrate between source and target endpoints that use the same database engine or different database 
+engin, such as from an Oracle database to an Oracle database or Oracle to PostgreSQL database and Or mysql database to S3 bucket.
+===================================================================
+
+CloudWatch:- It monitors all AWS resources provisioned and deployed. Sends notifications if anything goes wrong. All aws services has seprate metrics 
+there like CPU utilization, Disk, N/W. All aws services send metrics to cloud watch by default. Based on metrics it create alarm and alarm based it 
+connect other aws service SNS topic, autoscaling, email notification,terminate instance and send message to console also. it collect data through logs 
+and metrics and Data reported through dashboard and visulation. There is multiple chart is there for dashboard to visulation data like (pie,line,bar, 
+number, Text, etc).
+There are two type of monitoring:
+
+Basic Monitoring: its free poll data in every 5 minuts, works with limited metrics. support maximum 5GB data.
+
+Enhanced monitoring: its chargable, charge per instance per month, it can polls data in every one minute, large number of metrics.
+
+
+LAB:
+1) Goto Cloudwatch> Dashboard > Create dashboard > select "Line war" (multiple graph chart is there) > Metrics > select resource.> select metric name(cpu,disk,N/W)  > create widget. (multiple add widget)	and finally save Dashboard.
+
+2) Goto Action > shared dashboard publicly and privately. (dashboard link is generated to share)
+
+Alarm: 
+Alarm watch over metrics and metrics only. They can be set to take action based on metrics data.
+Alarm States: 
+OK: within the threshold
+ALARM: Crossed the threshold
+INSUFFICIENT_DATA: The metrics is not available/missing data(Good, Bad, Ignore, and Missing)
+
+Alarm Steps:
+Create a alarm. 
+The Alarm should monitor the CPU utilizations of an EC2 instances.
+Decide on the threshold and period.
+Provision all the three actions: SNS, autoscale, and EC2 instance termination.
+Create a billing Alarm.
+
+LAB:
+1) create ec2 instance.
+2) Create AMI image.
+3) Create Launch configuration.
+4) Create AutoScaling Group
+5) Create SNS topic and Subcriptions
+6) Goto CloudWatch > Create Alarm > select Autoscaling metrics (cpu utilization) > enter threshold value greater then: 0.001 (alarm condition) > Next
+select an existing SNS topic. > send notification to .....> 
+Create scaling policy > Create cloudWatch alarm. > Taken a action: 1 >Create
+Add autoscaling Action: select Alarm> Resource type: EC2 autoscaling grouup > select autoscaling_group_name > NExt
+Alarm Name: anyname > Create Alarm
+## automatically instance create and send notification to Email, 
+
+Billing Alarm:
+goto Billing > create alarm > metric > 
+Metric name: EstimateCharges
+currency: USD
+Statics: Maximum
+period: 1 day
+condition > Lower :  800 USD  > Next > Create SNS topic > alarm name: any name> created.
+## billed configure for AWS account
+
+CloudWatch Logs:
+CloudWatch Logs are used to monitor, store, and Access log files from various AWS resources, including EC2
+
+Logs Agent:
+1) CLI plugin that pushes data to cloudWatch Logs.
+2) Script that run "aws logs push" command to send data to CW logs
+3) Cronjobs that ensure that the agen dameon runs at all time.
+
+# Install and configure the agent
+sudo yum install -y awslogs
+/etc/awslogs/awscli.conf
+/etc/awslogs/awslogs.conf
+sudo service start awslogs
+/var/logs/awslogs.log
+sudo chkconfig awslogs on
+
+Config File: it contains information needed by "aws logs push" command.
+CloudWatch Logs:
+Create a log group
+Use filter pattern
+export data to S3.
+LAB:
+Logs > create log group > checked demogroup (bydefault no of log group exist) > goto action > export data to S3 bucket. (select bucket name)
+# we can export logs to s3 for specific time frame 
+
+select /aws/lambda/awslambdademo > create metric filter > filter START > Test pattern (came log only START pattern) > Next
+Fileter name: practice filter
+File pattern: START
+metric namespace: any name
+metric name: any name
+metric value: 2   > Create matric filter.
+
+=============================================================================
+CloudTrail:- Keep tracks of everything about users login/logout/edit/delete . When activity occurs in your AWS account, that activity is recorded 
+in a CloudTrail event. You can easily view recent events in the CloudTrail console by going to Event history
+
+------------------------------------
+AWS Organizations:-  This is account management service. it Centralized managed all AWS accounts. Consololidated billing for all members accounts.
+ use for create account, add account, Group account, apply policies, Enable AWS services. There are no additional charges. Apply policy also on account, 
+who have give access resources to account or who have not give accessess resources to account.
+
+Elastic BeansTalk:- 
+AWS Elastic Beanstalk is Application Orchestration service an easy-to-use service for deploying and scaling web applications and services developed 
+with Java, .NET, PHP, Node.js, Python, 
+Ruby, Go, and Docker on familiar servers such as Apache, Nginx, Passenger, and IIS.
+And used to execute backend task and version controlling application.
+
+You can simply upload your code and Elastic Beanstalk automatically handles the deployment, from capacity provisioning, load balancing, auto-scaling to 
+application health monitoring. At the same time, you retain full control over the AWS resources powering your application and can access the underlying 
+resources at any time
+
+OpensWorks:- AWS OpsWorks is a configuration management service that provides managed instances of Chef and Puppet. ... OpsWorks lets you use Chef and
+Puppet to automate how servers are configured, deployed, and managed across your Amazon EC2 instances or on-premises compute environments
+
+
+Global Accelerator:  improving availibility and performance of our application with local or global user. It provides you with static IP addresses that 
+you associate with your accelerator which will act as a fixed entry point to your application endpoints in one or more AWS Regions.
+Create 2 ec2 instance with install httpd ( security ssh,http,https)
+goto aws global accelarator, add endpoint group, select both ec2 instance, 
+
+Elastic Network Interface : it is used to communicate from outside internet. it is a logical networking component in a VPC that represents a virtual 
+network card. When you move a network interface from one instance to another, network traffic is redirected to the new instance. IP address is per network 
+interface per instance type. I will have to attach multiple netrwork interfaces. 
+first will create network interface and then assigned interface while create ec2 instance.
+
+Elastic Network Adapter: Amazon EC2 provides enhanced networking capabilities through the Elastic Network Adapter (ENA). ENA supports network speeds 
+up to 100 for the supported instance types.
+
+CloudShell: it used for suppose we need to access aws CLI for short period of time, not permanently for some task. cloudshell access without create any ec2.
+
+=======================

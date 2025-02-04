@@ -1,0 +1,337 @@
+What is ELK?         ( elasticsearch, logstash, kibana)
+Ans:
+Elastic stack refers to a set of opensource products that have been developed by elastic to help it's users collect data from different types of sources and then analyze the collected data and represent it in an easy to understand and aesthetic visulization. This is done so that meaningful observations can be made.
+
+Component of ELK:
+Elasticsearch : Used for storing & searching collected data.
+Elasticsearch is a NOSQL Database that was developed based on apache Lucene search engine. It can be used to index and store multiple different types of ducuments and data. It provides a function to search the data that is stored in real-time as it's being fed.
+
+Logstash: Used for collecting & filtering the input data.
+Logstash is a collection agent and is used to collect both heterogenous/non-heterogenous data from various sources. it has the capability to screen, breakdown and make string alteration in the data it collects. Aftr it has collected and filtered the data it then send it to elasticsearch for storage.
+
+Kibana : Provides a graphical user interface.
+Kibana is graphical user interface that is used to display the data that was collected and stored in Elasticsearch. it displays them with appealing visuals so that the data could be easily understood and analyzed, it does so using multiple different types of visuals like bar charts, pie chart, world maps, heat maps, co-ordinate maps etc.
+
+Features of Kibana:
+Discover the data by expoloring it. Analyze the data by applying different metrics. Visualize the data by creating different types of charts. Apply machine learning on the data to get data anomaly.
+
+Beats: Multiple light weight data collectors.
+Beats is similar to Logstash in the matter of fact that they both collect the data that will be later stored and analyzed, but beats differs in the method of collection. Here beats are multiple small software installed on different servers from whre they collect that data and send it to Elasticsearch.
+
+
+ELK Installation:
+Pre-requisites: At least 2GB of RAM. At least 20 GB storage. and JAVA
+
+1. Create ubuntu EC2 instance , t2 medium.
+2. sudo apt-get update
+3. sudo apt-get install -y openjdk-8-jdk
+4. sudo apt-get update
+5. sudo apt-get install nginx
+6. sudo systemctl enable nginx
+
+7. sudo wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.2.0-amd64.deb
+8. sudo dpkg -i elasticsearch-7.2.0-amd64.deb
+
+9. sudo wget https://artifacts.elastic.co/downloads/kibana/kibana-7.2.0-amd64.deb
+10. sudo dpkg -i kibana-7.2.0-amd64.deb
+
+11. sudo wget https://artifacts.elastic.co/downloads/logstash/logstash-7.2.0.deb
+12. sudo dpkg -i logstash-7.2.0.deb
+
+13. sudo wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.2.0-amd64.deb
+14. sudo dpkg -i filebeat-7.2.0-amd64.deb
+------------
+
+sudo vi /etc/elasticsearch/elasticsearch.yml          # For Elasticsearch configuration
+cluster.name: my-application        # uncomment
+node.name: node-1                   # uncomment
+network.host: localhost             # uncomment
+http.port: 9200                     # uncomment
+
+sudo systemctl start elasticsearch
+sudo systemctl status elasticsearch
+
+
+sudo vi /etc/kibana/kibana.yml
+server.port: 5601         # uncomment
+server.host: "localhost"      # uncomment
+sudo systemctl start kibana
+sudo systemctl status kibana
+
+sudo apt-get install -y apache2-utils                         #      install apache
+sudo htpasswd -c /etc/nginx/htpasswd.users kibadmin
+new pas:
+
+sudo cat /etc/nginx/htpasswd.users                            # find pas
+sudo vi /etc/nginx/sites-available/default                     # nginx configuration file to access kibana
+server {
+        listen 80;
+        server_name ec2publicIP;
+        auth_basic "Restricted Access";
+        auth_basic_user_file /etc/nginx/htpasswd.users;
+        location / {
+               proxy_pass http://localhost:5601;
+               proxy_http_version 1.1;
+               proxy_set_header Upgrade $http_upgrade;
+               proxy_set_header Connection 'upgrade';
+               proxy_set_header Host $host;
+               proxy_cache_bypass $http_upgrade;
+        }
+}
+
+sudo systemctl start nginx
+sudo systemctl status nginx
+
+URL : ec2public IP          # kibana working fine as graphically.
+================================
+1. Collect static Apache logs using Logstash and analyze them using kibana.
+
+Analyzing apache logs With Logstash & kibana
+
+sudo wget https://logz.io/sample-data             # download sample apache log file and upload in kibana to analize data.
+ls      # all file downloaded.
+sudo cp sample-data apache.log                 #
+
+cd /etc/logstash/conf.d
+vi apachelog.conf         # (new file) to create pipeline
+input {
+  file {
+      path => "/home/ubuntu/apache.log"           // this is where log is located
+      start_position => "beginning"
+      sincedb_path => "/dev/null"                // since there is no DB we won't link one here
+      }
+    }
+  
+   filter {
+       grok{
+          match => ["message" => "%{COMBINEDAPACHELOG}"]
+           }
+       date {
+       match => [ "timestamp", "dd/mmm/yyyy:HH:mm:ss z" ]
+        }
+       geoip {
+         source => "clientip"
+           }
+       }
+
+     output {
+      elasticsearch {
+         hosts => ["localhost:9200]
+         index => "petclinic-prd-1"   //so if you put petclinic-prd*  
+         }
+        }
+
+
+sudo systemctl start logstash        # 
+sudo systemctl status logstash       #  running
+
+URL : ec2public IP                   # to visualiation and explore data must create index pattern
+Goto the kibana home page > kibana > index pattern > search pet*  and found petclinic-prod-1  > create index pattern
+select @timestamp    > create index pattern
+
+goto Discover (top left) will see apache logs content timestemp wise.
+we can search any particular data in logs using filter option (like search geoip data only.)
+-------------------------------------
+2. Collect static '.csv' using Logstash and analyze them using kibana.
+
+Analyzing .CSV logs with logstash & kibana
+
+sudo curl -o https://raw.githubusercontent.com/packtpublishing/Kibana-7-Q-Start-Guide/master/Chapter02/crimes_2001.csv
+cd /etc/logstash/conf.d ; ls apachelog.conf
+vi crime.conf         # creating pipeline to upload .csv file and analize using kibana
+input {
+          file{
+            path => "/home/ubuntu/crime_2001.csv"
+            start_position => begining
+         }
+}
+filter {
+        csv{
+             columns => [
+                          "ID",
+                          "Case Number",
+                          "Date",
+                          "Block",
+                          "Description",
+                          "District"
+                         ]
+                         seprator => ","
+                         }
+        }
+output {
+         elasticsearch {
+                 action => "index"
+                 hosts => ["localhost"]
+                 index =>  "crime"
+              }
+ }
+
+
+systemctl start logstash
+systemctl status logstash
+systemctl restart logstash
+Now goto kibana browser > management > Kibana > index pattern > create index pattern > founded crime index, select this > next > @timestamp > create index pattern.
+Now founded all columns fields as per data
+
+Goto Discover > Filter > crime > all csv data is there and using filter columns analyze data
+------------------------------------
+
+3. Collect real-time web logs & configure beats to inject them into Elasticsearch, and analyzed them using kibana.
+Analysing Real Time web Logs With Beats & Kibana
+
+sudo filebeat modules list         # all module lists with enables and Disables, bydefault all modules disabled (like apache,mysql, mongodb, redis, system, netflow etc)
+
+sudo filebeat modules enable nginx       # now nginx enabled
+sudo filebeat modules enable system
+cd /etc/filebeat/modules.d
+ls   # listed all configuration files.
+
+sudo vi nginx.yml          # edit   
+access:
+    var.paths: ["/var/log/nginx/access.log*"]
+error:
+    var.paths: ["/var/log/nginx/error.log*"]
+
+sudo vi system.yml          # edit 
+syslog:
+    var.paths: ["/var/log/syslog*"]
+auth:
+    var.paths: ["/var/log/auth.log*"]
+
+sudo systemctl start filebeat
+sudo systemctl status filebeat
+
+goto URL browser kibana > management > kibana > index patterns > create index pattern > founded filebeat file, select > next > @timestamp > create index pattern.
+
+goto Discover > Filter filebeat and filebeats log content listed.
+
+goto visualize > create new visualization > (above 3 files is there to visualization) and with multiple pie chart,bar chart, table chart is there
+
+# multiple setting is there to more way visualization of data.
+
+sudo filebeat setup -e         # Loading dashboard and to setup default dashboard. (many dashboard is already there)
+=====================================================
+
+Twitter Analysis With ELK
+
+vi /etc/losgstash/conf.d/twitter.conf             # edit twiter account key, token, secret etc..
+
+input {
+  twitter {
+    consumer_key => "FPZmJo93FYR......"
+    consumer_secret => "7x4tog73......"
+    oauth_token => "1364830...."
+    oauth_token_secret => "51dhSDS574411..."
+    keywords => ["Trump","Biden","kamala"]
+    full_tweet => true
+  }
+}
+filter {
+          mutate {
+                   add_field=>  { "token" => "generated token" }       # goto kibana>setting>manage token > new shared token > add > enter any name > add then token gen.
+ }
+}
+
+output{
+   tcp {
+   hosts => "listener.logz.io"
+   port => "5050"
+   codec => json_lines
+   }
+}
+
+systemctl restart logstash
+cd /usr/share/logstash/bin
+sudo ./logstash -f /etc/logstash/conf.d/twitter.conf
+
+vi etc/logstash/conf.d/twitter.conf      # leave it default configuration
+
+goto kibana and see trump and Biden and kamala word is highlighted with yellow in all logs data
+
+=================================================================
+Jenkins with ELK           # here analize jenkins log file
+
+first install jenkins
+Configuration global tool and configuration ( add jdk and maven)
+
+cd /etc/filebeat
+vi filebeat.yml              # edit
+enabled: true
+
+paths:
+# - /var/log*.log      # commented
+- /var/log/jenkins/jenkins.log
+- /var/lib/jenkins/jobs/*/builds/*/log
+=====Dashboard======
+setup.dashboards.enabled: true
+=====Kibana=======
+host: "localhost:5601"          # uncomment
+=====Elasticsearch output=====
+hosts: ["localhost:9200"]
+=====Logging=======
+logging.level: info
+logging.to_files: true
+logging.files:
+        path: /var/log/filebeat
+        name: filebeat
+        keepfiles: 5
+        permissions: 0644
+
+
+cd /usr/share/filebeat/bin
+sudo ./filebeat test config -e -c /etc/filebeat/filebeat.yml
+
+sudo systemctl start filebeat
+sudo systemctl status filebeat
+sudo systemctl restart elasticsearch
+sudo systemctl status elasticsearch
+sudo systemctl restart kibana
+sudo systemctl restart filebeat
+sudo filebeat setup --dashboards -E setup.dashboard.kibana_index=filebeat-*              # to load kibana dashboard
+
+# Now jenkins logs being generated inside kibana and can see jenkins logs on kibana dashboard
+
+Now create jenkins job
+
+Now goto Discover in kiaban > click on filebeat-* and found logs are associated with this.
+=======================END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

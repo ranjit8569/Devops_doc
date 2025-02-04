@@ -1,0 +1,119 @@
+# this is project to deploy java application on tomcat server using script.
+First download vagrant on windows and install on windows
+Then install git on windows as well. Then goto GitHub and copy project repository URL.
+git clone https://github.com/..............
+
+
+# to Create temprary virtual machine. using vagrant fast create and destroy vm machine.
+
+vi Vagrantfile
+Vagrant.configure("2") do |config|
+config.vm.box = "bento/ubuntu-20.04"        # download ubuntu image from internet
+config.vm.network "public_network"
+end
+
+vagrant.exe up     # now vm created and this VM will be show in Oracle virtual Box.
+# vagrant.exe destroy   # destroy temp vm.
+$ vagrant.exe ssh     # connected this vm and logined
+# bydefault this vm filesystem is mounted with local system.
+cd /vagrant/
+ls   # all project code is there, whatever cloned.
+===============================
+vi setup.sh
+#!/bin/bash
+function installPackage()
+{
+  local packageName=${1}        # this is local variable, and taking value from calling function parameter.
+  
+  if ! apt-get install -y ${packageName}
+  then
+      echo " ${packageName} Not install successfully"
+      exit 1
+  fi
+}
+
+function mavenTarget()
+{
+local mavenCmd=${1}        # this is local variable and assigned value from calling function.
+
+if ! mvn ${mavenCmd}
+then
+echo "${mavenCmd} failed"
+exit 1
+fi
+}
+
+if [[ $UID != 0 ]]
+then
+echo "User is not a root user"
+exit 1
+fi
+
+read -p "Please enter access path" APP_CONTEXT
+APP_CONTEXT=${APP_CONTEXT:-app}     # if empty string then assign bydefault app
+
+if ! apt-get update
+then
+echo "Not able to update the repository"
+exit 1
+fi
+
+installPackage maven    # calling function with paramenter
+installPackage tomcat9
+mavenTarget test         
+mavenTarget package      
+
+
+if cp -rvf target/hello-world-0.0.1-SNAPSHOT.war /var/lib/tomcat9/webapps/${APP_CONTEXT}.war
+then
+  echo "War file deployed successfully. And you access on it https://{IP_ADDRESS}/$APP_CONTEXT"
+else
+  echo "War file Not deployed successfully"
+fi
+exit 0      # return 0 if script successfuly.
+----
+
+chmod +x setup.sh
+./setup.sh
+
+$ ip a      # to check server ip
+
+URL: ip:8080/app       # app running fine.
+==============================================
+
+a="ranjit jkumar"
+echo ${a^}     	#convert first char in capital letter
+echo ${a^^}     	#convert all in capital letter
+b="WELCOME INDIA"
+echo ${b,}   		 # convert first char in small letter
+echo ${b,,}   		 # convert all in small letter
+echo ${#b}      	# print length of the string
+echo ${b:1,4}           # remove 1 to 4th char in string
+echo ${b:2:4}         # print only 2 to 4 char of string
+echo ${b: -3}         # print only last 3 char in string
+echo ${a#r*j}         # remove char r to j in string
+echo ${a##r*j}         # remove char r to 2nd j in string
+echo ${a%%r*j}         # remove char r to 2nd j in string (matching from ending)
+aa=abcxyzabcxyz
+echo ${aa/abc/xyz}    # replace first abc to xyz in string
+echo ${aa//abc/xyz}    # replace all abc to xyz in string
+echo ${aa/abc}    # remove first abc in string
+echo ${aa//abc}    # remove all abc in string
+a=${b:-ranjit}   # if null string then assign default value ranjit
+
+bb=ranjit
+: ${bb:?" Please set variable value"}   # if variable null then print this mesg.
+
+if [[ $aa == $bb ]]        # recomended to use double bracket in string comarision, 
+insted of single bracket with double cost string.
+
+set -x    # for debug enable in shell script
+set -e    # for debug script but where error found, script will be exist.
+set +x    # debug mode disable in shell script
+set -xe
+
+
+
+
+
+

@@ -1,0 +1,24 @@
+
+create user 'wipro'@'localhost' identified by 'wipro123';
+grant all privileges on *.* to 'wipro'@'localhost';
+select user,host,plugin from mysql.user;
+update mysql.user set plugin="mysql_native_password" where user='wipro';   # bydefault "mysql_native_password"
+update mysql.user set plugin="mysql_native_password" where user='root';
+flush privileges;
+exit;
+sudo service mysql restart;
+mysql -u wipro -p # enter and provide pass
+
+$ mysql -h localhost -u user_name -p db_name
+$ mysqladmin -u root -poldpassword password root123  #  to change new passwor of root user.
+SELECT user, host, account_locked, password_expired FROM user;  # to check account loc or not
+SELECT user();  # to check current user;
+SELECT current_user();   # to check current user
+SELECT user, host, db, command FROM information_schema.processlist;  # to check current logged user.
+SELECT user FROM  mysql.user;  # show list of users.
+update mysql.user set password='moonup123' where user='moonup';
+select user,password from mysql.user where user='moonup';
+flush priveleges;
+use mysql  # to change database.
+show databases;   # list databases.
+==========================

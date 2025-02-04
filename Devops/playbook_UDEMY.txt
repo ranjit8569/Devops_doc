@@ -1,0 +1,775 @@
+--- # Target and Task Playbook
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  tasks:
+    - name: Install HTTPD on Centos 7
+      action: yum name=httpd state=installed
+    - name: Uninstalled HTTPD on Centos 7
+      action: yum name=httpd state=absent
+==============================================
+
+ansible version 2.1, 2.2, 2.3
+--- # MY playbook for handlers
+- hosts: demo
+  user: ansible
+  become: yes
+  tasks:
+          - name: Install httpd server on centos
+            yum: name=httpd state=installed
+            notify: restart httpd
+          - name: start the service on agent
+            service: name=httpd state=started
+          - name: copy the templet
+            template: src=/etc/ansible/playbook/index.html dest=/var/www/html/index.html
+  handlers:
+          - name: restart httpd
+            service: name=httpd state=restarted
+
+
+---
+- name: install images with loop
+- host: abc.example.com
+  tasks:
+   - name: install python
+     apt: name={{item}} state=installed
+     with_items:
+      - python
+      - python-setuptools
+      - python-dev
+      - build-essential
+      - python-pip
+      - python-mysqldb
+ -----------------------------------------------
+mkdir sql
+cd sql
+git clone https://github.com/geerlingguy/ansible-role-mysql.git
+------------------------------------------------
+   - name: install database
+     apt: name={{item}} state=installed
+     with_items:
+       - mysql-server
+       - mysql-client
+  
+  - name: start my sql server
+    service: name=mysql state=started enabled=yes
+ 
+  - name: create application user
+    mysql-user:
+     name: db_user
+     password: password    #encrypted pass using openssl and also mkpasswd --method=sha-512 
+     priv: '*.*:ALL'
+     state: present
+     host: '%'
+
+  - name: install python flack dependency
+    pip:
+      name: {{item}}
+      state: present
+      with_items:
+        - python
+        - sql
+
+  - name: copy soruce code
+    copy:
+    	src: /ab/cd/app.py
+    	dest: /opt/app.py
+
+  - name: start webserver
+    shell: abc.py hohup flask run --host=0.0.0.0
+-----------------------------
+---
+ - name: install package
+   host: tera.tera.com, abc.example.com
+   tasks: 
+    - name: install two package
+      apt:
+        name: {{item}}
+        state: present
+      with_items:
+        - mysql-server
+        - mysql-client
+
+-------------------------------
+---
+ - name: start service
+   host: abc.example.com
+   tasks:
+    -name: start mysql service
+     service:
+      name: mysql
+      state: started
+      enabled: yes
+-------------------------------
+
+--- 
+ - name: create database
+   host: abc.example.com
+   tasks:
+    mysql_db:
+      name: employee_db
+      state: present
+-------------------------------
+---
+ - name: Web application 
+   host: xyz.example.com
+   tasks:
+    mysql_user:
+    - name: create db user
+      name: db_user
+      password: password
+      privilige: '*.*:ALL'
+      host: '%'
+------------------------------
+----
+ - name: webapplication 7
+   host: aaa.example.com
+   tasks:
+    yum:
+     - name: install python dependency
+       name= {{item}} state=install
+       with_items:
+        - flask
+        - flask-mysql
+-----------------------------
+---
+ - name: web application 7
+   host: aaaa.example.com
+   tasks:
+    copy:
+     - name: copy module
+       src: /opt/app.py
+       dest: /aa/bb/app.py
+---------------------------
+---
+ - name: webapplication web 7
+   host: xxx.examle.com
+   tasks:
+    script:
+     - name: start service
+       FLASK_APP=/opt/app.py nohup flask run --host=0.0.0 &
+---------------------------
+---
+ - name: user variable to install
+   host: abc.example.com
+   vars:
+    db_name: employee_db
+    db_user: db_user
+    db_user_pas: password
+   taks:
+     - name: install databse mysql
+       mysql_db:
+        name: {{db_name}}
+        state: present
+     - name: create database user
+        mysql_user: 
+          name: {{db_user}}
+          password: {{db_user_pass}}
+==========================================================
+inventory.txt
+[db_and_web_servers]
+db_and_web_server1 ansible_host=192.168.1.6 ansible_ssh_pass=password
+db_and_web_server2 ansible_host=192.168.1.10 ansible_ssh_pass=password
+-----------
+FILE SEPRATION
+
+OR create host_vars        -- seprate file for variable (create directory host_vars and in this dir create two yml files and all variable will past there sepratly)
+host_vars  (create dir)
+
+vi db_and_web_server1.yml
+    db_name: employee_db
+    db_user: db_user
+    db_user_pas: password
+
+vi db_and_web_server2.yml
+    db_name: employee_db
+    db_user: db_user
+    db_user_pas: password
+
+---------------------
+OR  (create group_vars directory and in this dir create db_and_web_server.yml
+group_vars  (dir)
+
+vi db_and_web_servers.yml        --(in inventory file  group name should be same as this name)
+    db_name: employee_db
+    db_user: db_user
+    db_user_pas: password
+
+tasks (create directory tasks and in this dir create two yml files, 1 deploy_db.yml 2 deploy_web.yml )
+
+vi deploy_db.yml
+- name: install mysql database
+    apt: name={{item}} state=installed force=yes
+    with_items:
+     - mysql-server
+     - mysql-client
+  
+  - name: start my sql server
+    service: name=mysql state=started enabled=yes
+ 
+  - name: create application user
+    mysql-user:
+     name: db_user
+     password: password
+     priv: '*.*:ALL'
+     state: present
+     host: '%'
+
+  - name: Create application database
+    mysql_db: name= {{db_name}} state=present
+
+---------------
+vi deploy_web.yml
+- name: install python flack dependency
+    pip:
+      name: {{item}}
+      state: present
+      with_items:
+        - python-flack
+        - python-db
+- name: copy soruce code
+    copy:
+    src: /ab/cd/app.py
+    dest: /opt/app.py
+
+- name: start webserver
+    shell: abc.py hohup flask run --host=0.0.0.0
+
+
+vi playbook.yml
+- name: Deploy a web server
+  hosts: db_and_web_server1,db_and_web_server2
+  tasks:
+   - name: Install and required dependency
+     apt: name={{item}} state=installed force=yes
+     with_items:
+       - python
+       - python-setuptools
+       - python-dev
+       - build_essentials
+       - python-pip
+       - python-mysqldb
+   - include: tasks/deploy_db.yml 
+   - include: tasks/deploy_web.yml
+
+
+run$  ansible-playbook playbook.yml -i inventory.txt
+====================================
+mkdir host_vars
+ host_vars  ( in this dir below yml file will create)
+vi db_and_web_servers.yml
+    db_name: employee_db
+    db_user: db_user
+    db_ip: 12.45.34.3
+    db_user_pas: password
+
+mkdir tasks  --- (In this dir below two yml file will create)
+
+  vi deploy_db.yml
+     - Install MySQL database
+     - Start Mysql Service
+     - Create Application Database
+     - Create Application DB User
+
+  vi deploy_web.yml
+
+  vi playbook.yml
+      - name: Install and required dependency
+     	apt: name={{item}} state=installed force=yes
+     	with_items:
+       	 - python
+       	 - python-setuptools
+         - python-dev
+         - build_essentials
+         - python-pip
+         - python-mysqldb
+      - include: tasks/deploy_db.yml 
+
+      - name: Install python flask dependencies
+      - name: copy web server code
+      - name: Start web application
+
+      - include: tasks/deploy_web.yml
+=============================================
+=============================================
+ROLES  
+
+i can also download ansible role : ansible-galaxy install username.rolename
+To create file structure of role : ansible-galaxy init rolename
+
+it is used for organize, Re-Use and Share.
+
+DIR( tasks,tests,handlers,vars,defaults,meta in mysql_db roles.)
+
+ansible-glaxy init mysql_db        # to create roles mysql_db  using command
+-------------
+vi mysql_db/tasks/main.yml              # first roles
+---
+ - name: Install mysql database
+   apt: name={{item}} state=installed force=yes
+   with_items:
+   - mysql-server
+   - mysql-client
+
+ - name: start mysql server
+   service:
+     name: mysql
+     state: started
+     enabled: yes
+
+ - name: create application database
+   mysql_db: name={{db_name}} state=present
+
+ - create database user
+   mysql_user:
+     name: "{{db_user}}"
+     password: "{{db_user_pass}}"
+     priv: '*.*:ALL'
+     state: present
+     host: '%'
+ansible-glaxy init flask_web
+-----------
+mkdir flask_web            # to create manual roles.
+mkdir tasks
+
+vi flask_web/tasks/main.yml                    # second roles
+- name: Install python Flask dependency
+  pip: 
+    name: "{{item}}"
+    state: present
+  with_items:
+    - flask
+    - flask-mysql
+
+- name: copy source code
+  copy: src=app.py dest=/opt/app.py
+
+- name: Start web server
+  shell: FLASK_APP=/opt/app.py nohup flask run --host=0.0.0.0&
+
+------------
+mkdir -p python/tasks           # create another role python manually 
+
+vi python/tasks/main.yml        # Third roles
+
+- name: Install and required dependency
+  apt: name={{item}} state=installed force=yes
+  with_items:
+    - python
+    - python-setuptools
+    - python-dev
+    - build-essentials
+    - python-pip
+    - python-mysqldb
+-----------
+vi playbook.yml          # execute all roles from here
+
+- name: Deploy and web application
+  hosts: db_and_web_server1,db_and_web_server2
+  roles:
+    - python
+    - mysql_db
+    - flask_web
+-----------
+ansible-playbook playbook.yml -i inventory
+
+we can edit README.md file also for understand.
+And can also edit in meta dir main.yml file (author, description, company)
+===============
+login to my git-hub account online and create new repository
+
+Repository name
+
+OR create new repository using command line.
+git init           # .git folder created.
+git add .          ## add all the files to repository
+git commit -m "first commit"  # commit those changes and all files added.
+git remote add origin https://github.com/mumshad/ansible-role-mysql.git      #remotly add origin
+git push -u origin master    # push the all code on online repository.
+
+ansible-glaxy search mysql       # to search role
+====================================END ROLES======================
+CREATE ROLE
+
+ansible-glaxy init mysql_db        # create roles mysql_db role 1
+
+1) vi mysql_db/tasks/main.yml          
+- install mysql database
+- start mysql service
+- create application database
+- create applicatin DB user
+
+ansible-glaxy init flask_web        # create role flask_web role 2
+
+2) vi flask_web/tasks/main.yml
+- Install python flask dependency
+- Copy webserver code
+- start web-application
+
+ansible-glaxy init python          # create role python role 3
+
+3) vi python/tasks/main.yml
+name: Install and required dependency
+  apt: name={{item}} state=installed force=yes
+  with_items:
+    - python
+    - python-setuptools
+    - python-dev
+    - build-essentials
+    - python-pip
+    - python-mysqldb
+
+vi playbook.yml
+---
+- name: execute all role from here
+  host: db_servers
+  roles:
+    - python
+    - mysql-db
+    - flask-web
+
+
+vi Deploy a web server
+---
+- name: Deploy a web server
+  host: web_server
+  roles:
+    - python
+    - flask_web
+======================================
+ASYNCHRONOUS ACTIONS
+
+Run a process and check on it later
+Run multiple process and check on them later
+Run process and forget.
+                                         # This script monitor and helth check of webserver.
+- name: Deploy web application
+  hosts: db_and_web_server
+  tasks:
+    - command: /opt/monitor_webapp.py
+      async: 360         #How long to run.
+      poll: 60           # How frequently to check, default 10 second
+      register: webapp_result
+
+    - command: /opt/monitor_database.py
+      async: 360
+      poll: 60
+      register: database_result
+
+    - name: check status of task
+      async_status: jid={{webapp_result.ansible_job_id}}
+      register: job_result
+      until: job_result.finished
+      retries: 30
+
+    - name: check status of task database
+      async_status: jid={{database_result.ansible_job_id}}
+      register: db_job_result
+      until: db_job_result.finished
+      retries: 30
+=====================
+exercise
+
+vi playbook.yml
+- name: web application
+  hosts: db_and_web_server
+  tasks:
+   - command: /opt/monitor_webapp.py
+     async: 360
+     pool: 30
+     register: webap_result
+   
+   - command: /opt/database_monitoy.py
+     async: 360
+     pool: 0
+     register: db_result
+=================
+STRATEGY  # without strategy install software parallel together in all server task by task, one task complete in all server then move another task in all
+ server.
+STRATEGY  # with strategy  install software parallel togethere in all server task by task but not wait to complete one task in all server, if any task 
+taking much time
+ on any particular server and another server has completed current task then move another task in another server.
+
+- name: Deploy Web Applications
+  strategy: free
+  hosts: server1,server2,server3
+  tasks:
+   - name: Install dependency
+      ....
+   - name: Install mysql database
+     .... 
+   - name: Start mysql service
+     ....
+   - name: Install python flask dependency
+     .....
+   - name: Run webserver
+     ....
+
+---------------------
+SERIAL   directive  # if there is no of server then if i use serial 3, so first all tasks complete in 3 server. if complete install in 3 server then mover another 3 server and
+install all software.
+
+- name: Deploy Web Applications
+  serial 3
+  hosts: server1,server2,server3
+  tasks:
+   - name: Install dependency
+      ....
+   - name: Install mysql database
+     .... 
+   - name: Start mysql service
+     ....
+   - name: Install python flask dependency
+     .....
+   - name: Run webserver
+     ....
+     
+----------------------
+ansible.cfg
+fork = 5
+----------------------
+exercise
+
+vi inventory
+[server]
+server1
+server2
+server3
+......n
+------------
+- name: install software
+  host: server1,server2,server3,servern
+  yum:
+    name=sqlserver state=install force=yes
+---------------
+- name: install software
+  serial 2
+  host: server
+  yum:
+    name=sqlserver state=install force=yes  
+---------------
+- name: install software
+  serial 2,3,5
+  host: server
+  yum:
+    name=sqlserver state=install force=yes 
+---------------
+- name: install software
+  serial 20%
+  host: server
+  yum:
+    name=sqlserver state=install force=yes 
+---------------
+- name: install software
+  strategy: free         (fast install) # no wait to complete one task in all server, if any task complete on any server first then another task move on another server.
+  host: server
+  yum:
+    name=sqlserver state=install force=yes 
+---------------
+===================================================
+ERROR HANDLING  # by default if any task fail on any server but not all server then failed task will be stop on that server, and anothere task will be continues run.
+any_errors_fatal true: in this case if any task fail on any particular server then task will stop running on all the servers.
+
+- name: install software
+  host: server1,server2,server3,servern
+  any_errors_fatal: true
+  yum:
+    name=sqlserver state=install force=yes
+-------------
+- name: Deply web Application
+  hosts: db_and_web_server
+  tasks:
+    ........
+    ........
+
+    - mail:
+        to: devops@corp.com
+        subject: ServerDeployed!
+        body: web server deployed
+    - ignore_errors: yes
+
+    - command: cat /var/log/server.log
+      register: command_output
+      failed_when: "'ERROR' in command_output.stdout"
+---------------------------------------
+exercise
+
+- name: software installation
+  host: server1,server2,server3,servern
+  tasks:
+   any_errors_fatal: true                      # if a task faile on any one server then this task will stop in all server.
+   yum:
+    name = sqlserver state=present force=yes
+---------------------
+- name: web development installation
+  host: host1,host2,host3,hostn
+  any_errors_fatal: true
+  tasks:  
+     some task here
+     mail:
+        to: devops@corp.com
+        subject: server deployed
+        body: web server deployed
+     ignore_errors: yes
+     command: cat /var/log/server.log
+     register: command_output
+     failed_when: "'ERROR' in command_output.stdout"
+
+==========================================
+Templating jinja2   : Generating dynamic content.
+
+- name: Test template playbook
+  hosts: localhosts
+  vars:
+   my_name: Ranjit kumar
+  tasks:
+   - debug: 
+      msg: "my name is {{my_name}}"
+------------------------------------
+- name: Test template playbook
+  hosts: localhosts
+  vars:
+   my_name: Ranjit kumar
+  tasks:
+   - debug: 
+      msg: "my name is {{my_name|upper}}"
+      msg: "my name is {{my_name|lower}}"
+      msg: "my name is {{my_name|title}}"
+      msg: "my name is {{my_name|replace("Ranjit","Rani")}}"
+      msg: "my name is {{first_name|default("james")}} {{my_name}}"
+-----------------------------------
+{{[1,2,3]|min}}
+{{[1,2,3]|max}}
+{{[1,2,3,2]|unique}}
+{{[1,2,3,4]|union([4,5])}}
+{{[1,2,3,4]|intersect([4,5])}}
+{{100|random}}
+{{["The","name","is","Bond"]|join("")}}
+--------------
+FILTERS - FILE
+
+{{"/etc/hosts"|basename}}          		# hosts
+{{"c:\windows\hosts"|win_basename}}             # hosts
+{{"c:\windows\hosts"|win_splitdrive}}           # ["c:","\windows\hosts"]
+{{"c:\windows\hosts"|win_splitdrive|first}}      # "c:"
+{{"c:\windows\hosts"|win_splitdrive|last}}      #"\window\hosts"
+-----------------
+exercise:
+
+- name: test template
+  hosts: localhosts
+  vars:
+   abc: Ranjit
+  tasks:
+   - debug:
+      msg: "name is {{abc}}"
+      msg: "name is {{abc|titel}}"
+      msg: "lowest no{{[6,8,9,7]|min}}
+-------------------
+
+- name: install dependency
+  host: abc.example.com
+  tasks:
+   yum: name={{item}} state=installed force=yes
+   with_items:
+    {{['web_dependency'],['sql_dependency']|unique}}
+------------------
+- name: generate random task
+  host: localhost
+  tasks:
+   - debug:
+      msg: "/tmp/random_file_{{100|random}}"
+---------
+- name: check valid ip address
+  host: server2,server3
+  tasks:
+   vars:
+    ip_adr: 120.43.44.34
+   - debug:
+      msg: "valid ip {{ip_adr|ipaddr}}"
+------------------------
+{{"/etc/hosts"|basename}}     # Return hosts file name. 
+
+{{ list1 | union(list2) }}
+{{ list1 | unique }}
+{{ list1 | intersect(list2) }}
+{{ list1 | difference(list2) }}
+{{ list1 | symmetric_difference(list2) }}
+==================================
+FILE LOOKUP
+ # CSV file - credentials.csv  (find the password)
+
+Hostname,Password
+Target1,password
+Target2,password
+
+{{lookup('csvfile','target1 file=/tmp/credentials.csv delimiter=,')}}         ## return password
+--------
+exercise
+
+- hosts: all
+  vars:
+     contents: "{{ lookup('file', '/etc/foo.txt') }}"
+  tasks:
+     - debug: msg="the value of foo.txt is {{ contents }}"
+------------------------- csv file
+H,1,1.008
+He,2,4.0026
+Li,3,6.94
+Be,4,9.012
+B,5,10.81
+
+- debug: msg="The atomic number of Lithium is {{ lookup('csvfile', 'Li file=elements.csv delimiter=,') }}"
+- debug: msg="The atomic mass of Lithium is {{ lookup('csvfile', 'Li file=elements.csv delimiter=, col=2') }}"
+================================
+vi ab/cc/credentials.csv
+db_server1,24.34.55.3,22
+web_server1,87.54.33.2,33
+db_server2,24.34.54.3,22
+web_server2,87.54.32.2,33
+
+- name: webserver lookup
+  host: all
+  tasks:
+   - debug: 
+      msg: "Then password of webserver is {{lookup('csvfile','web_server1 file=ab/cc/credentials.csv delimiter=,')}}"
+-----------------------
+ini format
+
+- debug: msg="User in integration is {{ lookup('ini', 'user section=integration file=users.ini') }}"
+============================
+VAULT :        # it store the data in encrypted format ( VAULT is use only command line not write playbook)
+vi inventory.txt
+db_server ansible_ssh_pass=password ansible_host=19.168.1.1
+web_server ansible_ssh_pass=password ansible_host=19.168.1.2
+
+ansible-vault encrypt inventory.txt         # inventory file encrypted 
+
+ansible-playbook  playbook.yml -i inventory.txt  # in this case giving errors.
+
+ansible-playbook playbook.yml -i inventory.txt -ask-vault-pass       # in this case no giving errors. and working fine
+
+ansbile-playbook playbook.yml -i inventory.txt -vault-password-file ~./vault_pass.txt    # provide encrypted file for pass.
+
+ansbile-playbook playbook.yml -i inventory.txt -vault-password-file ~./vault_pass.py    # provide python file
+
+ansible-vault view inventory.txt       # to view the contant of encrypted file only
+ansible-valult create inventory.txt    # to create encrypted file only
+======================================
+DYNAMIC INVENTORY ## dynamic inventory written in python 
+
+ansbile-playbook playbok.yml -i inventory.py
+====================================
+CUSTOME MODULE             # write in python and online tool
+=============================
+PLUGINS 
+
+custom filter
+Upper	lower	title	replace	default	max  unique union intersect  random  join  basename  win_basename win_splitdrive
+
+
+
+
+
+

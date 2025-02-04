@@ -1,0 +1,1754 @@
+
+https://www.youtube.com/watch?v=jZYQajDqu_U&list=PL_OdF9Z6GmVayanQ4cjISqY_UkrOcZtr1&index=17 
+
+What is teraform ?
+Ans:
+with the help of teraform we can codify our infrastructure. Infrastructure means our component of AWS. Teraform  is a open-source tool Created by 
+HashiCorp in 2014. It is Develop by Mitchell Hashimoto developer. Terraform is written in GO language. Frontend language is HCL.
+
+Configuration management tool like - puppet, chef, Ansible are excellent at managing application and Services. So often focoused on software 
+configuration rather than building the infrastructure components.
+
+Teraform comes in scenario when our focus is on building infrastructure insted of configuration management. Cloudformation support only AWS, but 
+Teraforms support multiple cloud with covered almost all services.
+
+Terraform support parallel management of resources. Separate planning from execution (dry-run). Detail document. Support all Major Cloud provider.
+
+
+wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
+unzip terraform_0.12.24_linux_amd64.zip
+ls      # terraform, terraform_0.12.24_linux_amd64.zip
+set path of terraform in .bash_profile
+terraform --version
+
+Command |Terraform Plan
++ indicate a resource will be created.
+- indicate a resource will be destroy.
+~ indicate a resource will be update in plan.
+-/+ indicates a resource will be destroyed and re-created.
+
+
+There is approx 35 commands in teraforms.
+### Basic commands
+
+terraform -v      #to check version
+terraform -help    # to see all commands with description.
+terraform init     # to initialize a Terraform working directory (created .terraform/terraform.lock_hcl). installed plugin to communcate with aws. 
+child module installation. Back-end initialization.
+terraform plan     # it run in dry mode, not create actual resource.
+terraform apply    # created resource of aws as per tf files. Now created terraform.tfstate file.
+terraform destroy  # it work on terraform.tfstate file. delete resource from statfile and console.
+terraform destroy --target resource_type.name           # delete particular resource from terraform.
+terraform validate # to check syntax/validate terraform file.      (if no any error in script/template then come SUCCESS.)
+terraform fmt main.tf     # if incorrect indentation/space in main.tf template file, then it automatically correct indentation/space of main.tf template file..
+terraform providers      # to check syntex of either aws or google cloud or azure cloud in main.tf template file.
+terraform show    # it make easy to understand of state or plan file. (human redable output)
+terraform console    # can print variable value on terminal directly (var.username, var.city)
+terraform import      # if created manually any aws resources then import command is update the statefile whatever manually resources created. after 1.5 version manually created exist resources resource.tf also created automatically.
+
+terraform taint     # manualy marke resource for recreation
+then terraform apply   # tainted resource recreated.
+# Now Terraform taint command is deprecated, must use -replace option (terraform apply -replace="resource_name")
+
+terraform untaint    # manually unmark a resource as tainted
+terraform get        # Download and install modules for the configuration
+terraform stat list  # list all resource name from stat file
+terraform state rm resource_name     # delete particular resource from statefile.
+-------------------
+### Advance command 
+terraform graph > test.dot  # it read .tf file and convert template code into graph way. (need to install gvedit graph first)
+open gpedit and select test file. Then open graphicaly.(window)
+
+Using Graph, which resource i will create then it will show as graph way.
+terraform graph | dot -Tpdf > graph.pdf
+
+goto filesystem  > aws-first-instance > open Folder
+graph.pdf   # open this and show graphically.
+---------------------
+terraform output
+terraform login
+terraform logout
+terraform workspace  #
+terraform workspace list   # show default list where stored launched any resource.
+terraform workspace new Dev  # Dev workspace created and switched to Dev. (current workspace indicate using *)
+terraform workspace show  # show current work space.
+terraform workspace select Dev   # change workspace.
+terraform workspace show    # now show current Dev workspace.
+terraform apply  # now execute main.tf from where exist. and automatically terraform.tfstate file created in Dev workspace. 
+(resource ec2 instance created using main.tf template file)
+cd terraform.tfstate.d/Dev; ls   # now found terraform.tfstate file. Each workspace has seprate statefile.
+
+#when execute first time terraform apply then create state file and this file maintain the configuration of resources. And disire state.
+
+terraform destroy  # terminate all resources depends on currently which workspace switched/logined.
+terraform get       #
+terraform debug
+terraform refresh   # Refresh statefile. if anything change manually in aws console resource then after refresh it changed statefile also.
+terraform taint aws_security_group.security_name  # resource name, taint is marked in state file any when apply then forcely recreate particular this resources.
+terraform untaint
+terraform push
+
+=====================================================
+Launching First EC2 Via Terraform :
+There are three important considerations.
+
+1) How will you authenticate to AWS
+2) Which region the resource need to be launched
+3) Which resource your want to launch.
+
+# Sample Template create AWS instance  (syntex)
+
+(resource)    (resourceType) (any rsource uniqe name)
+<BLOCK_TYPE>  <BLOCK_TYPE>    <BLOCK_TYPE> {
+   
+<Identifier> =  <Expression>
+ (SubnetId)  = (SubnerName)
+ }
+
+
+Resource "aws_instance" "my-web-server"{
+    ami="ami-image"
+    instance_type="t2.micro"
+}
+
+####  Using Terraform Registry in google, to find all AWS resource code.
+
+First create IAM User terraform in aws and select all access type > attach existing policy > checked AdministratorAccess. > Create User.
+come user, Access Key ID, Secret access key or Download.csv file
+
+vi main.tf               # below all code already exist in google Terraform Registory Documentation. or use AWS provider
+provider "aws"{
+  region = "us-east-1"
+  access_key = "AKIAS......."           # goto IAM > create User with role full ec2 access > click on user > create access/secret key
+  secret_key = "RiEFRi8fN2y......."
+  version = "~> 2.0"
+}
+resource "aws_instance" "myec21" {
+  ami = "ami-0742b4e63072066f"           #ami ID is reagion specific. And this is Argument
+  instance_type = "t2.micro"
+  tags = {
+    Name = "primary_network_interface"
+  }
+}
+
+# if execute aws configure    (enter access/secret key) then no need to give access or secret key in provider block.
+===============================================
+
+## In production how to provide access/secret key in provider securely.
+## But most secure is create IAM Role and attache with ec2 instance in production env without access/secret key or .aws/credentials.
+
+terraform init
+
+
+provider "aws" {
+	shared_config_files		=["$PWD/.aws/conf"]           # this path exist after execute aws configure as below
+	shared_crendentials_files	=["$PWD/.aws/credentials"]   # aws configure create this path, test block exist in credentials file.
+	profile				="test"  # secured, not access ouside. access/secret exist in test block.
+}
+
+terraform{
+required_providers{          # we can define provider version also.
+  aws ={
+    source = "hashicorp/aws"
+    version = "4.8.0"
+   }
+  }
+
+aws configure --profile test_account1           # command line generating test profile (incase configure multiple account)
+aws access key:             # enter from aws account_1
+aws secret key:             # enter from aws account_1
+default Region:   ap-south-1
+Default output format: None
+# now profile generated. And to check configure properly or not, just open credentials file and see test block is there
+
+# aws ec2 describe-instances --profile test_account1  # check details from another account
+# export AWS_DEFAULT_PROFILE=test_account1             # to set default profile
+--------
+OR     Cross Account & Without Credentials ( with AWS IAM Instance Profile)   # must use in production
+
+Using Cross Account Access (aws Dev Account To aws Prod Account)        # Execute tf command on Dev Account and resource deploy to Prod Account.
+Need to create Role in Production Account. So Dev account can access or Provision resource to Prod account.
+
+Goto Prod account > IAM > Create Role > slect: "AWS account" > accountID: Dev-accountID > select policy/permission "ec2FullAccess" >
+roleName: ec2-Dev-to-Prod-access > Created    (role created on production)
+# goto Roles > add permission > Create inline policy > edit Create/List/Delete cluster policy (json) > 
+Policy Name: ecs-create-cluster > create policy.
+# Click on role, copy role's ARN       
+
+Now Goto Dev Account > IAM > Create Role > select: "AWS service" > common use cases: select EC2 > Create Policy > search service : sts > 
+Access level: select Write > Click on Resource: select: Specific > Add ARN : past role's ARN  > Add 
+policy Name: ec2-iam-profile(any name) > Create policy
+Roles > Policy: search created policy (ec2-iam-profile) > select this > Next
+Role name: ec2-prod-access > Create role
+
+select build server(Dev Ec2) > Action > Security > Modify IAM Role > select ec2-prod-access (role) > SAVE  #Build server, where all code/tool is execute.
+vi provider.tf
+assume_role
+role_arn ="enter role ARN"
+
+terraform apply -var-file="prod-app.tfvars"           # execute on Dev server
+all tf file there to create resource as per environment.
+
+===============================================
+
+terraform init    # download plugin to communicate with aws. plugin stored in .terraform file.  ( first must should be provider)
+terraform plan  # to check whether all configuration is correct or not.
+terraform plan -out abc.terraform        # save plan output to abc.terraform
+terraform apply abc.terraform       # apply from this abc.terraform file.
+or
+terraform apply   # created ec2 instance as per code of main.tf  AND it create in particular workspace.
+terraform destroy  # terminated ec2 instance in only same workspace, not other ec2 instance terminate.
+----------------
+resource "aws_instance" "terraform" {
+  ami = "ami-0742b4e63072066f"           #ami ID is reagion specific.
+  instance_type = "t2.micro"
+  subnet_id = "subnet-0ddf413......."  # in case manual vpc insted of default vpc
+  tags = {
+    Name = "Terraform-instance"
+  }
+}
+
+# below resource is for assign public ip
+
+resource "aws_eip" "terraform-instance-eip" {
+   instance = aws_instance.terraform.id            # Instance ID where configure public ip
+   vpc = true
+}
+
+terraform destroy  # terminate resources.
+-------------------
+provider "aws" {
+  access_key = var.access_key
+  secret_key = var.secret_key
+}
+
+# Ex Variables:      # variable for hide info and runtime enter key value
+
+vi inputs.tf            # this type is also global variable.
+variable access_key {
+type = string
+}
+
+variable secret_key {
+type = string
+}
+----------------
+# example of global variable
+
+variable "azname"{             # in list type, must declare default value, otherwise getting error.
+type = list
+default = ["us-east-1a","us-east-1b"]          
+}
+# instance_type = var.azname[0]          # pickup us-east-1a
+----------------
+
+Terraform Use Case :
+Create Infrastructure
+Update Infrastructure.
+
+How Terraform Helps?
+
+* Easy writing automation
+* Modification of Infrastructure easily
+* Replicate to multiple Environment
+* Helps in Staging Environment
+* Maintain the state of Infrastructure (state mgmt).
+
+Terraform Configuration file:
+* Input Sources (Config Files)
+* Provider (AWS, Azure, GCP)
+----------------------------------------
+Variable in terraform:
+
+Terraform Script Basic Structure.
+	* Main Script               #    where main resource are going to create
+	* Variable Script           #   where variable are define
+	* Output Script             # all output are kept
+
+* Variable value change as per region or account specific.
+   * Instance type value can be differ in dev and prod account.
+
+* Using variable we can hide secret/access key.
+
+vi provider.tf
+provider "aws" {
+  region = "${var.region}"
+  access_key = "${var.access_key}"
+  secret_key = "${var.secret_key}"
+  version = "~ 2.0"
+}
+----------
+# if define default value in variable.tf file then it must overwrite from tfvars file (if value exit in tfvars file). If value not exist
+in tfvars file then take default value from variable.tf file.
+
+vi variables.tf         # only define variable name here and assign value in terraform.tfvars file as below
+variable "access_key" {}       
+ 
+variable "secret_key" {}
+variable "region" {
+  default = "us-east-1"
+}
+
+variable "ami_id"{
+  type = "map"                # variable type (like string,number,map,list,etc)
+  default = {
+    us-east-1 = "ami-035b3c7efe6d061d5"
+    eu-west-2 = "ami-132b3c7efe6sdfdsfd"
+    eu-central-1 = "ami-9887h5h6nsn"
+  }
+}
+# ami = var.ami_id["us-east-1"]
+----------
+
+vi terraform.tfvars          # fixed name and define variable name and value only here
+access_key = "AKIASGHX7SHCAXOJTTXU"
+secret_key = "M2eRRCodTbRn60jiQvjib/3_wz3SK/6B8AtMJAL0"
+region =      "us-east-1"
+-----------
+
+vi aws-instance-example.tf
+resource "aws_instance" "web1"{
+  ami = "${lookup(var.ami_id, var.region)}"      # region will take default us-east1 from variables file. matching image: ami-035b3c7efe6d061d5
+  instance_type = "t2.micro"
+}
+
+terraform plan  # to check what is going on
+terraform apply  # crate Resources
+
+# Note: if status is tainted in any resource in terraform.tfstat file, means this resource will again recreate. (if resource creation is failed then 
+marked status tainted terraform.tfstat file)
+============================================
+required_provider{          # required_provider plugin use only this version only.
+ aws={
+  source = "hashicorp/aws"
+  version = "3.71.0"
+}
+
+#12 Terraform software provisioning | terraform provisioner | terraform software | PART 1
+
+File upload Host Connection:
+
+vi aws-instance-server-configure.tf
+
+resource "aws_instance" web-server" {
+  ami = "${lookup(var.ami_id, var.region)}"
+  instance_type = "t2.micro"
+  key_name = "terraform"             # generate .pem file for pass
+
+provisioner "file" {              # index file copy from local machine to remote ec2
+    source = "index.html"                     
+    destination = "/tmp/index.html"
+    
+connection{             #this type is local connection, means it work only for this provisionar.
+       type = "ssh"
+       user = "ec2-user"
+       private_key = "${file("${var.private_key_path}")}"     #private key define in var variable file.
+       host = "${aws_instance.web_server.public_ip}"  or host="${self.public_ip}"
+  }
+  }
+
+provisioner "file" {              # content write in index.html file
+    content = "my name is ranjit kumar"                     
+    destination = "/tmp/index.html"
+   }
+
+# Remote Execution Commands, install httpd where ec2 created
+
+provisioner "remote-exec" {
+      inline = [                       # inline for execute list of commands
+        "sudo yum install -y httpd",
+        "sudo cp /tmp/index.html /var/www/html/",
+        "sudo service httpd restart",
+        "sudo service httpd status"
+      ]
+  }
+
+connection{             # This type is global connection and use for all provisionar
+    type = "ssh"
+    user = "ec2-user"
+    private_key = "${file("${var.private_key_path}")}"
+    host = "${aws_instance.web_server.public_ip}"  or host="${self.public_ip}"
+  }
+ 
+provisioner "remote-exec" {
+  script = "./testscript.sh"        # give local script path and will be execute on remote ec2 server.
+}
+
+terraform plan
+terraform apply
+# ec2 instance created and installed httpd software in this serve
+------------------------------------
+Terraform Output
+* Many Resources dependent with other resource attribute.
+    * Resource Name
+    * Resourece arn
+    * EC2 IP (Public IP)
+    * EC2 DNS name
+
+* Terraform keeps attribute of all resource which terraform creates.
+* We can get all attribute as a output. And can used this in another script.
+
+vi output.tf                  # After execute, it print public IP on terminal.
+output "public_ip"{
+   value="${aws_instance.web-server.public_ip}"
+}
+
+
+# Terraform attribute in script.
+
+vi aws-instance-example.tf
+
+resource "aws_instance" "web-server" {
+  ami = "${lookup(var.ami_id, var.region)}"
+  instance_type = "t2.micro"
+
+provisioner "local-exec"{       # execute on local machine, where terraform execute
+    command = "echo ${aws_instance.web-server.private_ip} > ip_list.txt"     # ip saved in ip_list.txt on local server
+ }
+
+provisioner "local-exec" {
+    command = "echo ${aws_instance.web-server.arn} > arn.txt"    #after execute, ARN saved in arn.txt   on local server
+ }
+
+provisioner "local-exec" {
+    working_dir = "/tmp/"
+    command = "echo ${aws_instance.web-server.arn} > arn.txt"    # file saved in /tmp dir
+ }
+
+provisioner "local-exec" {
+    interpreter = [
+       "/usr/bin/python3","-c"
+        ]
+        command = "print('HelloWorld')"    # print on terminal locally
+      }
+ }
+
+provisioner "local-exec" {
+   on_failure = continue          # if incase this provisioner failed then still further process will be continue. 
+   command = "env > env.txt"
+   environment = {
+      envname = "envvalue"
+   } 
+
+provisioner "local-exec"{
+  when = destroy
+  command = "echo 'this block execute only when aws_instance delete'"	 # because this block come within aws_instance block
+}			
+
+
+terraform apply    # executed aws-instance-example.tf with output.tf
+
+------------------------------
+#16 Terraform State | Terraform Remote State on Amazon S3 | Terraform Remote State
+
+* Terraform keep remote state of infrastructure. Terraform state file is Json and maintain the desire state=actual state. For backup state file use 
+S3 bucket and must enable the version. Other wise incase deleted state file then generaly can't recover state file.
+* Current State will be stores on terraform.tfstate file
+* Terraform.tfstate.backup for previous state file
+
+Terraform state file can be in remote, using backend functionality. A "backend" in Terraform determines how state is loaded and how operation such as 
+apply is executed. This abstraction enables non-local file state storage, remote execution and state locking.
+
+Default backend is terraform state file. Other backend are (S3, consul).
+--------------
+Terraform backend Consule :
+terraform {
+   backend "consul"{
+     address = "mybackup.cusule.io"
+     path = "terraform/backup/"
+   }
+}
+
+-------------
+Terraform Backend s3 setup:
+terraform {
+  backend "s3" {
+    bucket = "mybucket"
+    key = "path/to/my/key"                 # folder name
+    region = "us-east-1"
+  }
+}
+-------------
+
+Terraform backend Remote setup:  
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config {
+    bucket = "terraform-state-prod"
+    key = "network/terraform.tfstate'
+    region = "us-east-1"
+  }
+}
+
+# dynamodb table(optional) this table used for state locking and consistency. The table must have a primary key named lockID. if not present, 
+locking will be disabled. 
+Create LockID Field in dynamodb Table.
+--------------
+Terraform Remote State Demo:  LAB
+
+First create s3 bucket "backup-state-terraform"  # verginia region 
+# aws CLI should be installed where i want to execute terraform apply. state file will be create only on s3 bucket.
+
+Now create DynmoDB table  "backend-test"   # for locking, so no one else can run.
+
+vi backend.tf      # 
+
+terraform {
+  required_version = ">= 0.11.0"  # always resource will create accordingly this terraform version only. only should be hardcode value, not use variable here.
+  backend "s3" {
+    bucket = "terraform"        # bucket name
+    key = "terraform.tfstate"       # this file is created on s3 bucket, not locally and all developer will use this same state file.
+    region = "us-east-1"
+    dynamodb_table = "backend-test"   # dynamodb table name, first create table in dynamodb. using this many user can not execute concurrently 
+terraform plan
+  }
+}
+
+vi aws-remote-state-example.tf
+
+resource "aws_s3_bucket" "bucket" {
+   bucket = "my-tf-test-bucket-abc"
+   acl = "private"
+   
+   tags = {
+      Name = "My bucket"
+      Environment = "Dev"
+   }
+}
+
+terraform init       # if comment backend part, and execute terraform init -migrate-state, then state file created in locally.
+terraform apply
+# now check in DynamoDB Table, entry Created LockID, Info  (state Locked)
+# Now Script completed and finally Released Lock. Digest.  So Now some one can run same script.
+# Now check S3, terraform.tfstate file created  ( one link is there, open and found S3 resource details in JSON format.
+-------------------
+
+Terraform Data Source:
+
+* Data Source provides a dynamic information. data source return value from cloud
+* Many Information of AWS are needed dynamically without create new resources.
+* Terraform exposed this information using data sources
+*Example:
+    VPC ID
+    Security ID
+    AMI List
+    Availability Zone
+
+vi aws-data-source-example.tf
+
+data "aws_vpc" "vpc_1" {              # vpc_1 any name. data return default vpc name from cloud, where key is Name and value is Default
+  filter{
+     name = "tag:Name"       # Name is key
+     values = ["Default"]    # value is Default, check on aws console
+  }
+}
+
+resource "aws_subnet" "example" {
+  vpc_id = "${data.aws_vpc.vpc_1.id}"
+  cidr_block = "172.31.0.0/20"
+}
+
+terraform plan
+terraform apply
+-----------------------------
+
+Terraform Modules :
+
+Module is set of Terraform configuration .tf files in single directory. Even a simple configuration consisting of a single directory with 
+one or more .tf files in module. Run terraform command directly such directory. And it considered the root module. use reusable code parts.
+
+You can use module to make terraform more organized.
+Define output variable that other resources or modules can use.
+
+Terraform Modules
+Module reuse from :
+* Third party modules like git.
+* Reuse part of your code example instance create.
+
+----------------------
+How Terraform Modules works:
+Required parameter provide to module -
+
+Module:
+Resource Creation
+Condition
+Property Define
+Output
+Variable
+--------------------
+Passing Argument to Modules without Variable:
+
+# Another folder access through source.
+
+module "module-example" {
+   source = "github.com/patelvijaykumar/terraform-aws-instance-template.git"   # Other folder path where instance created code exist.
+      region = "us-east-1"
+      ami_id = "ami-035b3c7efe6d061d5"
+      instance_type = "t2.micro"
+      tag = "module example"
+      key = file("${path.module}/id_rsa.pub")           # here module provide path of id_rsa.pub file (already exist this file)
+    #### instances = ["${module.module_name.output_name}"]   # access object from another module.
+}
+
+or
+module "mywebserver" {
+ source = "../modules/webserver"
+ }
+
+module "vpc" {
+  source = "../vpc_networking"             # Other vpc_networking folder is there, where vpc creation code .tf file is already there. take reference using source.
+ }
+--------------------
+
+Terraform Modules:    it take reference from other folder
+
+Main.tf
+provider "aws" {
+  region ="${var.region}"
+}
+
+resource "aws_instance" "web" {
+  ami = "${var.ami_id}"
+  instance_type = "${var.instance_type}"
+
+  tags = {
+    Name = "${var.tag}"
+  }
+}
+
+# define variable name here only. may define variable type here also. if default value is not define here and tfvars file then asked value at run time.
+vi variable.tf        
+  variable "ami_id" {}
+  variable "region" {}
+  variable "instance_type" {}
+  variable "tag" {
+  default = "Testing"
+}
+
+vi output.tf
+output "instance_ip" {
+  value ["${aws_instance.web.public_ip}"]
+}
+
+-------------------------------
+Use the output from the module in your code
+
+output "instance_public_ip_address"{
+  value="${module.module-example.instance_ip}"
+}
+
+===========================================
+How to build reusable terraform module         # module just take reference from other folder. in folder has resource creation file is there.
+module means resource.
+
+vi main.tf
+# Passing Argument to Modules with Variable:
+module "module-example"{
+  source = "github.com/patelvijaykumar/terraform-aws-instance-template.git"   # main.tf, output.tf, variable.tf present in github. in module folder must not provider.
+   
+     region = "${var.region}"
+     ami_id = "${var.ami_id}"
+     instance_type = "${var.instance_type}"
+     tag  = "${var.tag}"
+}
+output "instance_public_ip_address"{
+  value="${module.module-example.instance_ip}"
+}
+
+vi variables.tf
+variable "region" {
+  default = "us-east-1"          # default = value
+}
+
+variable "ami_id"{
+   default = "ami-035b3c7efe6d061d5"
+}
+
+variable "instance_type" {
+   default = "t2.micro"
+}
+
+variable "tag" {
+  default "t2.micro"
+}
+
+terraform plan
+terraform apply     # now ec2 instance created and print instance IP as output module.
+=================================================
+
+How to create AWS VPC, Subnet, InternetGateway, Route Table, EC2, NAT Gateway using Terraform.
+
+VPC is Virtual Data Center in the cloud. Amazon virtual private cloud is a commercial cloud computing service that provides users a virtual private cloud.
+* Launch instance into a subnet of your choosing.
+* Assign custom IP address range in each subnet
+* Configure route table between subnet.
+* Create internet gateways and attach them to subnet.
+* Security control of your AWS resources.
+* Instance security group.
+* subnet network access control list (ACLS).
+
+* On AWS you have a default VPC created by AWS to  launch instance.
+* We have used default VPC in our demos done.
+* An instance launched in one VPC can't communicate with an instance in other VPC suing their private ip address.
+* VPC peering will use for communicate 2 VPC.
+
+vi vpc.tf
+
+resource "aws_vpc" "vpc_demo" {
+  cidr_block = var.cidr
+  instance_tenancy = var.instance_tenancy
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support = var.enable_dns_support
+  enable_classiclink = var.enable_classiclink
+
+  tags = {
+       Name = var.tags
+    }
+}
+
+vi variable.tf
+variable "cidr" {
+    description = "The CIDR block for the vpc. Default value is a vlid CIDR, but not acceptable by aws and should be overwriten.
+    type = string
+    default = "10.0.0.0/16"
+}
+
+variable "instance_tenancy" {
+    description = "A tenancy option for instance launched into the vpc"
+    type = string
+    default = "default"
+}
+
+variable "enable_dns_hostnames" {
+      description = "should be true to enable DNS hostname in the VPC"
+      type = bool
+      default = true
+}
+
+variable "enable_dns_support" {
+     description = "should be true to enable DNS support in the VPC"
+     type = bool
+     default = true
+}
+
+variable "enable_classiclink" {
+     description = "Should be true to enable classiclink for the vpc. only valid in region and account that support EC2 classic.
+     type = bool
+     default = false
+}
+
+variable "tags" {
+     description = "A map of tags to add to all resources"
+     type = string
+     default = "vpc-custome-demo"
+}
+
+vi public_subnet.tf
+resource "aws_subnet" "public_1" {
+  vpc_id = aws_vpc.vpc_demo.id
+  map_public_ip_on_launch = true
+  cidr_block = "10.0.1.0/24"
+
+  tags = {
+    Name = "public_1-demo"
+  }
+}
+
+resource "aws_subnet" "public_2" {
+  vpc_id = aws_vpc.vpc_demo.id
+  map_public_ip_on_launch = true
+  cidr_block = "10.0.2.0/24"
+
+  tags = {
+     Name = "public_2-demo"
+    }
+}
+
+resource "aws_subnet" "public_3" {
+  vpc_id = aws_vpc.vpc_demo.id
+  map_public_ip_on_launch = true
+  cidr_block = "10.0.3.0/24"
+
+  tags = {
+     Name = "public_3-demo"
+    }
+}
+------------
+vi private_subnet.tf
+
+resource "aws_subnet" "private_1" {
+  vpc_id = aws_vpc.vpc_demo.id
+  map_public_ip_on_launch = false
+  cidr_block = "10.0.4.0/24"
+
+  tags = {
+    Name = "private_1-demo"
+  }
+}
+
+resource "aws_subnet" "private_2" {
+  vpc_id = aws_vpc.vpc_demo.id
+  map_public_ip_on_launch = false
+  cidr_block = "10.0.5.0/24"
+
+  tags = {
+    Name = "private_2-demo"
+  }
+}
+
+resource "aws_subnet" "private_3" {
+  vpc_id = aws_vpc.vpc_demo.id
+  map_public_ip_on_launch = false
+  cidr_block = "10.0.6.0/24"
+
+  tags = {
+    Name = "private_3-demo"
+  }
+}
+
+vi internet-gateway.tf
+
+resource "aws_internet_gateway" "gw" {
+   vpc_id = "${aws_vpc.vpc_demo.id}"
+
+   tags = {
+     Name = "internet-gateway-demo"
+   }
+}
+
+
+vi route_table.tf
+
+resource "aws_route_table" "route-public" {
+    vpc_id="${aws_vpc.vpc_demo.id}"
+
+    route {
+       cider_block = "10.0.0.0/0"
+       gateway_id = "${aws_internet_gateway_.gw.id}"
+    }
+
+    tags = {
+       Name = "public-route-table-demo"
+    }
+}
+
+resource "aws_route_table_association" "public_1" {
+    subnet_id = "${aws_subnet.public_1.id}"
+    route_table_id = "${aws_route_table.route-public.id}"
+}
+
+resource "aws_route_table_association" "public_2" {
+    subnet_id = "${aws_subnet.public_2.id}"
+    route_table_id = "${aws_route_table.route-public.id}"
+}
+
+resource "aws_route_table_association" "public_3" {
+    subnet_id = "${aws_subnet.public_3.id}"
+    route_table_id = "${aws_route_table.route-public.id}"
+}
+
+------------
+vi nat.tf
+
+resource "aws_eip" "nat" {
+    vpc = true
+}
+
+resource "aws_nat_gateway" "nat_gw"
+     allocation_id = "${aws_eip.nat.id}"
+     subnet_id = "${aws_eip.nat.id}"
+     subnet_id = "${aws_subnet.public_1.id}"
+     depends_on = ["aws_internet_gateway.gw"]
+}
+
+resource "aws_route_table" "route_private" {
+   vpc_id = "${aws_vpc.vpc_demo.id}"
+
+   route {
+      cidr_block = "10.0.0.0/0"
+      gateway_id = "${aws_nat_gateway.nat_gw.id}"
+   }
+
+   tags = {
+     Name = "private-route-table-demo"
+   }
+}
+
+resource "aws_route_table_association" "private_1" {
+    subnet_id = "${aws_subnet.private_1.id}"
+    route_table_id = "${aws_route_table.route_private.id}"
+}
+
+resource "aws_route_table_association" "private_2" {
+    subnet_id = "${aws_subnet.private_2.id}"
+    route_table_id = "${aws_route_table.route_private.id}"
+}
+
+resource "aws_route_table_association" "private_3" {
+    subnet_id = "${aws_subnet.private_3.id}"
+    route_table_id = "${aws_route_table.route_private.id}"
+}
+
+terraform plan
+terraform apply   # 1 vpc, 3 private subnet & 3 public subnet, 1 public & 1 private Route table, Internetgateway created.
+----------------
+
+EC2 Instance Create with Custome VPC
+
+* Resource will be created
+   * VPC
+   * Security Group
+   * EC2 Instance
+
+Security Group:
+* Security group is a firewall for Ec2 Instance
+* Security group controls how traffic allow into or out of EC2 Instance.
+* Terraform script configured ingress (inbound), egresss(outbound) traffic rules.
+* In example create 22 port allow rule for inbound
+* 0.0.0.0 to allow for all outbound traffic.
+
+vi security_group.tf
+
+resource "aws_security_group" "allow_ssh" {
+  name = "allow_ssh"
+  description = "Allow SSH inbound traffic"
+  vpc_id = aws_vpc.vpc_demo.id
+
+  ingress {                      # allow inbound rule
+     from_port = 22
+     to_port = 22
+     protocol = "tcp"
+     cidr_block = ["0.0.0.0/0"]
+  }
+
+  engress {                         # allow outbound rule
+    from_port =0     # 0 means all ports
+    to_port = 0
+    protocol = "-1"        # -1 means all Traffic.
+    cidr_block = ["0.0.0.0/0"]
+  }
+
+===============================================LAB below
+cat instance.tf
+resource "aws_instance" "web" {
+   ami = lookup(var.ami_id,var.region)
+   instance_type = var.instance_type
+
+# public subnet assign to instance
+   subnet_id = aws_subnet.public_1.id
+
+# Security group assign to instance
+   vpc_security_group_ids=[aws_security_group.allow_ssh.id]
+
+# key name
+key_name = var.key_name
+      tag = {
+         Name = "Ec2-with-VPC"
+      }
+}
+----------
+vi variable.tf
+variable "region" {
+  type = "string"
+  default = "us-east-1"
+}
+
+vaiable "ami_id" {
+  type = "map"
+  default = {
+     us-east-1 = "ami-035b3c7efe6d061d5"
+     eu-west-2 = "ami-132b3c7efe6sdfdsfd"
+     eu-central-1 = "ami-9787h5h6ns5gd33"
+  }
+}
+
+variable "instance_type" {
+  type = "string"
+  default = "t2.micro"
+}
+
+variable "key_name" {        # create password
+  type = "string"
+  default = "ec2-demo"
+}
+
+variable "cidr" {
+   description = "The CIDR block for the VPC. Default value is a valid CIDR, but not acceptable by aws and should be overridden"
+   type = string
+   default = "10.0.0.0/16"
+}
+
+variable "instance_tenancy" {
+   description = "A tenancy option for instance launched into the VPC.
+   type = string
+   default = default
+}
+
+variable "enable_dns_hostnames" {
+   description = "Should be true to enable DNS hostnames in the VPC.
+   type = bool
+   default = true
+}
+
+variable "enable_classiclink" {
+   description = "SHould be true to enable classiclink for the VPC. Only valid in regions and accounts that support EC2  Classic"
+   type = bool
+   default = false
+}
+
+variable "tags" {
+   description = " A map of tags to add to all resources"
+   type = string
+   default = "Vpc-custome-demo"
+}
+
+----------
+vi vpc.tf
+
+resource "aws_vpc" "vpc_demo" {
+  cidr_block = var.cidr
+  instance_tenancy = var.instance_tenancy
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support = var.enable_dns_support
+  enable_classiclink = var.enable_classiclink
+
+  tags = {
+       Name = var.tags
+    }
+}
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.vpc_demo.id
+  tags = {
+     Name = "internet-gateway-demo"
+  }
+}
+
+resource "aws_subnet" "public_1" {
+   vpc_id = aws_vpc.vpc_demo.id
+   map_public_ip_on_launch=true
+   cidr_block = "10.0.1.0/24"
+   tags = {
+     Name = "public_1-demo"
+   }
+}
+
+rosource "aws_route_table" "route-public" {
+   vpc_id = aws_vpc.vpc_demo.id
+   route {
+     cidr_block = "10.0.0.0/0"
+     gateway_id = aws_internet_gateway.gw.id
+   }
+
+   tags {
+      Name = "public-route-table-demo"
+   }
+}
+
+resource "aws_route_table_association" "public_1" {
+   subnet_id = aws_sbunet.public_1.id
+   route_table_id = aws_route_table.route-public.id
+}
+--------
+vi security_group.tf
+
+resource "aws_security_group" "allow_ssh" {
+  name = "allow_ssh"
+  description = "Allow SSH inbound traffic"
+  vpc_id = aws_vpc.vpc_demo.id
+
+  ingress {
+     from_port = 22
+     to_port = 22
+     protocol = "tcp"
+     cidr_block = ["0.0.0.0/0"]
+  }
+
+  engress {
+    from_port =0
+    to_port = 0
+    protocol = "-1"
+    cidr_block = ["0.0.0.0/0"]
+  }
+
+terraform plan
+terraform apply   # vpc and  instance created.
+
+ssh ec2-user@pulic_ip of instance -i /home/vijay/ec2-demo.pem   # connected
+ping google.com         # pingin...
+
+===================================
+#26 AWS EBS DEMO - Resizing & Changing Type, EBS Snapshot, Attach Detach EBS with Terraform |Part 1
+
+Amazon EBS allows you to create storage volumes and attach them to amazon EC2 instance, Once attached you can create a file system on top of these volumes, run a dataase, or use them in any other way you would use a block device. Amazon EBS volumes are places in a spedific availability zone, where they are automatically replicated to protect you form the failure of a single component.
+
+* Disk in the cloud
+* It attach to ec2 instance
+* You can have OS, database installed
+* Multiple EBS device to single ec2 instance
+* But you can't attach one EBS to Two instance.
+
+resource "aws_ebs_volue" "ebs_volue" {
+  availability_zone = "us-east-1a"
+  size = 20
+  type = "gp2"
+
+  tags = {
+    Name = "ebs-volume-terraform-demo"
+  }
+}
+
+resource "aws-volume_attachment" "ebc_volume_attachment" {
+   device_name = "/dev/xvdh"
+   volume_id = aws_ebs_volume.ebs_volume.id
+   instance_id = aws_instance_ebs_instance_example.id
+}
+
+terraform apply   #  volume attached
+
+ssh ec2-user@pulic_ip of instance -i /home/vijay/ec2-demo.pem   # connected
+sudo -s
+df -kh  # still not attached
+mkfs.ext4 /dev/xvdh       # file system created.
+mkdir data
+mount /dev/xvdh /data
+df -kh  # Now attached
+================================
+
+# 28 Terraform Tutorial : Provision EC2 on AWS | Amazon EC2 User Data Tutorials
+
+* User_data will be use for virtual machine customization at time of launch
+* With user_data
+  * Can update packages
+  * Install software
+  * Execute Scripts
+  * Mount EBS volume
+
+User_data will be using with instance creation.
+ * There are two ways to run user_data
+ * Steps provide in aws_instance resources.
+ * Pass shell script file in user_data
+
+resource "aws_instance" "user_data_example" {
+ ami	= lookup(var.ami_id, var.region)
+ instance_type	=	var.instance_type
+ vpc_security_group_ids	=	[aws_security_group.allow_ssh.id]
+ key_name 	= var.key_name
+
+ user_data=<<-EOF      # - ignore the tab in script
+    #! /bin/bash
+    sudo yum update -y
+    sudo yum install -y httpd.x86_64     # or nginx
+    sudo service httpd start
+    sudo service httpd enable
+     echo "<h1> Deployed via Terraform </h1>" |yum tee /var/www/html/index.html
+ EOF
+
+ tags ={
+        Name = "Ec2-User-data"
+ }
+}
+
+# user_data= file("${path.module}/script.sh")            # user_data execute while instance is launching. and define within aws_instance block
+vi script.sh
+#! /bin/bash
+sudo apt-get update
+sudo apt-get install apache2 -y
+sudo echo "Welcome to apache"> /var/www/html/index.html
+
+----------------
+
+#! /bin/bash
+sudo mkdir /data
+sudo mkfs.ext4 ${device_name}
+mount ${device_name} /data
+
+data "template_file" "init"{
+   template ="${file("volume.sh")}"
+
+   vars = {
+       device_name = var.device_name
+   }
+}
+--------------------------
+
+#31 Terraform EIP Public Private | AWS EC2 EIP | Terraform: Elastic IP
+
+Private IP
+ * Instance will be having Public and Private IP
+ * Private IP Auto assign to instance
+ * VPC having subnet and Every subnet having range of IP Address
+ * Manually you can specify the Private IP address.
+
+resource "aws_instance" "IP_example" {
+ ami	= lookup(var.ami_id, var.region)
+ instance_type	=var.instance_type
+ subnet_id	=aws_subnet.public_1.id
+ 
+ vpc_security_group_ids	=[aws_security_group.allow_ssh.id]
+ private_ip	="10.0.1.10"
+ key_name	=var.key_name	
+
+# Elastic IP will be use for public static IP (incase rebooted, it can't changes public ip)
+
+resource "aws_eip" "eip" {
+ instance	= aws_instance.IP_example.id
+ vpc	=true
+}
+
+-----------------------------------
+#32 AWS Route 53 | AWS Route 53 Tutorial | What Is AWS Route 53? | AWS Tutorial
+Route53
+
+* IP address is hard to remember hence hostname use.
+* DNS is use for mapping hostname to IP address.
+* DNS works on 53 Port number
+* Route 53 is aws DNS service with route 53 you can.
+   * Host Domain name
+    * Register domain name
+    * Create zone and add DNS record.
+
+The A record maps a name to one or more IP address when the IP are known  and stable.
+The CNAME record maps a name to another name, used when there are no other records on that name.
+
+resource "aws_route53_zone" "easy_aws" {
+   name = "easyaws.in"
+   tags = {
+       Environment = "dev"
+   }
+}
+
+resource "aws_route53_records" "www" {
+   zone_id = aws_route53_zone.easy_aws.zone_id
+   name = "www.easyaws.in"
+   type = "A"
+   tt1 = "300"
+   records = [AWS_eip.eip_public_ip]
+
+}
+
+output "name_server" {
+  value = aws_route53_zone.easy_aws.name_servers
+}
+
+-----------------------------------------
+#33 Terraform AWS Route53 | Create your own private hosted domain using AWS Route 53 Using Terraform
+
+LAB done   (website runing using domain name)
+---------------------------
+
+#35 Terraform AWS RDS | AWS Databases - Difference between RDS, DynamoDB, Redshift
+
+AWS RDS :
+RDS (Relational Database Services)
+Its managed database services.
+ * Can setup replication (High Availability)
+ * Automated snapshot for backup
+ * Automated Security upgrade
+ * Easily Instance scaling
+
+AWS RDS Databases
+ * MySQL
+ * MariaDB
+ * PostgresSQL
+ * MicrosoftSQL
+ * Oracle
+
+Will be creating below resource to deploy RDS service.
+* Subnet Group:
+      Where to deploy database service within region.
+* Parameter Group
+      Allow you to specify the parameter to change setting in database
+* Create Security group that allow incoming traffic to the RDS instance
+* At last Create RDS Instance.
+
+resource "aws_db_parameter_group" "default" {
+ name = "mariadb"
+ family = "mariadb10.2"
+
+ parameter {
+   name = "max_allowed_packet"
+   value = "16777216"
+ }
+}
+
+resource "aws_db_subnet_group" "default" {
+  name	="main"
+  subnet_ids = [aws_subnet.private_1.id, aws_subnet.private_2.id]
+
+ tags = {
+   name = "My DB subnet group"
+ }
+}
+
+resource "aws_security_group" "db"{
+ name	= "allow_SSH"
+ description	= "allow SSH inbound traffic"
+ vpc_id	= aws_vpc.vpc_demo.id
+
+ ingress {
+   from_port	= 3306
+   to_port	= 3306
+   protocol	= "tcp"
+   security_groups	=[aws_security_group.allow_ssh_http.id]
+ }
+
+ egress {
+   from_port =0
+   to_port = 0
+   protocol = "-1"
+   cidr_blocks = ["0.0.0.0/0"]
+ }
+}
+
+resource "aws_db_instance" "default" {
+  allocated_storage	= 20
+  storage_type	= "gp2"
+  engine	="mariadb"
+  engine_version	="10.2.21"
+  instance_class	="db.t2.micro"
+  name	="mydb"
+  username	="root"
+  password	="foobarbaz"
+  parameter_group_name	= "mariadb"
+  db_subnet_group_name	=aws_db_subnet_group.default.name
+  vpc_security_group_ids	=[aws_security_group.db.id]
+  availability_zone	=aws_subnet.private_1.availability_zone
+}
+
+output "end_point" {
+  value = aws_db_instance.default.endpoint
+}
+
+terraform apply         #after execute, use mysql
+---------------------------------
+#37 AWS DynamoDB with Terraform | AWS DynamoDB Tutorial | AWS Training Video
+
+AWS DynamoDB:
+Amazon DynamoDB is a key-value and document database that delivers single-digit millisecond performance at an scale and serverless.
+
+AWS DynamoDB:
+* Fast and flexible NoSQL database service for all application that need consistent
+* it is fully managed database and support both document and key-value data models.
+* its flexible data model and reliable performance make it is great. fit for mobile,web, gaming,ad-tech,IoT, any many other application.
+
+
+
+https://www.youtube.com/watch?v=GEWgu7O_g5k&list=PL_OdF9Z6GmVayanQ4cjISqY_UkrOcZtr1&index=29
+
+===========================================================================================
+vi xyz.tfvars           # if define another tfvars file name insted of terraform.tfvars then will use -var-file parameter to access another tfvars file.
+image_id="e4kdjf"
+
+terraform plan -var-file=xyz.tfvars           # now considered as terraform.tfvars file
+terraform plan  -var="image_id=e4kdfj"        # direct pass value also (higher priority)
+terraform plan out -var-file=xyz.tfvars          # print image_id value (out is used for output) (-var-file passed global variable)
+---------
+terraform.tfvars file equal to xyz.auto.tfvars
+---------
+
+Environment variable
+export TF_VAR_instancetype=t2.micro
+# instance_type will be define as variable name in terraform file. And read t2.micro
+---------
+
+provider "github"{
+  token="github token no"           # first generate token using github. 
+}
+
+resource "github_repository" "terraform-first-repo" {
+ name = "first-repo-from-terraform"
+ description = "My First resource for my youtube viewers."
+ visibility = "public"
+ auto_init = true         # for create README.md file
+}
+
+terraform init
+terraform plan        # just read statfile, what currently resources are maintained in this file
+terraform apply  --auto-approve        # repository created on github
+#  --auto-approve   it never asked for user input yes
+
+terraform destroy --target github_repository.terraform-first-repo    #only this resource deleted, not other resources. Now this reosources deleted from statefile and other resources are still presist in statefile.
+
+terraform apply --auto-approve        # now only deleted resource will create, as previously deleted. because deleted rosource are not maintain in statefile and other resource are maintain in statfile.
+ 
+========
+
+ssh-keygen rsa    # Enter and generated key id_rsa.pub
+
+resource "aws_key_pair" "key-tf" {           # key-tf is local name of terraform env
+  key_name = "key-tf"                        # key-tf is key name of aws env
+  public_key = file("${path.module}/id_rsa.pub")        # file function show content of id_rsa.pub  (path.module provide current path)
+}
+
+output "keyname" {
+  value = "${aws_key_pair.key-tf.key_name}"            # print key value
+}                                            
+
+resource "aws_instance" "web" {
+  ami = "ami-0e47....."
+  instance_type = "t2.micro"
+  key_nanme = "${aws_key_pair.key-tf.key_name}"         # assign key-tf and this have id_rsa.pub for this instance
+  vpc_security_group_ids = ["${aws_security_group.allow_tls.id}"]      # take security list
+  tags = {
+       Name = "first-tf-instance"
+  }
+}
+
+
+## assign multiple port inbound rule with ec2 using loop as below (without loop, code will be large and complicated)
+
+resource "aws_security_group" "allow_tls" {
+  name = "allow_tls"
+  description = "Allow TLS inbound traffic"
+  
+  dynamic "ingress" {                                #ingress means add inbound rule, and allow incoming traffic
+    for_each = [22,80,443,3306,27017]
+    iterator = port     # pick port one by one in port
+    content  {
+         description = "TLS from VPC"
+         from_port   = port.value
+         to_port     = port.value
+         protocol    = "tcp"
+         cidr_block  = ["0.0.0.0/0"]
+     }
+  }
+  egress {              # add outbound rule, and allow outgoing traffic
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"            # any protocol
+    cidr_blocks = ["0.0.0.0/0"]    # anywhere
+    ipv6_cidr_blocks = ["::/0"]   # anywhere
+  }
+}
+
+terraform init     #install dependency plugin to connect aws
+terraform plan
+terraform apply --auto-approve
+
+ssh -i id_rsa ubuntu@ip           # now connected
+# now pinging alow
+# now installed ngins using apt also
+because add outbound rule also.
+==============================================================
+
+48. Terraform (In Hindi) - Terraform Configurations
+Different user has different verison of terraform. User write code seprately for infra.
+Before execute tf code it will check this version will support or not. it produce error if below verion is not support, then need change version.
+
+terraform{
+ required_version = "1.1.0"   or ">=0.15"  or >=0.15, < 2.0.0           # can't use variable here
+  }
+
+or
+
+required_providers {
+ aws = {
+    source= "hashicorp/aws"
+    version = "3.71.0"
+   }
+}
+
+==================
+Q. You have a terraform configuration that create multiple resources in specific order, but need to skip some specify resource in the sequence, how can you accomplish this task?
+ANs: -target ( terraform apply target=aws_network_interface -target aws_instace.example) only this resource will create
+
+Q. How to attach new ebs volume in exit ec2 instance?
+Ans: resource "aws_ebs_volume"  to create ebs volume. and resource "aws_volume_attach" to attach volume.
+
+Q. How can you dynamically select availability zone at run time terraform?
+Ans: data resources
+
+Q How to create multiple ec2 instance of the same resources with slightly different configurations?
+Ans: using count, and ec2 name is manage by count.index
+
+Q what is remote_exec ?
+ans: used to create shell script remotly using remote_exec provisionar.
+
+Q. what is null_resource?
+Ans: null resource is not going to performance any action. Null resource used to call only 
+provisioner (remote_exec, local_exec,file,file) to read some data in cloud. Or used to run scripts on a specified trigger.
+
+Q. what happen if deleted state file?
+Ans: it can't recover. but to keep more secure just store statefile in s3 bucket using backend.
+
+Q. Can terraform used for automating on prem infra?
+Ans: yes, in private cloud like open stack, VM ware, cloud stack.
+
+Q. What if we encounter a serious error and want to rollback?
+Ans: i can do using branching strategy.
+
+Q. what happen if give count 0 in ec2 creation terraform script?
+Ans: no any resource will create.
+
+Q. What is Dynamic block in terraform?
+Ans: means i can provide value at run time from any variable.tf or tfvars file, where value stored in another place. when you need to hide details in 
+order to build a clean user interface for a re-usable module   (locals(
+
+Q. Best practices in Terraform?
+Ans: will use module to organize the terraform code. So we can easly found any error and edit the code incase any error. And will use git branch to 
+maintain code. store statefile in remotly s3 bucket.
+
+Q What CICD tool you have used to deploy terraform code and what version of terraform you have used?
+Ans: GitLab and 1.13.0 version used.
+
+Q. what are the provisioner used in Terraform.
+Ans: remote-exec, local-exec, file.
+
+Q. what is terraform plugin?
+Ans: Terraform Plugins are written in Go and are executable binaries invoked by Terraform Core. when use provider then just download the plugins to 
+execute code.
+
+Q. how do you deploy the terraform code?
+Ans: code stored in github and used cicd pipeline to create infra.
+
+Q. When you want to deploy the same terraform code on different env, then what is the best strategy?
+Ans:  we will manage using multi terraform.tfvars file. like ProdEnv.tfvars, DevEnv.tfvars
+
+Q. How can i upgrade plugin in terraform?
+Ans: terraform init -upgrade
+
+Q. How to create local statefile from remote s3.
+Ans: comment backend block and terraform init -migrate-state
+
+Q. What is depends_on resource 
+Ans: suppose first resource will create then other resource will create. Deploy all resources in correct orders.
+
+Q. How to object access from one module to another module
+Ans: module.module_name.output_name           # already define output block in another module.
+
+Q How to deploy resource in multiple regions using terraform
+
+Ans: using define multiple providers with seprate region in same file.
+vi provider.tf
+
+provider "aws"{      # declare multiple provider as per multi region.
+alias = "us"
+region = "us-ease-1"
+}
+
+provider "aws"{      # declare multiple provider as per multi region.
+alias = "Singapore"
+region = "ap-southeast-1"
+}
+
+resource "aws_security_group" "prod_sg" {       # this resource will create in singapor region, 
+name = "prod-firewall"
+provider = aws.singapore"
+}
+
+resource "aws_security_group" "dev_sg" {       # this resource will create in us region, 
+name = "prod-firewall"
+provider = aws.us"
+}
+--------------
+
+Q. how to access any object from one module to another module
+Ans: In module, module.module_name.output_name                      # output block define in another module.
+    
+ module "ec2_module" {
+      subnet_id = module.vpc.public_subnet[0]    
+       }
+
+Q. When will create statefile in terraform.
+Ans: terraform apply
+
+Q. Can we merge 2 different state files? : No
+-----------------------
+
+Q. how to manage environment using terrafrom   # Workspace & Multiple Environment
+Ans:
+There should be seprate prod/dev environment tfvars files. 
+
+prod-app.tfvars      # it has seprate resource details for prod (file has var=value only)
+project ="esa-tutorial"
+aws_region ="us-east-1"
+profile ="production"
+environment ="prod"
+backend_s3_bucket ="tf-state"
+backend_dynamodb_table ="tf-locks"
+create_ecs_cluster ="true"
+
+prod-backend.conf    # backend conf code to store prod env statefile in s3   (file has var=value only)
+bucket ="tf-state"                      # S3 bucket should be created first in both account (prod/dev)
+key ="cluster/terraform.tfstate
+region ="us-east-1"
+dynamodb_table ="tf-lock"
+encrypt = "true"
+profile ="production"
+
+Dev-app.tfvars       # it has seprate resource details for dev  (var=val as above prod)
+Dev-backend.conf     # backend conf code to store dev env statefile in s3 (var=val as above prod)
+variables.tf/outputs.tf/main.tf/version.tf        # this common for all tf. backend "s3" {} as empty exist in version.tf
+terraform.tfstate
+
+terraform workspace new prod-workspace           # new workspace created  # 
+terraform select prod-workspace                  # folder name "prod-workspace" created in S3 bucket, and store statefile in this
+
+terraform init -backend-conf="dev-backed.conf       # dev-backend.conf has S3 backend code for store seprate dev env statefile in s3.
+terraform apply -var-file="dev-app.tfvars"          # statefile will create in myworkspace dev folder in s3 bucket
+terraform init -backend-conf="prod-backed.conf      # prod-backend.conf has S3 backend code for store seprate prod env statefile in s3.
+terraform apply -var-file="prod-app.tfvars"         # statefile will create in myworkspace prod folder in s3 bucket
+
+terraform init -reconfigure -backend-conf="dev-backed.conf      # switch to dev environment and reconfigured.
+
+
+======================================================
+
+Q. what is lifecycle in Terraform?
+Ans: lifecycle is a nested block within a resource block. Using lifecycle some details of behavior can be customized.
+The arguments available within a lifecycle block are 
+create_before_destroy , prevent_destroy , ignore_changes , and replace_triggered_by
+
+Q. What is various type of META-Argument in terraform and there benefits?
+Ans
+META-Argument changes the default behaviours of Terraform Configuration.
+ depends_on, count, for_each, provider, lifecycle
+
+Q. Who create the terraform.tfstate.backup file and Under which scenario it is created.
+Ans:
+Backup state file is autoamtically created, when terraform destroy command is executed. it restore infrastructure to the same state.
+
+Q. what is conditional statement?
+Ans:
+variable input {}             # take input from user at run time
+resource "aws_instance" "dev" {         # if provide dev then create 2 instance otherwise 0 instance
+ count = var.input == "dev" ? 2 : 0
+  }
+
+Q. How to Create Multiple EC2 with different Configuration (diff region/count/ec2 type – for_each and count together?
+Ans:
+
+variable.tf
+variable "configuration" {
+  description = "The total configuration, List of Objects/Dictionary"
+  default = [{}]
+}
+
+
+vi dev.tfvars
+configuration = [
+  {
+    "application_name" : "GritfyApp-dev",
+    "ami" : "ami-09e67e426f25ce0d7",
+    "no_of_instances" : "2",
+    "instance_type" : "t2.medium",
+    "subnet_id" : "subnet-0f4f294d8404946eb",
+    "vpc_security_group_ids" : ["sg-0d15a4cac0567478c","sg-0d8749c35f7439f3e"]
+  },
+  {
+    "application_name" : "GrityWeb-dev",
+    "ami" : "ami-0747bdcabd34c712a",
+    "instance_type" : "t2.micro",
+    "no_of_instances" : "1"
+    "subnet_id" : "subnet-0f4f294d8404946eb"
+    "vpc_security_group_ids" : ["sg-0d15a4cac0567478c"]
+  }
+]
+
+
+vi main.tf
+provider "aws" {
+  region = "us-east-1"
+  profile = "personal"
+}
+locals {
+  serverconfig = [
+    for srv in var.configuration : [
+      for i in range(1, srv.no_of_instances+1) : {
+        instance_name = "${srv.application_name}-${i}"
+        instance_type = srv.instance_type
+        subnet_id   = srv.subnet_id
+        ami = srv.ami
+        security_groups = srv.vpc_security_group_ids
+      }
+    ]
+  ]
+}
+// We need to Flatten it before using it
+locals {
+  instances = flatten(local.serverconfig)       # flatten – to convert the nested list to a single list
+}
+resource "aws_instance" "web" {
+  for_each = {for server in local.instances: server.instance_name =>  server}
+  
+  ami           = each.value.ami
+  instance_type = each.value.instance_type
+  vpc_security_group_ids = each.value.security_groups
+  user_data = <<EOF
+
+
+#!/bin/bash
+echo "Copying the SSH Key to the remote server"
+echo -e "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDvhXuMn9FwsrcK/DkgOlZdQFbY9e0+InX2sdHm8ZF7hGOQvg3CTMdBtMHlALnzqsYlS0aN0puzNF7fWAvUawdGjcSYxKEMlO1CaKPYxEgLTPDdiuYm3DNUutNMOLB0KHSJDk1Vb83UEpXm4vZjAWwHQTgoSsyXA57GcV4+IiTOy+iIIiiB7XzTDjt7ePVOW237HJAENlB/txh0qEl4Gn0eNGykg2E00jN8cOfIf/sKuY2kXBRgSjTjr6HArB4an6+aJpNJMWFFLyk47+NOIepaZhJNuXL39y0kGp/KzTlQw45g+ct92CSoCvySGqSUGN85ofPeYfzwB45yVJ9bMrZpY88TG4kLGAFeAg4DHVxUmJQhbjQOBRL8FDadOZuHmawlBUNeqFFtQ1EAad9Z2FWAZ80htaPysE9coA2VXC559VapIs9fsx2nPStKoB8bPP91rArS4Q9tt077+BgPE3d4IK2GRTYsC1TXzrF6hvGGk9zk+nWpZMqDtW5sQxdxl0k=" >> /home/ubuntu/.ssh/authorized_keys
+echo "Changing the hostname to ${each.value.instance_name}"
+hostname ${each.value.instance_name}
+echo "${each.value.instance_name}" > /etc/hostname
+EOF
+  subnet_id = each.value.subnet_id
+  tags = {
+    Name = "${each.value.instance_name}"
+  }
+}
+output "instances" {
+  value       = "${aws_instance.web}"
+  description = "All Machine details"
+}
+
+Q. two terraform file is ignored by git when commit code to reporsitory.
+Ans: terraform.tfvars, terraform.tfstat
+
+Q. How to easyest way to read,write terraform secret from vault : vault provider
+Q. Each workspace can be mapped to how may VCS (git) repo : 1
+Q. You want to use terraform import to start managing infrastructure, but before that what must prepare to manage these resources using terraform?
+Ans: update the configuration file to include the new resources.
+Q. Can we use multiple provider in single Terraform configuration file. : Yes
+Q. How to enable most verbose logging for troubleshooting the error. : TRACE   (other is DEBUG,ERROR,WARN,INFO)
+Q. Bydefault where does terraform OSS/CLI store its statefile : Current working directory
+Q. How would be used to identify the specific version of provider requierd: required_providers
+Q. What is root module ? : any .tf file is root module/root module
+Every terraform configuration has at lease one module, that is root module.
+Q. What is local variable ? : 
+Ans:  it avoid repeating the same values
+local {
+          service_name = "forum"
+          owner = "community_team"
+            }
+# Sentinel is proactive service that prevent the provisioning of out-of-policy infrastructure.
+Q. what is primitive data type in terraform : string, bool, number
+Q. Terraform data type
+ANs: set() a collection of unique values
+list()  a sequence of value whole values starting with zero
+object() a collection of name attribute that each have there own type.
+tuple() a sequence of elements identified by consutive whole number starting with zero, each element has its own type. internally converted into string.
+map() a collection of values where each is identified by string label.
+
+======================================
+
+
+Hashicop Suite
+
+# Deploy full vault cluster through Terraform. Vault is tool for securly accessing secret.
+Terraform vault:  vault operator init -tls-skip-verify  # return recovery key  with Root token and vault console login.
+resource "vault_auth_backend" "userpass" {
+type = "userpass"
+}
+
+resource "vault_policy" "admin_policy" {
+name = "admins"
+policy = file("policies/admin_policy.hcl")
+}
+resource "vault_mount" "developer"{
+path = "developer"
+type = "kv-v2"
+description = "kv2 secret engin for developer"
+}
+
+vault operator unseal
+vault login
+vault secret list
+vault auth list
+vautl policy list
+
+Terraform Consul: 
+
+Terraform Nomad:

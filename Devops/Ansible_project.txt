@@ -1,0 +1,136 @@
+mkdir sql
+cd sql
+git clone https://github.com/geerlingguy/ansible-role-mysql.git
+
+#amzn2-core.repo  amzn2-extras.repo  epel.repo  epel-testing.repo
+----------------------------------END
+--- # comments
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  tasks:
+    - name: copying repo file
+      copy: src=/etc/yum.repos.d/rhel.repo dest=/etc/yum.repos.d/rhel.repo
+    - name: install WGET
+      yum: name=wget state=installed
+    - name: install python
+      yum: name=MySQL-python state=installed
+    - name: Download lib
+      get_url: url=http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm dest=/usr/mysql/mysql-community-release-el7-5.noarch.rpm
+    - name: install rpm
+      yum: name=/usr/mysql/mysql-community-release-el7-5.noarch.rpm state=present
+    - name: install mysql
+      yum: name=mysql-server state=installed
+    - name: Start SQL Service
+      service: name=mysqld state=restarted
+    - name: create demo database
+      mysql_db: name=anupam state=present
+    - name: create demo user
+      mysql_user: name=demo password=demo priv=demo.*:ALL host='%' state=present
+    - name: restart mysql
+      service: name=mysql state=restarted
+
+------------------------
+below is removing
+
+become: yes
+  tasks:
+    - name: removing repo file
+file: path=/etc/yum.repos.d/epel.repo state=absent
+    - name: Uninstall WGET
+yum: name=wget state=absent
+    - name: Uninstall MySQL-python
+yum: name=MySQL-python state=absent
+    - name: Removing lib
+file: path=/usr/mysql/mysql-community-release-el7-5.noarch.rpm state=absent
+    - name: Uninstall rpm
+yum: name=/usr/mysql/mysql-community-release-el7-5.noarch.rpm state=absent
+    - name: Uninstall mysql-server
+yum: name=mysql-server state=absent
+    - name: uninstall mysql
+yum: name=mysql state=absent
+    - name: removing demo database
+mysql_db: name=anupam state=absent          # oradb
+    - name: Removing demo user
+mysql_user: name=moonup state=absent
+    - name: stopped mysql
+service: name=mysql state=stopped
+- name: Stoped SQL Service
+service: name=mysqld state=stopped
+===========================================================================================================
+# Install and Start tomcat using Ansible Playbook
+# ls -ltr /usr/lib/jvm          # to check how may java installed
+# alternatives --config java    # suppose 2 java installed and need to select any one
+
+vi tomcat.yml
+---
+- name: Install JAVA and Tomcat 
+  hosts: 54.247.117.70
+  user: ansible
+  connection: ssh
+  become: yes
+  gather_facts: true
+  vars:
+    req_java: java-1.8.0-openjdk
+    set_java: jre-1.8.0-openjdk
+    req_tomcat_ver: 9.0.26
+    tomcat_url: http://mirrors.estointernet.in/apache/tomcat/tomcat-{{req_tomcat_var.split('.')[0]}}/v{{req_tomcat_ver}}/bin/apache-tomcat-{{req_tomcat_ver}}.tar.gz
+    tomcat_port: 8090
+  tasks:
+    - name: Updating repos
+      yum:
+        name: "*"
+        state: latest
+    - name: Installing required java
+      yum:
+        name: "{{req_java}}"
+        state: present
+    - name: Setting default java
+      alternatives:       	 # incase we have 2 java (java-1.7, java-1.8) installed and now need to select any one version
+        name: java
+        link: /usr/bin/java
+        path: /usr/lib/java/{{set_java}}/bin/java
+    - name: Downloading required tomcat
+      get_url:
+        url: "{{tomcat_url}}"
+        dest: /usr/local
+    - name: Extracting downloaded tomcat
+      unarchive
+        src: "/usr/local/apache-tomcat-{{req_tomcat_ver}}.tar.gz"
+        dest: /usr/local
+        remote_src: yes          # source file already on remote machine
+    - name: Renaming tomcat home
+      command: mv /usr/local/apache-tomcat-{{req_tomcat_ver}} /usr/local/latest
+    - name: Replacing default port with required port
+      template:
+         src: server.xml.j2             # change content dynamically of file befor copy server.xml to server.xml.j2 and used variable where port define. Edit, Connector port="{{tomcat_port}}"
+         dest: /usr/local/latest/conf/server.xml
+    - name: Starting tomcat
+      shell: nohup /usr/local/latest/bin/startup.sh &
+    
+ansible-playbook tomcat.yml
+URL: ec2_ip:8090     # tomcat runing fine.
+============================================================================
+
+https://www.youtube.com/watch?v=nP6uei3TBsc&t=146s           # jenkins project with ansible kubernetes and aws
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+  

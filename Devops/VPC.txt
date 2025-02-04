@@ -1,0 +1,164 @@
+1. What is Amazon Virtual Private Cloud (Amazon VPC)?
+Answer: A virtual private cloud is virtual network or data center. character static is private but this is virtual private cloud in AWS .
+amazon is provide storage space with fully private level more security in very minimum cost as per normal where you setup infrastructure youself. and fill like this is my private level and physical setup infra existing. There is nobody can access my virtual private cloud and data center.we can create 5 vpc in one region and 200 subnet and 200 router can create per vpc. In vpc all component are logical not physical. There is default vpc and custome vpc, in default vpc has already attached internet getway to go on internet.
+
+2. What are the connectivity options for my VPC?
+Answer: You may connect your VPC to:
+The Internet (via an Internet gateway)
+Your corporate data center using a Hardware VPN connection (via the virtual private gateway)
+Both the Internet and your corporate data center (utilizing both an Internet gateway and a virtual private gateway)
+Other AWS services (via Internet gateway, NAT, virtual private gateway, or VPC endpoints)
+Other VPCs (via VPC peering connections)
+
+Q How many elastic ip can create in per account -  5 elastic ip can create in per account and use in NAT getway.
+Q How many subnet create per vpc  - 200 subnet and 200 router can create per vpc
+Q How may vpc can create per region - 5 vpc can create.
+
+ROUTER : internetwork communication, communicate between two different network. And we can define 50 route or entry in ROUTE TABLE.
+
+NOTE : vpc connect internet through internet getway.
+NOTE : Each subnet must be associate with only one Route table but multiple subnet associate with same Route table at any given time.
+NOTE : public subnet can go on internet through internet getway (IGW) but private subnet can not go on internet.
+NOTE : In one Region, multiple availability zone is there.
+NOTE: Every availbility zone has seprate and unique subnet ip
+NOTE : VPC create always only in Region not in availability Zone.
+NOTE : subnet create always only in abailability Zone not in Region. And CIDR range must between 16 to 28
+NOTE : same subnet is not created in two different availbility zone.  (subnet 10.0.0.0/24)
+NOTE : same VPC is not extend in two different Region. (vpc 10.0.0.0/16)
+NOTE : once created VPC then after can not change primery CIDR (ip)
+NOTE : Router is always is within VPC/Region and it is connection between two and more availity zone.
+NOTE : NAT gateway is always to be for public subnet but use for private subnet and NAT getway must have to associate with elastic IP.
+NOTE : VPC is itself working as a virtual router  because there is no need to use any other router between two different subnet within region/vpc.
+NOTE : internet getway is apply on region boundry. And internet getway is also kind of Router.
+NOTE: we can create 5 vpc in one region.
+NOTE : if i create one vpc then 3 object is created automatically DHCP, NACL, Security group.
+NOTE : 4 steps to follow to create new vpc (1 create vpc, 2 create subnet, 3 create internate getway, 4 Route table)
+NOTE : public subnet connect to internet getway but private subnet can not connect to internate getway.
+NOTE : always subnet range will be created between 16 to 28.
+NOTE : Below 5 IP is reserved always in vpc.
+1 10.0.0.0 - Reserved for network address
+2 10.0.0.1 - Reserved for vpc router.
+3 10.0.0.2 - Reserved for DNS server
+4 10.0.0.3 - Reserved for future usage.
+5 10.0.0.255 - Reserved for Broadcast address.
+NOTE : To check subnet public or private, check using Routing table (mention local (private), internet getway (public))
+NOTE : NAT (network address translation) getway apply in only public subnet but used for private subnet instance.
+NOTE : NAT getway must use only elastic ip.(static ip)
+NOTE : Security group give security on EC2 instance level and NACL give security on subnet level, work as virtual firewall. (one security group apply on many instance or individual security to each orther instance) and it has only allow permission.
+NOTE : NACL apply and work on Subnet or entire vpc, it supported both allow rules and denay rules.
+NOTE : per EC2 instance max 5 security group apply.
+NOTE : default NACL is allow inbound and outbout traffic but in custome NACL is default all denay inbound and outbound traffic, we can allow.
+NOTE : In NACL apply rules, max rule apply 32766. and one NACL connect from multiple subnet but one subnet can not connect multiple NACL, and work as security, firwall on vpc. minimum value is heighest priority and maxium value is low priority.
+NOTE : security group has only port allow permission for inbound and outbound. but in NACL both has permission port allow and port denay.
+NOTE : security group operate on instance level and NACL is operate for subnet level.
+NOTE : we can communicate between 2 vpc in private subnet using perring connection. even this is in same or different region.
+NOTE : default vpc has already attached internet getway, but in manualy create vpc i need to create vpc, subnet, internet getway and define router.
+NOTE : public ip is dynamic and elastic ip is static.
+NOTE : per availibilty zone has per subnet exist in vpc.
+NOTE : statfull is availity if i inbound allow then automatically allow both inbound and outbound side. but stateless is if allow inbound then i will have to allow for outbound.
+NOTE : vpc endpoint use with aws services insted of internet getway. without internet getway, vpc endpoint is way to access aws service without internet, (NAT getway is chargable and vpcendpoint is chargless) vpc enpoint connect through private instance.
+NOTE : vpn connection is use to access private remote desktop.
+NOTE: Transitive peering is not possible.
+
+3. How do you connect my VPC to the Internet?
+Answer: Amazon VPC supports the creation of an Internet gateway. This gateway enables Amazon EC2 instances in the VPC to directly access the Internet.
+
+
+4. What are the components of Amazon VPC?
+Answer:
+
+â¦ A Virtual Private Cloud (VPC): A logically isolated virtual network in the AWS cloud. You define a VPCâ€™s IP address space from a range you select.
+=â¦ Subnet: public and private subnet and segment of a VPCâ€™s IP address range where you can place groups of isolated resources.
+â¦ Internet Gateway: The Amazon VPC side of a connection to the public Internet.
+â¦ NAT Gateway: A highly available, managed Network Address Translation (NAT) service for your resources in a private subnet to access the Internet.
+â¦ Hardware VPN Connection: A hardware-based VPN connection between your Amazon VPC and your datacenter, home network, or co-location facility.
+â¦ Virtual Private Gateway: The Amazon VPC side of a VPN connection.
+â¦ Customer Gateway: Your side of a VPN connection.
+â¦ Router: Routers interconnect subnets and direct traffic between Internet gateways, virtual private gateways, NAT gateways, and subnets.
+â¦ Peering Connection: A peering connection enables you to route traffic and we can connect via private IP addresses between two different region's VPC and other account also, without go to internet. (configure in both instance, edit security group inbound add rule ALL ICMP v4 and in Router edit another system IP with select peering connection in both instance). afterthat connect system to each other.
+â¦ VPC Endpoint for S3: Enables Amazon S3 access from within your VPC without using an Internet gateway or NAT, and allows you to control the access using VPC endpoint policy
+â¦ Egress-only Internet Gateway: A stateful gateway to provide egress only access for IPv6 traffic from the VPC to the Internet.
+
+5. What are the steps to build a custom VPC?
+Answer: Below is the steps to building a custom VPC:
+1. Create a VPC
+2. Create subnets
+3. Create an internet gateway (IGW) and attached internet gateway with vpc to access internet.
+4. Create a new route table (RT) and add associate with internetgateway. and Associated
+
+
+6. Why should you use Amazon VPC, Advantage of using AWS VPC?
+Answer:
+it is Easy-to-Use
+i can give service as per my requirement. and it give flixibility of my service duration.
+
+
+8. Within Amazon VPC, can you use SSH key pairs created for instances within Amazon EC2, and vice versa?
+Answer: Yes
+
+10. Why canâ€™t you ping the router, or my default gateway, that connects my subnets?
+Answer: for Ping requests to the router in your VPC is not supported. Ping between Amazon EC2 instances within VPC is supported as long as your operating systemâ€™s firewalls, VPC security groups,  (add rule in security group Inbound "ALL ICMP V4" ) 
+
+11. Can you monitor the network traffic in your VPC?
+Answer: Yes. You can use the Amazon VPC Flow Logs feature to monitor the network traffic in your VPC.
+
+12. Within which Amazon EC2 region(s) is Amazon VPC available?
+Answer: Amazon VPC is currently available in multiple Availability Zones in all Amazon EC2 regions.
+
+13. Can a VPC span in multiple Availability Zones ?
+Answer: Yes.
+
+14. Can you use your existing AMIs in Amazon VPC?
+Answer: You can use AMIs in Amazon VPC that are registered within the same region as your VPC. 
+
+15. Can you employ Amazon CloudWatch within Amazon VPC?
+Answer: Yes 
+
+16. How do you specify which Availability Zone my Amazon EC2 instances are launched in?
+Answer: When you launch an Amazon EC2 instance you must specify the subnet on which to launch the instance. The instance will be launched in the Availability Zone associated with the specified subnet.
+
+17. Are there any bandwidth limitations for Internet gateways?
+Do you need to be concerned about its availability? Can it be a single point of failure?
+Answer: No. An Internet gateway is horizontally-scaled, redundant, and highly available. It imposes no bandwidth constraints.
+
+18. How do you secure Amazon EC2 instances running within my VPC?
+Answer: Amazon EC2 security groups can be used to help secure instances within an Amazon VPC. Security groups in a VPC enable you to specify both inbound and outbound network traffic that is allowed to or from each Amazon EC2 instance. network traffic entering and exiting each subnet can be allowed or denied via network Access Control Lists (ACLs).
+
+20. How do you determine which Availability Zone my subnets are located in?
+Answer: When you create a subnet you must specify the Availability Zone in which to place the subnet. When using the VPC Wizard, you can select the subnetâ€™s Availability Zone in the wizard confirmation screen. 
+
+24. Can you employ Auto Scaling within Amazon VPC?
+Answer: Yes
+
+25. What is the IP range of a default VPC?
+Answer: The default VPC CIDR is 172.31.0.0/16. Default subnets use /20 CIDRs within the default VPC CIDR. 
+
+26. How many default VPCs can you have?
+Answer: You can have one default VPC in each AWS region where your Supported Platforms attribute is set to â€œEC2-VPCâ€.
+
+27. How many default subnets are in a default VPC?
+Answer: One default subnet is created for each Availability Zone in your default VPC.
+
+28. Can you launch Amazon EC2 Cluster Instances in a VPC?
+Answer: Yes. Cluster instances are supported in Amazon VPC, however, not all instance types are available in all regions and Availability Zones. 
+
+29. What is a default VPC?
+Answer: A default VPC is a logically isolated virtual network in the AWS cloud that is automatically created for your AWS account the first time you provision Amazon EC2 resources. When you launch an instance without specifying a subnet-ID, your instance will be launched in your default VPC.
+
+30. What is the advantage of a default VPC?
+Answer: When you launch resources in a default VPC, you can benefit from the advanced networking functionalities of Amazon VPC (EC2-VPC) with the ease of use of Amazon EC2 (EC2-Classic). You can enjoy features such as changing security group membership on the fly, security group egress filtering, multiple IP addresses, and multiple network interfaces without having to explicitly create a VPC and launch instances in the VPC.
+
+31. How are IAM accounts impacted by default VPC?
+Answer: If your AWS account has a default VPC, any IAM accounts associated with your AWS account use the same default VPC as your AWS account.
+
+32. Can you attach or detach one or more network interfaces to an EC2 instance while itâ€™s running?
+Answer: Yes
+
+33. What if your peering connection goes down?
+Answer: AWS uses the existing infrastructure of a VPC to create a VPC peering connection; it is neither a gateway nor a VPN connection and does not rely on a separate piece of physical hardware. There is no single point of failure for communication or a bandwidth bottleneck.
+
+34. Can you create a peering connection to a VPC in a different region?
+Answer: Yes.
+
+35. Can you peer my VPC with a VPC belonging to another AWS account?
+Answer: Yes, assuming the owner of the other VPC accepts your peering connection request. Amazon Web Services Training

@@ -1,0 +1,201 @@
+Type of Hypervisor:
+Hypervisor is a piece of software or firmware that creates and run virtual machine. A hypervisor is sometimes also called a virtual machine manager(vmm)
+
+Type-1 Hypervisor (firmware) or Bare Metal or Native Hypervisor
+
+Also called bare metal hypervisor Type-1 Hypervisor run directly on the system hardware A guest O.S runs on another level above the Hypervisor.
+
+VMware (ESXi) is Type-1 hypervisor that runs on the host server hardware without on underlying O.S.
+Type-1 hypervisor act as their own operating system.
+
+ESXi provides a virtualization layer that abstracts the CPU, Storage, memory and networking Resources of the physical host into multple virtual machine.
+
+Hardware -> Hypervisor -> VMware -> Guest O.S.
+------------------------
+
+Type-2 Hypervisor (Hosted Hypervisor or Software type)
+
+Hardware -> Host O.S windows -> Hypervisor -> VM -> Guest O.S  (used students for learning purpose only)
+
+Hypervisor that runs within a conventional O.S environment and the host OS provides.
+Example of Type-2 Hypervisor are VMware Workstation, Oracle virtualBox and Microsoft Virtual PC. It does not have direct access to the host hardware & Resources.
+
+Difference between both hypervisor
+Type-1 Hypervisor:
+
+Bare metal & Native
+virtualalization: Hardware virtualization
+Operation: Guest O.S. and application run on the hypervisor.
+
+Better Scalability
+System Independent: Has direct access to Hardware along with virtual machine it host.
+performance: Higer performance as there is no middle layer.
+security: More Secure
+Ex: VMware ESXi, hyper-V, 
+
+
+Type-2 Hypervisor:
+Hosted
+virtualization: O.S. Virtualization.
+Operation: Run as an application on the host O.S.
+scalability: Not so much because of it Resilience on the underlying O.S.
+
+System independent: Are not allowed to direct access the host hardware and its resources.
+Performance: Comparatively has reduce performance rate as it runs with excel overhead.
+Security: Less secure, as any probelem in the base OS affect the entire system.
+vmware workstation.
+------------
+
+VMware Vsphere is brand name for VMware suits of virtualization products previously VMware suite ie vsphere was called VMware infrastructure. (suits means collection of software)
+
+vsphere include following components:
+VMware ESXi:
+   - vcenter server
+   - vsphere client
+   - vsphere web client.
+
+Different between vcenter server and vsphere client:
+Vsphere client is an interface (GUI) used to  connect remotely to an ESx/ESxi host from window PC.
+
+This client can be used to access and manage virtual machines on the ESXi Host and also perform other Management and configuration Task.
+
+If we want to have all the ESXi host in a single console then we need vcenter server.
+
+VCenter Server is similar to vsphere client but it comes with rich features and more powers it is the centralised management tool.
+
+Multiple ESxi host & VM can be managed from single console, where as wing vsphere client we were accessing only a single host.
+
+For using features like DRS, HA, vmotion and Fault Tolerance we need vcenter Server.
+-------------
+VMware Machine Migration and its types:
+
+
+Migration is the technique of moving a virtual machine from one host to another host or from one datastore to another Datastore.
+Type of migration:
+Cold migration
+Suspended
+Vmotion
+Physical to virtual
+Virtual to Virtual
+
+Note: Datastore virtual machine files, log files, virtual disk and ISO images Type types - VMFS, NFS
+
+---------------
+High Availability:
+
+In HA when the host crashes or fails, the VM gets Restarted on another host so there is a very small Downtime which is only related to the time taken for VM to Restarted.
+
+Note: Automatic detection of server failure.
+HA is a complete automated process and does not need any admin interference as there is no time to Recover machine if host is about to crash.
+The VM for which its parent host is Crashing then it can restart on any of the other runing host.
+
+For High Availability, we need following things:
+1) Cluster
+2) Shared Storage
+3) Vcenter server configured for the Environment.
+
+Resource check:
+Ensure that capacity is always available in order to restart all virtual machine affected by server failure HA continously monitor capacity utilization and Reservers spare capacity to be able to restart virtual machine.
+
+--------------------------------
+Pre-requisit for VMware Vsphere HA
+
+All host must be licensed for VMware H.A. . You need at least two host in the cluster.
+All host need a unique host name. All host need to be configured with static IP address if you are using DHCP, you must ensure that the address for each host persist across reboots.
+
+All host in a VMware H.A cluster must have DNS configured.
+-------------------
+Fault Tolerance:
+
+AIM of fault tolerance is similar to H.A, but in terms of availability it provides 0% downtime and full availability as machine does not goes down or restarts.
+
+This is meant for mission critical applications/Servers Ex: Robotic Surgery ARM, Auto-pilot system, Spacecraft mission.
+VMware lockstep technology is used in F.T.
+
+With F.T a secondary VM is created on another host using distributed resource scheduler. This VM is exact replica of the primary VM..
+
+it requires extra standby VM, therefor it is a costlier solution. it maintain 0 downtime with help of primary and secondry VM. if any one fails then another one will work continusly. primary and secondry vm are sync using management network.
+
+----------------------------
+VMware Distributed Resource Scheduler
+
+DRS is a feature of cluster which is managed by vcenter server IT balances load of VM across ESXi HOST.
+A DRS enabled cluster has following resources management capabilities:
+1) Initial VM placement
+2) Load Balancing
+3) Power Management
+
+Depending on how end-users are using applications on virtual machines, VMs constantly expands & Contracts throughout the day, week or Month The physical hosts becomes over utilized or under utilized based on VM utilization and no of VM runing over it.
+
+Vmotion is primary require of DRS.
+
+Main goal of DRS is to:
+Keep all ESXi Servers in the cluster healthy and well utilized by dynamically/automatically moving VMs across the ESXi Host.
+Provide VMs with enough Resources all the time to keep them Running in most efficient ways.
+
+Conduct Zero-downtime server maintenance. By default, DRS checks in every 5 minuts to see it the cluster workload is balanced or not.
+--------
+There are Three Selections REgarding the automation level of the DRS cluster:
+
+1) Manual - when a DRS cluster is set to manual, every time you power on a VM, the cluster prompts you to select the ESXi Host where that VM should be hosted.
+
+2) Partially Automated:  If you select partially automated setting in the DRS Automation Settings, DRS will make an automatic decision about which host a VM should run on when it initially powered ON(without prompting the User who is performing the power-on task) but will still prompt for all migration on the DRS lab.
+
+
+3) Fully Automated:
+The third setting for DRS is fully automated this setting makes decision for initial placement without prompting and also makes automatic vmotion decisions based on the selected automation level.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

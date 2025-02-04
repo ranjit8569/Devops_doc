@@ -1,0 +1,55 @@
+Use Case: Need monitor servers and i should have dashboard which should have server cpu utilization, disk space and many more.
+
+First install node exporter in all nodes.
+
+promethous is data source of Graphana. Prometheus is a time series database. Prometheus is designed to monitor targets. Servers, databases,
+standalone virtual machines, pretty much everything can be monitored with Prometheus.
+
+Graphana is multi-platform open source analytics and interactive visualation tool. It provides charts, graphs, and alerts when connected to
+supported data sources. It is expandable through a plug-in system. End users can create complex monitoring dashboards using interactive
+query builders.
+
+prometheus.io/download     # to download prometheus-2.18.1 (copy link)
+wget https://.........
+tar -xvf prometheus-2.18.1.linux-amd64.tar.gz
+cd prometheus
+./prometheus
+
+URL: nodeIP:9090               # Runing prometheus console.
+goto Status > Targets          # All node servers configures and Endpoints status details listed in prometheus
+URL: nodeIP:9090/metrics        # listed all metrics
+
+# Now download Node Exporter and installed on all servers    # prometheus.io/download/#node_exporter
+wget https://github.........
+tar -xvf node_exporter-0.18.1.linux-amd64.tar.gz
+cd node_exporter-0.18.1.linux-amd64
+./node_exporter                       # execute and port listening 9100
+
+URL: node_ip:9100       # Node Export console working fine, click on Metrics, then list all metrics.
+
+vi prometheus.yml       # where prometheus installed
+- job_name: 'node_exporter'            # any name
+  static_configs:
+  - targets: ['node_1_IP:9100','node_2_IP:9100','node_3_IP:9100']
+
+./prometheus
+
+----------------
+graphana.com\graphana\download
+wget https://d1.grafana.com/oss/release/grafana-6.7.3.linux-amd64.tar.gz
+tar -xvf grafana-6.7.3.linux-amd64.tar.gz
+cd grafana-6.7.3
+./bin/grafana-server
+
+URL: nodIP:3000/login          # working fine  (bydefult ID/pas admin/admin)
+Now need to configure Datasource
+click on "Add data source"
+then select Prometheus . Then configure URL: prometheus_serverIP:9090    > save and Test
+
+# now import templete. enter templete no and click on Load
+Name: Node Export Full
+Folder: select General
+Prometheus: select prometheus  
+click on "Import"            # now display graphicalli
+
+many servers > premethous > Grapahana 

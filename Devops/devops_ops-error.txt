@@ -1,0 +1,170 @@
+Tell Us about Yourself (AWS/DEVEOPS)
+I start my day with:
+1) Checking Email/Tickets
+2) Checking Notification from Monotiring system
+3) Ensuring that there is not critical alert un attended
+4) Provide help and support to Developers
+5) Providing support for production servers
+6) Automation Admin Repeatitipve Task.
+7) Creating jenkins jobs for Deployment
+8) Supporting existing infra and creating New servers.
+9) Deploying Code on Dev & Prod servers.
+10) Checking for proper approval before code release.
+
+I am responsible for:
+1) Build And Release Process
+2) Managing User access on Resources (Grant/Revoke)  - Git
+3) Managing Git Branches
+4) Automation (Jenkins/Ansible/Docker/Kubernetes)
+5) Server & Application supoort
+6) Taking backup of instance and restoring if required.
+7) Writing/modify playbook, dockerfile, k8s manifest file and shell scripting for automating daily taks.
+8) Verify if all the services is runing  on that server are covered under monitoring system.
+
+-----------------------------------------------
+
+Total 8 kubernetes cluster is there
+1) In devops how may server is there- 80 server
+2) which tool use for ticketing -  Submit tool
+3) how many server in kubernetes cluster - Total 8 k8 cluster, per cluster 9 servers. use openshift service of aws to handel k8 cluster.
+4) how many server for ansible -  approx 80 servers
+5) different between web server and application server- 
+6) how many application - 
+--------------------------------------------------------
+production issues:   
+1) outOfMemory exception while building jenkins job on Jenkins Slave server.
+Resoulution: goto console and select slave server, then goto action and changed t2 class for increase memeory.
+
+2) Failed Email notification on jenkins due to expire DL/group ID.
+Resolution: dedicated admin team provide new DL/group id and i just configure eamil ID and port in Jenkins to getting notification.
+
+3) Failed Deployment on Tomcat server due to tomcat credentials issues.
+Resoulution: configure new id/pas in tomcate (tomcat_user.xml file) and configure same in jenkins in Deploy ware/ear to container block.
+
+4) Connection failed between master and salave server in jenkins while building job.
+Resolution: Again generate new key using ssh-keygen on jenkins master server and this key configure on all slave node server (Autherise-key file).
+
+5) Not able to connect to EC2 instance from my local machine and as no such file or directory error.
+Ans: key already downloaded in downloades dir and verified. then use ssh -i *.pem user@ip (URL copy from aws console)
+
+6)  Unable to connect to GitHub/Bitbucket in jenkins
+Ans: Click on Add button and provide Github credentials, select it from dropdown after adding it.
+It should be GitHub credentials.
+
+7) There is not POM in this directory?
+Ans: Path of pom.xml was not spedified in the build job. click on Advance and add the path of pom.xml. in our case /MyWebApp/pom.xml
+
+8) Tomcat Deployment failed or not able to access WebApp after deployment.
+Ans: Tomcate deployment steps are not configured correctory in jenkins job. click on post build action, add deploy to container step and 
+enter tomcat url and credentials. tomcat credentials are entered correctly as per tomcat-users.xml file. and aswell restart sudo systemctl restart tomcat9
+
+9). Unable to access jenkins/Tomcat from the browser?
+Ans: goto AWS console, select EC2 instance, click to connect and copy public dns name.
+
+10) Tomcat deployment failed in jenkins - invalid user name and password.
+Ans: it could be invalid id/pass and need to enter correct id/pass and select it from dropdown. edit id/pas in /var/lib/tomcat9/conf/tomcat-users.xml file
+
+<role rolename="manager-script"/> <user username="tomcat" password="password" roles="manager-gui,manager-script"/>
+sudo systemctl restart tomcat9
+copy id/pas from tomcat-users.xml file and past in jenkin, Add credentials
+----------------------------
+
+1) AWS Ec2 instance connection timeout?  (issue RDP/SSH)
+Ans: 
+
+a) security group inbound rule add port 22) and also check ACL (inbound/outbound, port 22 with Access/denied)
+b) check instance status runing or not, status should be 2/2
+c) Need to check instance screenshot from Ec2 console. (goto Action > monitoring turbolshoot > system screenShot/system logs) to find issues.
+d) Cloud trail- Any recent changes to that instance  (copy instance_id and search in cloud trail)
+e) Instance should be in public subnet, means Internetgateway attached with rout table in VPC .
+f) Ec2 stop/restart
+g) Restore from latest snapshot backup.
+
+2) AWS ELB turubleshooting/error:
+Ans:
+
+Application LoadBalancer not working and turbleshooting.
+Client cannot connect to an internet-facing load balancer using DNS.  ( 502 Bad gateway, page isn't working)
+
+a) LoadBalancer backend isntance status inservice/Healthy. And need to check target group.
+b) if Load Balancer backend instances status is Out of Service/Unhealthy
+c) Ec2 instance Status checks - 2/2 Checks Passed
+   * 1/2 - N/W, Antivirus, EBS, Nw interface.
+   * 0/2 - Need check with AWS| Backend H/w issue
+d) Check security Group and NACL for required Port open or not (HTTP 80, HTTPS 443 in ELB, Ec2)
+e) Load balancer health check configuration need to be verified. (Health check configuration tab is there)
+f) Try to restart the application service inside of backend Ec2 instance. (systemctl restart httpd)
+g) check for the ALB Forwarding rules configured properly.
+h) check private vs public subnet. VPC has IGW or not.
+i) Cloud Trail -> Any recent changes to that instance
+j) stop/start Ec2 instance
+
+3) AWS VPC Peering issues/Turbleshooting?
+Ans: 
+
+a) Check the Security Group in Source Ec2 and Destination Ec2 whether required ports are opened or Not.
+b) Check the VPC peering status is Active or not in AWS console.
+c) Check both the instance are connecting individually.
+d) Check total no of Subnets in Source VPC and check its Properly- associated with the Route Table.
+e) Check Source/Destination VPC Route Table whether Routing for peering is configured with proper CIDR or not.
+f) Disable the software Firewall inside of Ec2 instances and check. (optional)
+
+4) AWS S3 issues/Turbleshooting?
+S3 bucket showing errors.
+Ans:
+
+a) Check what is the status of other S3 buckets, whether all buckets are showing error or not
+b) Check IAM user/role has the following permission/policies:
+   s3:GetAccountPublicAccessBlock
+   s3:GetBucketPublicAccessBlock
+   s3:GetBucketPolicyStatus
+   S3:GetBucketAcl
+   s3:ListAccessPoints
+
+c) Possible login from the Root User and check what is the status of the error bucket.
+d) Check the Bucket has any custom policy.
+
+5) AWS Auto scaling issues/Troubleshooting: (below issues)
+
+a)  Trobleshooting scaling issues with my Amazon EC2 Auto Scaling group
+b) EC2 Auto-scaling group isn't following the scaling policy|configured
+c) Ec2 Auto-scaling group is scaling out insted of scaling in
+d) scaling isn't responding to a Cloudwatch alarm or health check replacement
+e) Auto-scaling my instance is stuck in the Pending:Wait or Terminating:Wait state during scaling activity
+f) EC2 Auto-scaling group isn't responding to scheduled action
+
+Ans:
+a) Check your scaling policies to see whether an event trigger more then one policy.
+b) Verify if a scaling-out and a scal-in policy are trigger at the same time
+c) Check if your Auto-Scaling group already reached its minimum or maximum number of instances
+d) Check if your instances are in a cooldown period and instance warmup
+e) Check if there is a lifecycle hook configured for your EC2 Auto Scaling group.
+
+6) AWS lambda issues:
+Lambda event based Trigger not working
+AWS lambda not getting Triggered
+
+Ans:
+a) Check the correct AWS Event bridge trigger properly configured mapped to the Lambda.
+b) Check with Event based trigger configured with right JSON.
+c) Check lambda code locally and confirm source code has any errors.
+d) Check the lambda cloud watch log groups for any error or info
+e) check lambda configuration setting all are configured properly.
+f) Check whether Cloud Trail has been enabled for the region where lambda has been configured.
+
+https://www.youtube.com/watch?v=H7JqAM8_Qeo
+
+i am ranjit kumar. i completed MCA as highest education in 2012. As of now i have total 8.6 years of exp in prod/aap/dev support. 
+Since 4 years i am working as devops eng, in devops i have exp in AWS, Terraform, Git, Docker, Kubernetes, Oracle, Shell scripting.
+i AWS no of services i used()
+
+
+
+
+
+
+
+
+
+
+

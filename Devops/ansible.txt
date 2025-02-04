@@ -1,0 +1,188 @@
+  - name: Set sit variables
+    set_fact:
+      ENV: "sit"
+      connection_string_URL: "{{sit_connectionstring_json}}"
+    when: "inventory_hostname in groups['sit1']"
+
+  - name: Set uat variables
+    set_fact:
+      ENV: "uat"
+      connection_string_URL: "{{uat_connectionstring_json}}"
+    when: "inventory_hostname in groups['uat1']"
+    
+  - name: Set dr variables
+    set_fact:
+      ENV: "dr"
+      connection_string_URL: "{{dr_connectionstring_json}}"
+    when: "inventory_hostname in groups['dr']"
+    
+  - name: Set prod variables
+    set_fact:
+      ENV: "prod"
+      connection_string_URL: "{{prod_connectionstring_json}}"
+    when: "inventory_hostname in groups['prod']"
+    
+  - name: checking if cpicsp folder exists
+    stat:
+      path: "/opt/app/cpicsp"
+    register: register_name
+
+  - name: Get timestamp from the system
+    shell: date +%Y-%m-%d%H-%M-%S
+    register: tstamp
+
+  - name: Set variables
+    set_fact:
+      cur_date: "{{ tstamp.stdout }}"
+
+##################################################################
+  - name: Create New Directories for cpicsp
+    file:
+      path: "{{item}}"
+      state: directory
+    when: register_name.stat.exists
+    with_items:
+      - /opt/app/cpicsp/tomcat/agent
+      - /opt/app/cpicsp/tomcat/temp
+      - /opt/app/cpicsp/tomcat/tomcat-backup
+      - /opt/app/cpicsp/tomcat/webapps/certs/certs_backup
+
+  - name: Create New Directories for quickpay
+    file:
+      path: "{{item}}"
+      state: directory
+    when: not register_name.stat.exists
+    with_items:
+      - /opt/app/quickpay/tomcat/agent
+      - /opt/app/quickpay/tomcat/temp
+      - /opt/app/quickpay/tomcat/tomcat-backup
+      - /opt/app/quickpay/tomcat/webapps/certs/certs_backup
+      
+
+#####################################################################
+# Download Application Insight related files and certificates in agent dir for cpicsp
+  - name: download files for cpicsp
+    get_url:
+      url: "{{item}}"
+      dest: "/opt/app/cpicsp/tomcat/agent/"
+      mode: 0755
+    when: register_name.stat.exists
+    with_items:
+     - https://nexus.digital.com/repository/cloud-engineering-hosted/applicationinsight/applicationinsights-agent-{{ version }}.jar
+     - "{{connection_string_URL}}"
+     
+     
+#############################################################################
+# Download Application Insight related files and SSL certificates in agent dir for quickpay
+  - name: download jar file for quickpay
+    get_url:
+      url: "{{item}}"
+      dest: "/opt/app/quickpay/tomcat/agent"
+      mode: 0755
+    when: not register_name.stat.exists
+    with_items:
+     - https://nexus.digital.com/repository/cloud-engineering-hosted/applicationinsights/applicationinsights-agent-{{ version }}.jar
+     - "{{connection_string_URL}}"
+  
+
+#####################################################################
+
+  - name: download ssl certificate for cpicsp
+    command: "{{item}}"
+    when: register_name.stat.exists    
+    with_items:
+    - wget -O /opt/app/cpicsp/tomcat/agent/digicertbaltimoreroot.cer "https://nausp-aapp.aceins.com/Vishwa-Pawar/insightjar/raw/master/digicertbaltimoreroot.cer?raw=true"
+    - wget -O /opt/app/cpicsp/tomcat/agent/digicertglobalrootg2.cer "https://nausp-aapp.aceins.com/Vishwa-Pawar/insightjar/raw/master/digicertglobalrootg2.cer?raw=true"
+ 
+  - name: download ssl certificate for quickpay
+    command: "{{item}}"
+    when: not register_name.stat.exists    
+    with_items:
+    - wget -O /opt/app/quickpay/tomcat/agent/digicertbaltimoreroot.cer "https://nausp-aapp.aceins.com/Vishwaraj-Pawar/insightjar/raw/master/digicertbaltimoreroot.cer?raw=true"
+    - wget -O /opt/app/quickpay/tomcat/agent/digicertglobalrootg2.cer "https://nausp-aapp.aceins.com/Vishwaraj-Pawar/insightjar/raw/master/digicertglobalrootg2.cer?raw=true"
+ 
+
+#####################################################################
+# Taking backup of tomcat.conf file tasks
+  - name: Taking backup of tomcat.conf in cpicsp
+    command: cp  "/opt/app/cpicsp/tomcat/tomcat.conf" "/opt/app/cpicsp/tomcat/tomcat-backup/tomcat-{{ cur_date }}.conf"
+    when: register_name.stat.exists
+    notify: 
+     - updating jvm args in tomcat.conf for cpicsp
+     - updating CATALINA_TMPDIR for cpicsp
+
+  - name: Taking backup of tomcat.conf in quickpay
+    command: cp "/opt/app/quickpay/tomcat/tomcat.conf" "/opt/app/quickpay/tomcat/tomcat-backup/tomcat-{{ cur_date }}.conf"
+    when: not register_name.stat.exists
+    notify: 
+     - updating jvm args in tomcat.conf for quickpay
+     - updating CATALINA_TMPDIR for quickpay
+  
+###################################################################################
+# Installing ssl certificates on cpicsp
+  - block:
+    - name: create temp.txt to check certificates present [cpicsp]
+      shell: keytool -v -list -keystore /opt/app/cpicsp/tomcat/webapps/certs/prscct-{{ENV}}.chubb.com.jks -storepass "Chubb@123456"
+      register: results1
+      when: register_name.stat.exists
+
+    - set_fact:
+        myvalue1: "{{ results1.stdout | regex_search(regexp) }}"
+      vars:
+        regexp: 'digicertglobalrootg2'
+      when: register_name.stat.exists
+
+    - name: create temp.txt to check certificates present [cpicsp]
+      shell: keytool -v -list -keystore /opt/app/cpicsp/tomcat/webapps/certs/prscct-{{ENV}}.chubb.com.jks -storepass "Chubb@123456"
+      register: results2
+      when: register_name.stat.exists
+
+    - set_fact:
+        myvalue2: "{{ results2.stdout | regex_search(regexp) }}"
+      vars:
+        regexp: 'digicertbaltimoreroot'
+      when: register_name.stat.exists
+
+    - name: Check whether certificate is present in keystore [cpicsp]
+      shell: echo "Certificates does not exist, proceeding with import certificates task for cpicsp"
+      when: ('digicertglobalrootg2' not in myvalue1 ) and ('digicertbaltimoreroot' not in myvalue2) 
+      notify: 
+        - Taking backup of keystore in cpicsp
+        - Import SSL certificates for cpicsp    
+    when: register_name.stat.exists
+################################################################################################################################
+# installing ssl certificate for quickpay
+
+  - name: check certificates present [quickpay]
+    shell: keytool -v -list -keystore /opt/app/quickpay/tomcat/webapps/certs/na-quickpay-{{ENV}}.chubb.com.jks -storepass "Chubb@123456" -noprompt
+    register: results1
+    when: not register_name.stat.exists
+
+  - set_fact:
+       myvalue1: "{{ results1.stdout | regex_search(regexp) }}"
+    vars:
+       regexp: 'digicertglobalrootg2'
+    when: not register_name.stat.exists
+
+  - name: check certificates present [quickpay]
+    shell: keytool -v -list -keystore /opt/app/quickpay/tomcat/webapps/certs/na-quickpay-{{ENV}}.chubb.com.jks -storepass "Chubb@123456" -noprompt
+    register: results2
+    when: not register_name.stat.exists
+
+  - set_fact:
+       myvalue2: "{{ results2.stdout | regex_search(regexp) }}"
+    vars:
+       regexp: 'digicertbaltimoreroot'
+    when: not register_name.stat.exists
+
+  - name: Check whether certificate is present in keystore [quickpay]
+    shell: echo "Certificates does not exist, proceeding with import certificates task for quickpay"
+    when: ('digicertglobalrootg2' not in myvalue1 ) and ('digicertbaltimoreroot' not in myvalue2) and (not register_name.stat.exists)
+    notify: 
+      - Taking backup of keystore in quickpay
+      - Import SSL certificates for quickpay  
+
+
+#######################################################################################################
+
+  

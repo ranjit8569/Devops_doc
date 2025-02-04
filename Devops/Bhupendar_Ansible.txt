@@ -1,0 +1,1599 @@
+﻿Ansible configuration management tool and it is pushed based machenism, whenever Ansible server want to update/configure any Server/sofware/packages/storage/devices to 
+all Node server then Ansible Server will pushed to update/configure to all node server. And most important is it is agentless, means no need to
+install any agent or software on any node. And all nodes connect through ssh. Ansible develop using python which is easy to understand.
+
+But Chef and puppet is also configuration management tool and this is pull based machenism. in this tool all node server will pull request from 
+Chef Server predically. if any software updated in chef server then all node server itself pull update software from chef server and automaticall 
+started to update.
+
+Create 3 EC2 linux instance and connect putty and sudo su
+# yum repolist all|grep ansible            # to search ansible repository
+
+wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm   # to download rpm package
+ls  # found epel-release-latest-7.noarch.rpm
+yum install epel-release-latest-7.noarch.rpm    # many software there in this package
+yum update -y
+
+yum install git python python-level python-pip openssl ansible        ################# Ansible Server
+ansible --version   # 2.9.16
+
+****** vi /etc/ansible/hosts
+[demo]   # group name
+private or public ip
+
+# ansible tuning parameters files ansible.cfg
+****** vi /etc/ansible/ansible.cfg          # OR ansible-config init --disabled > ansible.cfg ; use for silent mode, vi ansible.cfg (host_key_checking=False)
+inventory = /etc/ansible/hosts     # uncomment
+sudo_user = root   # uncomment
+[defaults]                          # bydefault exist
+log_path=/tmp/ansible               # if configure this then store ansible log here.
+
+adduser ansible  # user created
+passwd ansible   # enter pass    # Ranjit#123
+
+sudo su
+visudo   # to give sudo priveleged  (first search root)
+ansible ALL=(ALL) NOPASSWD: ALL               # ansible is usernanme
+
+su ansible
+------
+######## another instance, connect putty and sudo su         ################################# Node 1
+adduser ansible
+passwd ansible   # enter password
+
+sudo su
+visudo   # to give sudo priveleged  (first search root)
+ansible ALL=(ALL) NOPASSWD: ALL
+
+vi /etc/ssh/sshd_config 
+PermitRootLogin yes  # Uncomment
+PasswordAuthentication yes  # Uncomment
+PasswordAuthentication no  # Comment
+
+service sshd restart
+su - ansible
+------
+######## another instance, connect putty and sudo su        ##################################### Node 2
+adduser ansible
+passwd ansible   # enter password     Ranjit#123
+
+sudo su
+visudo   # to give sudo priveleged  (first search root)
+ansible ALL=(ALL) NOPASSWD: ALL
+
+vi /etc/ssh/sshd_config 
+PermitRootLogin yes  # Uncomment
+PasswordAuthentication yes  # Uncomment
+PasswordAuthentication no  # Comment
+
+service sshd restart
+su - ansible
+--------------------------------------
+Go to ansible server                                       ############################### Ansible Server
+sudo yum install httpd -y  # Now installed  (for testing install or not)
+su - ansible   
+ssh 172.31.41.240   # permission denied
+exit
+vi /etc/ssh/sshd_config 
+PermitRootLogin yes  # Uncomment
+PasswordAuthentication yes  # Uncomment
+PasswordAuthentication no  # Comment
+
+service sshd restart
+su - ansible
+ssh 172.31.41.240 (private ip)  # enter pass, now connected node1.
+exit
+ssh 172.31.42.228 (private ip)  # enter pass, now connected node2.
+exit
+
+su  ansible    # from ansible server
+ssh-keygen   # enter...... (password less)
+ls -a  			# .ssh file exit
+cd .ssh/ ; ls # id_rsa id_rsa_pub
+ssh-copy-id ansible@10.0.0.122  (node1)   # enter password
+ssh-copy-id ansible@privateIP  (node2)   # enter password
+cd
+ssh ansible@privateIP (node1)  # now connected without pass
+=================================================
+ansible controller machine is always Linux. node machine is may be linux/window.
+
+# for window vm connection: first install pywinrm on control machine.
+vi /etc/ansible/hosts
+[win]
+172.16.2.5
+172.16.2.6
+
+[win:vars]
+ansible_user=vagrant
+ansible_password=password
+ansible_connection=winrm
+ansible_winrm_server_cert_validation=ignore
+
+ansible all -i hosts -m win_ping   # to check window connectivity
+--------------
+
+
+Ansible server:
+su - ansible
+ansible all --list-hosts  # show all hosts IP
+ansible demo --list-hosts   # show IP list of demo group
+ansible demo[0] --list-hosts   # show node1 ip
+ansible demo[1] --list-hosts   # show node2 ip 
+ansible demo[-1] --list-hosts   # show last node ip
+------------------
+Ad-hoc commands, Modules & Playbook
+
+1) Ad-hoc Commands  (simple linux command)  # No Idempotency , means it does Overwrite like install any same soft on server (not good).
+Ad-hoc Commands are not used for configuration management and deployment, and used for single time use only.
+It used for very particular task.
+Ex: just validate the uptime of 1 to 200 remote servers.
+    just get the disk space of remote hosts.
+    ping and validate if the server is alive and responds.
+    shutdown multiple remote hosts at a single command.
+
+
+2) Modules  : single command execute   (Not overwrite)
+Ansible Ships with a number of modules (called module library) that can be executed directly on remote hosts. A module is reusable.
+there are no servers, daemons, or databases Required. Module abstract system tasks. it dealing with package,creating/changing file.
+
+3) Play: Define of single hosts in playbook.
+
+4) Playbooks  : playbook contain one or more plays(multiple host define in playbook) (Not Overwrite). used for confiugration management and deployment.
+ansible playbook are human-readable, as developed in basic text language.
+
+5) Facts: Global variable containing information about the system like network interface, operating system.
+
+GoTo ansible server (ad-hoc command)
+ansible demo -a "ls"
+ansible demo[0] -a "touch file1"
+ansible all -a "touch file4"
+ansible demo -a "ls -al"
+ansible demo -a "sudo yum install httpd -y"        # 
+ansible demo -ba "yum install httpd -y"   # -b for become, sudo permission
+ansible demo -ba "yum remove httpd -y"
+ansible demo -a "/sbin/reboot" -f 12  username  # 12 parallel fork at time with non default user. but first execute "ssh-agent bash"
+-----------
+AD-HOC Module command   (install=present, uninstall=absent, update=latest)
+ansible demo -b -m yum -a "pkg=httpd state=present" -u user_name
+ansible demo -b -m yum -a "pkg=httpd state=absent/removed"
+ansible demo -b -m service -a "name=httpd state=started"     #to check: sudo service httpd status
+ansible demo -b -m user -a "name=ranjit group=admin append=yes shell=bin/bash"    # user ranjit created
+ansible demo -b -m user -a "name=ranjit state=absent"   # removed user ranjit
+ansible demo -b -m copy -a "src=file4 desc=/tmp"
+ansible demo -m setup   # to check, what software configured/install on server.
+ansible demo -m setup -a "filter=*ipv4*"
+------------------------------
+Playbook:
+Playbook in ansible are written in YAML format. It is human readable data seralization language it is commonly used for configuration files.
+Playbook is like a file where you write codes consist of vars, tasks, handlers, file, templates and roles. Each playbook is composed of one or
+ more "modules" in a list module is a collections of configuration files. Playbook are dived into many sections.
+
+Target section : 
+Defines the host against playbook task has to be executed.
+
+Variable Section :
+Define Variable
+
+Task Section:
+List of all modules that we need to run in an Order. Single task means install a package.
+
+Play: 
+All members of a list lines must begin with same indentation level starting with "-" eg:
+Fruits:
+-mango
+-banan
+-------------
+Dictonary example
+dict:
+ name: Right
+ job: trainer
+ skill: ansible
+--------
+su - ansible
+vi target.yml
+--- # Must start with --- every YAML Playbook.
+- hosts: demo
+  user: ansible
+  become: yes              # Not prompting from pass
+  connection: ssh
+  gather_facts: yes
+... # Must end with ... dots playbook
+
+ansible-playbook target.yml  # execute this file
+ansible-playbook --syntax-check target.yml   # for syntax check.
+
+vi task.yml
+--- # Target and Task Playbook
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  task:
+    - name: Install HTTPD on centos 7
+      action: yum name=httpd state=installed
+    - name: Add firewall Rules
+      firewalld:
+        port: 80/tcp
+        permanent: true
+        state: enabled
+    - name: Reload firewall configuration for the new rule
+      systemd:         # reload/enable/disable service
+        name: firewalld
+        state: reloaded
+    - name: Copy index file to apache dir
+      copy:
+        src: /tmp/index.html
+        dest: /var/www/html
+    - name: start services
+      service: 
+        name: httpd
+        state: restarted
+
+ansible-playbook task.yml  #  installed on both server, to check (which httpd)
+curl nodename/ip         # working fine
+sudo yum remove httpd -y  # on both server to removed packaged.
+
+-----------------------------------------------------------------------------------
+Execution process: Playbook Execution > Fact Gathering > Task Execution > Playbook Completion
+-----------------------------------------------------------------------------------
+
+vi variable.yml
+--- # MY Variable FILE for TESTING purpose
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  vars: 
+      pkgname: httpd
+  tasks:
+      - name: install HTTPD server on centos 7
+        action: yum name='{{pkgname}}' state=present
+------------
+
+tasks:          # best way define, insted of loop
+- name: install package
+  yum:
+    name:             # Or name: ['gcc','make','epel-release']
+     - httpd
+     - vsftpd
+     - nginx
+    state: latest
+
+ansible-playbook variable.yml  # install httpd on both server.
+ansible-doc package/archive/apt/yum          # 
+---------------------------
+
+Handler Section:
+A handler is exactly the same as a task, but it will run when called by another task using notify. Handler only run if the taks contains a "notify" 
+directive and if changed something or condition meet then handler will be executed otherwise handler will not execute. ( changed means Yellow colour,
+ OK means Not changed Green color)
+
+vi handler.yml
+--- # MY PLAYBOOK FOR HANDLERS
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  tasks:
+       - name: install httpd server on centos
+         action: yum name=httpd state=installed
+         notify: restart httpd
+  handlers:
+            - name: restart httpd
+              action: service name=httpd state=restarted
+
+ansible-playbook handler.yml --check   # Dry run using -- check (befor run, check correct or not)
+ansible-playbook handler.yml  # now  executed, and installed httpd as well started service on both node.
+ansible-playbook handler.yml  -vv     # verbosity (-vv)
+--------------------------
+
+LOOP:
+vi loop.yml
+--- # MY LOOPS PLAYBOOK
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  tasks:
+         - name: add list of users in my nodes
+           user: name='{{item}}' state=present
+           with_items:
+                       - bhupinder
+                       - sachin_tendulkar
+                       - einstein
+                       - vasco_d_gama
+
+ansible-playbook loops.yml  # executed and user created on both server   (to check cat /etc/passwd)
+--------------------------------------------------
+Condition :
+
+Whenever we have different different scenarios, we put conditions according to the Scenario.
+When statement:
+Sometimes you want to skip a particualar command on a particular node.
+
+import: This is static, import tasks or files before execution of playbook.  # produce error if partially code define in another place.
+include: This is dynamic, include tasks or files at runtime of playbook      # success even partially code define in another place as well.
+
+vi condition.yml
+--- # Condition Playbook
+- hosts: demo
+  name: install software on centos/Linux
+  user: ansible
+  become: yes
+  connection: ssh
+  tasks:
+      - name: install apache on debian
+        command: apt-get -y install apache2
+        when: ansible_os_family == "Debian"   or when: ansible_facts['distribution'] == 'Ubuntu'
+      - name: install apache for redhat
+        command: yum -y install httpd
+        when: ansible_os_family == "RedHat"   or when: ansible_facts['distribution'] == 'CentOS'
+      
+      - name: execute another tasks file
+        import_tasks: group-task.yml          # import_tasks module run all the tasks only from another yml file  
+     or include_tasks: group-task.yml
+      
+      - name: execute another playbook
+        import_playbook: loop.yml             # import_playbook module call another completed playbook. static
+      - name: run another/reused playbook
+        include: loop.yml                     # include module call another compelete playbook. dynamic
+        import: loop.yml
+
+ansible-playbook condition.yml                # installed httpd on both server, because condition match RedHat linux server
+
+cat group-tasks.yml
+- name: create developers group
+  group:
+     name: developers
+============================================
+
+Ansible Vault:            it used for encrypt the data.
+
+Ansible allows keeping sensitive data such as passwords or keys in encrypted files, rather than a plaintext in your playbooks.
+
+# Creating a new encrypted playbook:
+ansible-vault create vault-pas.yml            # enter, 
+ask Vault password:abc123                     # save as in key,value password: password@123 in vault-pas file and as saved encrypted file with key (abc123)
+ansible-vault view vault-pas.yml              # ask Vault password: abc123, then see content of file
+
+ansible-vault edit vault-pas.yml              # Edit the encrypted playbook
+ansible-vault rekey vault-pas.yml             # To change the password
+ansible-vault encrypt target.yml              # To encrypted target.yml file with vault password.
+ansible-vault decrypt target.yml              # To Decrypt an encrypted playbook
+# We can encrypt string also.
+vi ansible-vault.yml
+---
+- name: test ansible playbook
+  hosts: all
+  vars_file: vault-pas.yml          # provide encrypted password file
+  tasks:
+  - name: clone repo
+    git:
+       #repo: https://user_name:password@github.com/ranjit_repo/vault.git                # Hard code user/pas
+        repo: https://user_name:{{password}}@github.com/ranjit_repo/vault.git            # take reference password from encrypted vault-pas file
+       dest: /opt/ansadmin/test-vault
+
+ansible-playbook -i hosts ansible-vault.yml --ask-vault-pass         # enter Vault password: to decrypt encrypted vault-pass file
+
+vi pass.yml        # saved encrypted file key
+abc123
+ansible-playbook -i hosts ansible-vault.yml --vault-password-file pass.yml    # passed encrypted key using file
+---------------------------------------
+
+---
+hosts: node1             
+tasks:
+  post_tasks:                     # module name
+  - name: Runs last
+    debug:
+       msg: "I will run very last (post_task)."
+  pre_tasks:                      # module name
+  - name: Runs first
+    debug:
+       msg: "I will run very first (pre_task)."
+  roles:
+   - webserver
+-----------------------
+
+hosts: node1
+vars:
+ x: 45
+vars_prompt:                         # take user input
+ - name: user_name                   # user_name store user's input value
+   prompt: Enter the user_name       # ask input value from user
+   private: false/no                 #  user type on prompt, value is visible on prompt
+ - name: user_pass                   # user_pass store user's input value
+   prompt: Enter your password       # ask input value from user
+   private: true/yes                 # user type password on prompt is not visable. 
+gather_facts: false 
+tasks:
+- name: print variable value
+  debug:
+    msg: "The  user name is {{user_name}} and user pass is {{user_pass}}"
+   
+
+remote_src: True/yes plugin: it work on remote only, suppose copy remote to remote
+========================================================
+
+Roles:
+An ansible role is group of tasks/playbooks and reusable code. Roles are good for Organising tasks and encapusulating the data. 
+
+Using ansible-glaxy we can create dynamic and static roles. As well Ansible Glaxy is repository where user can upload/download  and search the roles.
+glaxy.ansible.com
+
+Static roles is when user is create and dynamic role is where already roles is reside at ansible-glaxy, just install and use role.
+Ansible Roles Directory Structure:- Default, files, Handler, Meta, Templates, Tasks, Vars.
+
+We can Organise Playbooks into a directory structure called roles. When adding more and more functionality to the playbooks it will make it defficult 
+to maintaine in a single file. Using Role we can easily manage the code by dir structure.
+
+Ansible playbook organizes tasks and Ansible roles organizes playbooks.
+
+------
+LAB ROle: (simple role)
+
+sudo yum install tree -y    # install tree
+mkdir -p playbook/roles/webserver/tasks
+tree
+# roles dir and master.yml should be on same position
+
+cd playbook
+vi roles/webserver/tasks/main.yml
+- name: install apache on RedHat
+  yum: pkg=httpd state=latest
+
+vi playbook/master.yml
+--- # master playbook for webservers
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  roles:
+         - webserver
+
+
+ansible-playbook master.yml    # install httpd on both server.  (for check, execute which httpd on both server)
+
+-------------------------------------------------------
+
+************ Now creating dynamic Role, Based on Dir structure.
+
+ansible-glaxy search mariadb         # search role mariadb (suppose searched geerlingguy.mysql)
+ansible-glaxy list                    # list roles
+ansible-glaxy info geerlingguy.mysql
+ansible-glaxy install geerlingguy.mysql     # roles install from glaxy.
+ansible-glaxy remove role_name              # remove role from system.
+
+cd /home/ranjit     ### below creating static role
+
+ansible-glaxy init roles/apache  --offline   # cd role1; if execute tree apache (all below dir structure created)
+
+Default dir: default/main.yml   # define only variable and values there. itself overriden by vars. so default has low priority. Default is dynamic
+Files dir: files/index.html      # it contains files only suppose need to be copy from local files dir to the remote machine .
+Handlers dir: handlers/main.yml  # They are triggers using notify and the any kind of tasks.
+Meta dir: meta/main.yml         # This directory contained meta data : Author Name, title, team name, email, which os it supports.
+Task dir: tasks/main.yml        # It contain all the tasks that normally in the playbook eg: installing packages and copies files etc.
+Vars dir: vars/main.yml         # define only variable and values there. The priority of the vars is higher than that of defaults. vars is static
+templates : templates/httpd.conf.j2   # This dir contain configuration template file, after assigned value using variable in file then copy to remote 
+server . dynamic changes files using variable.
+
+cd /home/ranjit/roles/apache
+
+vi default/main.yml              # override variable (low priority), when pass value at run time using -e var=value
+apache_port: 80
+apache_user: httpd
+apache_group: httpdadm
+apche_name: Goutham
+
+vi vars/main.yml 
+apache_package: apache2
+
+ls -ld tasks/      # listed ( configure.yml, install.yml, main.yml, service.yml, setup.yml
+vi tasks/main.yml
+---
+- import_tasks: setup.yml              # import_tasks execute only tasks yaml file.
+- import_tasks: install.yml
+- import_tasks: configure.yml
+- import_tasks: service.yml
+
+vi meta/main.yml
+author: Ranjit kumar
+description: wipro project
+company: wipro
+
+
+vi tasks/setup.yml
+---
+- name: To create a group
+  group:
+     name: "{{ apache_group }}"
+     state: present
+
+- name: To create a user
+  user:
+     name: "{{ apache_user }}"
+     state: present
+     groups: "{{ apache_group }}"
+    
+
+- name: make archive file
+  archive:
+    path: /var/log
+    dest: /tmp/logs.tar.gz
+    format: gz
+
+vi tasks/configure.yml
+---
+- name: To copy the data file from ansible server to remote servers
+  copy:
+    src: files/index.html
+    dest: /var/www/html
+    mode: 0644
+  notify: restart apache
+
+- name: To copy my configuration template to remote servers
+  template:
+    src: templates/httpd.conf.j2   # template first changed value using variable at run time in this file then copy to the destination. Suppose 
+                         We only change port value in default or vars/main.yml file, it automatically will be changed in config file at remote.
+    dest: /opt/httpd.conf     	            
+    mode: 0644
+  notify: restart apache
+
+# httpd.conf is only one configuration file for apache server.
+
+vi handlers/main.yml
+---
+- name: restart apche
+  service:
+    name: "{{ apache_package }}"
+    state: restarted
+
+vi tasks/service.yml
+---
+- name: To start apache web server
+  service:
+     name: "{{ apache_package }}"
+     state: started
+
+cd /home/ranjit/roles
+vi apache.yml
+---
+- name: This playbook will invoke the Ansible role
+  hosts: webservers
+  gather_facts: True
+  roles:
+  - apache    # role_name
+  vars:
+    apache_name: kelly
+    apache_port: 81
+  degug:
+     msg: " Connected Server IP: {{ ansible_host }}"         # it will print all connected server IP on terminal
+
+
+ansible-playbook -i inventory apache.yml
+
+# How to upload role in ansible glaxy repository.
+git add .           # add all roles file.
+git commit -m " commit roles to glaxy"
+git push origin master # pushed to git hub repository.
+login ansible glaxi console > My content > Add content > "Import Role from GitHub" > select Role repository > OK   # imported role in glaxy.
+
+
+===================================================================
+delegate_to: execute set of tasks on a specific host.
+local_action: execute set of tasks on local machine only.
+
+# - local_action: command: touch local.txt      # file create on local server only.
+
+# - local_action: copy content={{ foo_result }} dest=/path/to/destination/{{ inventory_hostname }}file    # past variable's content in remote server file
+# - local_action: lineinfile line={{ foo_result }} path=/path/to/destination/file  # write register variable's content in remote file
+#   local_action: shell echo "This is  {{ ansible_distribution }} {{ ansible_distribution_major_version }}" >> /tmp/output  # save ansible version locally
+            in local server file
+#   local_action: shell echo "ip is {{ansible_hostname}} {{ansible_host}}" >> ip_file.txt  # save remote server's IP into local server file
+--------
+How to copy all ec2 ip in local text file
+
+name: Test ec2 info
+  hosts: local
+  connection: local
+
+  tasks:
+    - name: Get EC2 Info
+      ec2_instance_info:
+        filters:
+          "tag:Name": "SERVER0*"
+      register: ec2_name
+
+    - name: Get instance IP addresses.
+      debug:
+          msg: "{{ item.0 }} | {{ item.1 }} | {{ item.2 }}"
+      with_together:
+        - "{{ ec2_name.instances | map(attribute='tags.Name') | list }}"
+        - "{{ ec2_name.instances[0].public_ip_address }}"
+        - "{{ ec2_name.instances[0].private_ip_address }}"
+
+    - name: Gather and Save Instance Info
+      set_fact:
+         Tag_Name: "{{ ec2_name.instances | map(attribute='tags.Name') | list }}"
+         Pub_IP: "{{ ec2_name.instances[0].public_ip_address }}"
+         Pvt_IP: "{{ ec2_name.instances[0].private_ip_address }}"
+
+    - local_action:
+        copy content="{{ Tag_Name }} | {{ Pub_IP }} | {{ Pvt_IP }}" dest=ec2iptest.txt
+
+-------------------------------------------------------------------------------------
+## to CALL API (Rest API) Interacts with webservices
+
+ - name: Everyone loves a good Chuck Norris joke
+      uri:
+        url: https://api.chucknorris.io/jokes/random
+        method: GET
+      register: results       # capture the output of a task and save it to a variable results and use task output in elsewhere in playbook
+
+    - debug:
+        var: results.json.value             # output joke mesage
+
+-------------
+
+tasks:   
+    - name: Copy the file from mwiapp01(remote1) to mwiapp02(remote2) using Method Pull
+      hosts: remote1
+      tags: sync-pull
+      synchronize:               # incremental copy
+        src: "{{ item }}"
+        dest: "{{ item }}"
+        mode: pull
+      delegate_to: remote2       # specific host
+      register: syncfile
+      run_once: true            # execute on only one host (remote2)
+      with_items:
+       - "/tmp/app01-to-app02.jar"
+
+========================END Ansible=============================================
+---
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  vars:
+    a: "Ranjit kumar"
+  tasks:
+  - name: Save remote IP to local server
+    local_action: shell echo "remote IP is {{ansible_host}}" >> ip_file.txt
+  - name: just print values
+    debug:
+      msg: "{{a}}"     #print Ranjit kumar
+
+  - name: second debug
+    debug:
+      msg: "{{item}}"   # print below all
+    loop:
+     - sonia kumari
+     - monia kumari
+     - tonia kumari
+----------------------------------
+vi var1.yml
+---
+- name: play scope
+  hosts: all
+  become: yes
+  connection: ssh
+  gather_fact: yes
+  vars:
+     my_var: linux
+  tasks:
+  - name: make use on managed host
+    user:
+        name: "{{my_var}}"
+        state: present
+
+ansible-playbook --syntax-check var1.yml
+ansible -a 'id linux' all    # to check user exist
+ansible-playbook var1.yml -e "my_var=test2"    # pass username using variable while executing.
+ansible -a 'id test2' all
+--------------------------------
+Nested vars.
+
+vi var2.yml
+---
+- name: Variable file formate
+  hosts: all
+  vars_files: ./test/value.yml         
+  tasks:
+  - name: install {{my_pack}} server package.
+    yum: name="{{my_pack}}" state=latest
+
+vi /test/value.yml        # define only variables there
+my_pack: [telnet,vsftpd,bind]
+
+ansible-playbook --syntax-check var2.yml
+ansible-playbook var2.yml  #  installed three packages.
+ansible -a 'rpmquery vsftpd bind telnet' all   # to check install or not
+rpm  -qa |grep httpd              # check httpd exist or not
+---------------------------
+
+vi inventory
+[Data]
+client1.pool.org my_file=testing
+
+vi var3.yml
+---
+- name: Host Scope
+  hosts: clent1.pool.org
+  tasks:
+  - name: make {{my_file}} file on managed host.
+    file: name=/tmp/{{my_file}} state=touch
+
+ansible-playbook -i inventory var3.yml Data --syntax-check 
+ansible-playbook -i inventory var3.yml Data  # executed
+ansible -a 'ls /tmp/testing' all   # file found.
+-----------------------------
+---------------------------------------
+How to create linux user
+# openssl passwd  # enter ranjit123 and generated encrypted password FFJDHDNDD  
+# password_hash this also use for pass encryption
+groupadd admin   # cat /etc/group
+groupadd user1
+--- # MY LOOPS PLAYBOOK
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  tasks:
+         - name: add list of users in my nodes
+           user: name='{{item}}' state=present uid=1040 groups=ansible password=FFJDHDNDD shell= "/bin/bash"
+           with_items:
+                       - moonup1
+                       - moonup2
+                       - moonup3
+                       - moonup4
+----------------------------------------------
+openssh passwd moon1         # generate encrypted pas
+--- # creating linux user
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  tasks:
+  - name: Creating moonup user
+    user:
+	name:  moonup
+	comment: moonup comment
+	uid: 1001
+	groups: ansible
+	password: FFJDHDNDD    # encrypted pass is must
+	shell: "/bin/bash"
+
+# when su - moonup  # enter password moon1 and login successful.
+-------------------
+Nested loop
+--- # creating linux user
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  tasks:
+  - name: Creating moonup user
+    degug:
+      msg: "{{ item[0], item[1] }}"
+    with_nested:    # Nested loop 
+      - [ 'alice', 'bob' ]     # loop1
+      - [ 'clientdb', 'employeedb', 'providerdb' ]  # loop2
+---------------------
+--- # printing variable value
+- name: work together number and alfa
+  hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  vars:
+    alpha: ['a','b','c','d']     # array define
+    number: [1,2,3,4]
+    beta:                        # array define
+     -1
+     -2
+  tasks:
+    - name: printing char and number
+      debug:
+         msg: "{{item[0]}} and {{item[1]}}"
+         msg: "{{beta[0]}}"         # print 1
+      with_together:
+          - "{{alpha}}"
+          - "{{number}}"
+----------------------------
+loops: loop, with_items, with_nested, with_dict, with_file, with_fileglob, with_filetree, with_together, with_subelements, with_sequence, 
+with_random_choice, until, with_first_found, with_lines, with_ini
+===========================================
+----------------------------------------------------
+vars:
+  mylist:       # array define
+      - 1
+      - "{{ 3 == 3 }}"
+      - True
+  myotherlist:  # array define
+      - False
+      - True
+tasks:
+
+  - debug:
+      msg: "all are true!"
+    when: mylist is all
+
+  - debug:
+      msg: "at least one is true"
+    when: myotherlist is any              ## print both mesg value, because atleast one is True in both list
+---------------------
+vars:             # dictionaries define.
+ students:
+     name: ranjit
+     city: delhi
+     address: khora
+     
+----------------------------------------------------
+vi foo.sh
+#!/bin/bash
+echo " Retrying a task until a condition not match with "all system go"
+--------
+
+---
+- name: executing shell script
+  hosts: 127.0.0.1
+  become: yes
+  tasks:
+     - name: creating shell scripting
+       shell: /home/ansible/foo.sh
+       register: result
+       until: result.stdout.find("all system go") != -1                # running untill not matched "all system go" ( try 5 time and with gap 10 second)
+       retries: 5
+       delay: 10
+
+----------------------------------
+Dependencies ROLES:
+
+depnd.yml
+- name: THis is dependencies program
+  hosts: demo
+  user: ansible
+  connection: ssh
+  become: yes
+  roles:
+    -  myapp
+------------------
+cat roles/myapp/meta/main.yml
+---
+dependencies:
+  - role: common
+    vars:
+      some_parameter: 3
+  - role: apache
+    vars:
+      apache_port: 80
+  - role: postgres
+    vars:
+      dbname: blarg
+      other_parameter: 12
+------------------------------
+cat roles/common/tasks/main.yml
+- name: This is common role
+  debug:
+     msg: "common ROLE {{some_parameter}}"
+---------------------------
+cat roles/apache/tasks/main.yml
+- name: THis is Apache ROLE
+  debug:
+    msg: " Apache role {{apache_port}}"
+------------------------------
+cat roles/postgres/tasks/main.yml
+- name: THis is POSTgres Role
+  debug:
+     msg: "Postgres Role {{dbname}} - {{other_parameter}}"
+
+============================END
+Ansible Tags:
+       If you have a large playbook, it may be useful to run only spedific parts of it insted of running the entire playbook. You can do this with 
+Ansible tags. Using tags to execute or skip selected tasks is a two-step process.
+
+Add tags to your tasks, either individually or with tag inheritance from a block, play, role, or import.
+
+Select or skip tags when you run your playbook.  (Ex: ansible-playbook abc.yml --tags configuration, then only executed configuration block).
+--tags all - run all tasks, ignore tags (default behavior)
+--tags [tag1, tag2] - run only tasks with either the tag tag1 or the tag tag2
+--skip-tags [tag3, tag4] - run all tasks except those with either the tag tag3 or the tag tag4
+--tags tagged - run only tasks with at least one tag
+--tags untagged - run only tasks with no tags
+
+---
+ - name: Ansible Tags
+   hosts: localhost
+   gather_facts: false
+   tasks:
+     - debug:
+         msg: "This is first task"
+       tags: first
+     - debug:
+         msg: "This is second task"
+       tags: second
+     - debug:
+         msg: "This is third task"
+       tags: third
+     - debug:
+         msg: "IPV4 address is {{ansible_facts.default_ipv4.address}}"       # print ipv4 address
+         msg: "OS Distro is {{ ansible_facts.distribution }} "                 # OS name
+         msg: "Free memory {{ ansible_facts['memfree_mb']}}"                   # free memory
+       tags: fourth
+
+ansible-playbook ansible-tags-1.yml         # execute all tasks.
+ansible-playbook ansible-tags-1.yml --tags first      # execute only first task.  (print: This is first task)
+
+# /etc/ansible/facts.d        # This is custome fact, directory on your managed node(s). facts.d store variable and value.
+------------
+
+--- # assert module is for test whether a specific condition is met.
+- name:
+hosts: node1
+tasks:
+- name: check free memory
+  assert:
+    that: "{{ ansible_facts['memfree_mb'] > 500 }}"
+    fail_msg: "Low on memory!"
+- name: get file info
+  stat:
+    path: /etc/motd
+    register: motd
+- name: assert /etc/motd is a directory
+  assert:
+    that: motd.stat.isdir
+    fail_msg: "/etc/motd is not a directory!"
+-----------------
+Ansible Blocks
+Blocks create logical groups of tasks. Blocks also offer ways to handle task errors, similar to exception handling in many programming languages.
+
+Grouping tasks with blocks
+
+Handling errors with blocks
+-----------
+---
+- name: THis block example playbook
+  hosts: demo
+  user: ansible
+  tasks:
+  - name: Attempt and graceful roll back demo
+    block:
+       - name: Print a message
+         debug:
+            msg: 'I execute normally'
+
+       - name: Force a failure
+         command: /bin/false
+
+       - name: Never execute this task
+         debug:
+           msg: 'I never execute, due to the above task failed'
+    rescue:       # rescue execute when task failed in block part only. If block task not failed then rescue not exeute
+       - name: Exeucted this because task failed in block section
+         debug:
+            msg: 'I caught an error'
+
+       - name: Force a failure in middle of recovery! >:-)
+         command: /bin/false
+
+       - name: Never print this
+         debug:
+            msg: 'I also never execute :-('
+    always:               # it always execute, whether block task failed or not failed.
+      - name: Always do this
+        debug:
+           msg: "This always executes"
+================================================
+What is Ansible group_vars?
+
+Group var has more priority then default dir variable and The group_vars in Ansible are a convenient way to apply variables to multiple hosts at once. 
+group_vars : it used to access variable to particular group servers, not particular host. group_var file name and inventory group name should be same. group_var dir need 
+to create manually.
+
+Suppse we have dbserver, appserver, weserver group, etc. so suppose we want to install db on dbserver, application on appserver, apache2 on webserver. 
+using group var we can do easily.
+
+vi /etc/ansible/hosts
+[dbserver]
+10.43.23.2
+[apserver]
+10.43.23.3
+[webserver]
+10.43.23.4
+[nginx]
+10.43.23.4
+
+
+Ex: 1
+cd /home/ansible/group_vars/nginx
+vi main.yml
+version: 2.0.0           # variable define here, when run playbook then variable pick from this group_vars
+
+---
+Ex: 2 
+# file location is
+vi /etc/ansible/group_vars/dbserver
+fruit: apple
+vegetable: potato
+
+vi /etc/ansible/group_vars/appserver
+fruit: Orange
+vegetable: potato
+
+vi /etc/ansible/group_vars/webserver
+fruit: Graps
+vegetable: pumpkin
+-----------------------
+Nested group variable : 
+
+---------
+We created three files named as below: –
+
+/etc/ansible/group_vars/dbserver
+/etc/ansible/group_vars/webserver
+/etc/ansible/group_vars/appserver
+
+# ansible appserver -m debug -a "var=fruit"        # print Orange
+-------------------------------------------------------
+
+host_vars: it has more priority then group_vars variable. if we define variable in host_vars, means variable accessable only for particualr server 
+not group server. host_vars dir need to create manually.
+
+vi /etc/ansible/hosts
+[webservers_1]
+172.10.10.1
+172.10.10.2 
+[webservers]
+webservers_1  
+
+vi /etc/ansible/host_vars/172.10.10.1/main.yml 
+variable=value
+
+vi /etc/ansible/host_vars/172.10.10.1/main.yml   
+my_dir=dir_1      # variable define here ( this dir will create on particular this server only, using host_vars)
+
+cd ..
+vi var4.yml
+---
+- name: Host Scope
+  hosts: webservers
+  tasks:
+  - name: make {{my_dir}} dir on managed host.
+    file: path=/tmp/{{my_dir}} state=directory mode=777 owner=ftp
+
+ansible-playbook --syntax-check var4.yml
+ansible-playbook var4.yml  # executed, and dir created on 172.10.10.1 server only
+ansible -a 'stat /tmp/dir_1' all   # dir found on this 172.10.10.1 server only.
+
+ansible-playbook var4.yml -e "my_dir=dir_2   # highest priority, and now dir dir_2 created on 172.10.10.1 server only
+ansible -a 'stat /tmp/dir_1' all   # dir dir_2 found on this 172.10.10.1 server only.
+
+================================================================================
+================================================================================
+
+-------------------Ansible Gaurav Sharma
+2. Ansible tutorial: ansible inventory
+
+vi /etc/ansible/hosts           # this is default inventory
+192.168.0.2 ansible_ssh_pass=ranjit123
+
+sudo yum install sshpass -y    # sshpass utility installed
+ansible 192.168.0.2 -m ping    # ping success.
+--------------------------------
+
+vi inventory.txt       # None default inventory
+webserver ansible_host=192.168.25.15 ansible_ssh_pass=password ansible_connection=ssh ansible_port=22 ansible_user=root  # webserver is alias name and var/val
+
+ansible webserver -m ping -i inventory.txt          # webserver ping success.
+ansible webserver* -m ping -i inventory.txt         # webserver and webserver1 pin success
+
+ansible all -m ping -i inventory.txt                # all server ping success
+
+---------------------------
+
+vi /etc/ansible/hosts   # this way variable/value define is not standard paractice in default inventory. insted of this way, must use host_vars/group_vars.
+webserver1 ntp_server=us.pool.ntp.org http_port=443      # define variable and value crosponding to particular group server.
+webserver2 ntp_server=us.pool.ntp.org http_port=443    
+
+[webservers:vars]      # same thing easy way define here. because same configuration used to all servers. But Not standard parctice.
+ntp_server=us.pool.ntp.org
+http_port=443
+
+[local]
+localhost ansible_connection=local            # for local connection
+------------------------
+
+# suppose we want to access only databaseserver.
+ansible -i inventory_groups.txt databaseservers -m ping                  # ping only databaseservers group Not other group
+ansible -i inventory_groups.txt nfsservers -m ping                       # ping only nfsservers group Not other group
+ansible -i inventory_groups.txt nfs_database_servers -m ping             # ping together nfsservers and databaseservers group Not other group
+=============================================================================================
+vi testScript.sh
+#!/bin/bash
+echo "My name is $1" >>/tmp/test.txt
+echo "----------------------------"
+ifconfig >> /tmp/test.txt
+----------
+
+vi script.yml
+- name: Run a script only if file.txt does not exist on the remote node
+  ansible.builtin.script: /some/local/create_file.sh --some-argument 1234
+  args:
+    creates: /the/created/file.txt
+
+- name: Run a script only if file.txt exists on the remote node
+  ansible.builtin.script: /some/local/remove_file.sh --some-argument 1234
+  args:
+    removes: /the/removed/file.txt
+
+vi user.yml
+---
+- name: This is our first play
+  hosts: webserver1
+  tasks:
+    - name: Create  a User on webserver1
+      user: name="mytestuser" state=present password="k335/kl3hh4j3k/hl3kl43/h43jh4j35"
+-----------
+
+mkpasswd --method=sha-512      # to create encrypted password
+password: ranjit123         # enter and generated encrypted password as above
+
+/etc/passwd        # to check create user
+/etc/shadow        # save password there.
+
+vi remove.yml
+- name: This is our first play
+  hosts: webserver1
+  tasks:
+    - name: Remove  a User on webserver1
+      user: name="mytestuser" state=absent remove=yes
+
+==========================================================
+6. Ansible tutorial: ansible conditions
+
+---
+- name: This is play book
+  hosts: webserver1
+  vars: 
+    age: 18
+  tasks:
+     - name: 'Creating file using variable'
+       command: touch /tmp/18.txt
+       when: age == 18
+       
+    - name: 'Creating file using variable'
+      command: touch /tmp/greater_then_18.txt
+      when: age > 18
+
+   - name: 'Creating file using variable'
+     command: touch /tmp/between_10_and_18.txt
+     when: age > 10 and age < 18
+
+   - name: 'Creating file using variable'
+     command: touch /tmp/between_10_and_11.txt
+     when: ansible_host == node1 and age == 11
+========================
+
+Loop:
+
+--- 
+- name: This is our first playbook
+  hosts: webserver1
+  vars:
+     pkg:
+        - vsftpd
+        - tree
+  tasks:
+  - name: 'installing' 
+    apt: name="{{item}}" state=present
+    with_items: "{{pkg}}"
+=====================================
+
+8. Ansible tutorial: include | file separation in ansible | Modularization in ansible playbook
+
+vi variable.yml         # it containe all variable and values.
+var1: var1
+var2: var2
+var3: var3
+var4: var4
+var5: var5
+var6: var6
+var7: var7
+var8: var8
+var9: var9
+
+vi var_play.yml
+---
+- name: this is variable file example
+  hosts: webserver1
+  vars_files:               # load the variable right at the start
+     - variable.yml
+  include_vars:   myvars.yml       # include_vars module to dynamically load your variable in your playbook. (only variable define in myvars.yml)
+  
+  tasks:
+    - name: 'task1'
+      command: touch /tmp/var/{{var1}}.txt
+
+    - name: 'task2'
+      command: touch /tmp/var/{{var2}}.txt
+
+    - name: 'task3'
+      command: touch /tmp/var/{{var3}}.txt
+
+    - name: 'task4'
+      command: touch /tmp/var/{{var4}}.txt
+
+ansible-playbook var_play.yml          # executed and variable pick from variable file.
+-------------------------
+
+vi task.yml
+- name: 'task1'
+  command: touch /tmp/var/{{var1}}.txt
+
+- name: 'task2'
+  command: touch /tmp/var/{{var2}}.txt
+
+vi task1.yml
+- name: 'task3'
+  command: touch /tmp/var/{{var3}}.txt
+
+- name: 'task4'
+  command: touch /tmp/var/{{var4}}.txt
+
+vi taks_playbook.yml
+---
+- name: this is our first play
+  hosts: webserver1
+  vars_file:                       # import variable file
+     - variable.yml
+  tasks:
+    - include: task.yml            # import task file
+    - include: task1.yml            # import task1 file also  (we can create task1 file same as task file)
+
+ansible-playbook taks_playbook.yml
+===================================================================
+
+10. Ansible tutorial: Asynchronous Actions and Polling
+
+# without async, whole time made ssh connection till playbook completed. but i don't want to make connection always. Using async, make connection 
+on particular time and check job completed or not, and connection closed.
+
+--- 
+- name: this is async play
+  hosts: webserver1
+  tasks:
+  - name: 'sleep for 60 sec'
+    command: sleep 60
+    async: 70             # wait till 70 second to job complete.
+    poll: 35           # make connection on 35 second, check whether task completed or not on 35 second.  (bydefault poll time 10 second)
+
+  - name: second task
+    command: touch /tmp/second_task.txt
+---------------------
+
+# fire and forget machanism is if give poll: 0, means only check only job run or not and nothing.
+===============================================================
+
+11. Ansible tutorial: Strategies in ansible in hindi
+
+# Ansible has linear, Serial, Free, batch, Rolling Strategies to configure all target server.
+
+# strategy linear: This is the default strategy in Ansible where task are executed sequentially in the order in playbook. First one task will be completed on all hosts then again next task will execute in all hosts.
+
+# strategy serial: Executes task on a defined maximum number of hosts at a time as per serial values. usages as batches/ rolling changes. All tasks will be completed on all hosts as serial value first, then next time all task will completed next another hosts as serial values . Task executing process like linear strategy.
+
+# strategies free: This strategy executes tasks on all hosts at the same time, without any coordination or order. Ex webserver will not wait to complete the task on sqlserver
+           it boost overall performance.
+
+# Batch Strategy: This strategy executes tasks in batches, based on a defined percentage or number of hosts. by serial %
+
+# Rolling Strategy: This strategy executes tasks on a set of hosts in a rolling fashion, updating one host at a time while keeping the service operational. by serial
+
+Fork : Ansible use by default Fork mechanism, means first task execute/completed all target server together as per fork value, bydefault fork value is 5 but we can increase/descrease fork value, if fork value is 5 means simultaneously connection first 5 server only for first task, and then again 5 server. 
+
+But user configure Serial mechanism also, serial decide maximum number of nodes processed. menas all target server configure server as per serial value, usages as batches/ rolling changes. 
+
+
+
+# Forks tuning parameters in Ansible /etc/ansible/ansible.cfg  to customize default behavior   (cat ansible.cfg|grep forks)
+ 
+
+vi abc.yml
+---
+- name: 'strategy demo'
+  hosts: webserver1,sqlserver1
+  strategy: linear                     # default strategy, means first task complete on all servers first.
+           #serial: 2                  # batch processing            
+  tasks:
+  - name: first task
+    apt: name=apache2 state=present
+    
+  - name: second task
+    command: touch /tmp/stragey_tasks2.txt
+
+# Serial: 2  -> Using this, first execute all tasks on 2 servers, then execute again all task on next 2 servers. serial: 2 or serial: "30%" or
+serial:      # below define number of hosts, firstly all tasks will execute on one server, then next 5 server, then next 10 server. example of rolling update strategy.
+    - 1      
+    - 5
+    - 10
+or 
+serial:          # mixed
+    - 1
+    - 5
+    - "20%"   
+define in playbook directly.
+
+# forks: 5  -> Executes a task on the first five hosts, waits for the task to complete, and then takes the next batch of five hosts, and so on. we can change fork value in /etc/ansible/ansible.cfg
+
+ansible-playbook -fork 30 my_playbook.yml.       # fork increment command line also
+
+# apt-get remove apache2          # remove apache2 from server.
+==============================================================
+
+
+12. Ansible tutorial: error handling
+
+---
+- name: strategy demo
+  hosts: webserver1
+  tasks:
+  - name: 'first task'
+    command: touch /tmp/task/task1.txt
+
+  - name: 'second task'
+    command: touch /tmp/task2.txt
+
+# suppose in first task, due to task dir not exist, it got failed on webserver1 only. If failed first task then automatically failed second task 
+also webserver1.
+But if task dir exist on second server, then all task will execute on second server successully.
+
+If we want to run second task on webserver1 even failed first task on webserver1 Then will use ignore_errors: True plugin        # Error Handling
+if any host is not reachable the use ignore_unreachable plugin to ignore unreachable host and move to next host.
+---
+- name: strategy demo
+  hosts: webserver1
+  tasks:
+  - name: 'first task'
+    command: touch /tmp/task/task1.txt
+    ignore_errors: True                        # if come error then ignore it and execute second task
+
+  - name: 'second task'
+    command: touch /tmp/task2.txt
+
+==========================================================================
+
+13. Ansible tutorial: Jinja 2
+
+vi function.yml
+---
+- name: this is our funtion yml
+  hosts: webserver1
+  vars:
+     your_name: Gaurav
+     dummy_list:
+        - 1
+        - 10
+        - 20
+        - 30
+        - 10
+    dummy_list2:
+        - 30
+        - 40
+        - 10
+        - 50
+  tasks:
+    - name: executed all function
+      debug:
+         msg: "Hellow {{ your_name }}"
+      debug:
+         msg: "Hellow {{ your_name | upper }}"
+      debug:
+         msg: "Hellow {{ your_name| lower }}"
+      debug:
+         msg: "Hellow {{ your_name | replace('Gaurav','Saurav') }}"
+      debug:
+         msg: "{{ dummy_list | min }}"
+      debug:
+         msg: "{{ dummy_list | max }}"
+      debug:
+         msg: "{{ dummy_list | unique }}"
+      debug:
+         msg: "{{ dummy_list | union(dummy_list2) }}"
+      debug:
+         msg: "{{ dummy_list | intersect(dummy_list2) }}"
+      debug:
+         msg: "{{ 100 | random }}"
+      debug:
+         msg: "{{ '/etc/ansible/ansible.cfg' | basename }}"       # print ansible.cfg
+
+===================================================================================
+
+15. Ansible tutorial: ansible lookups plugin in hindi
+plugins is pieces of code, it enable rich, flexible feature. 
+Ex: become, Action, Filter, lookup, inventory, Shell, Vars, Modules, ignore_errors, ignore_unreachable
+amazon.aws.aws_ec2, azure.azcollection.azure_rm , openstack.cloud.openstack
+
+# password store in some special csv file, so we will get password from csv file using lookup
+
+
+vi inventory.txt
+webserver1 ansible_host=192.168.25.15         # webserver1 is alias name
+sqlserver1 ansible_host=192.168.25.16
+
+[webserverss]
+webserver1
+
+[databaseservers]
+sqlserver1
+
+[web_database_servers]
+webserver1
+sqlserver1
+-----------------
+
+vi credential.csv
+Hostname,Password
+webserver1,password
+sqlserver1,password
+
+vi lookups.yml
+---
+- name: Test Connectivity
+  hosts: webserver1
+  vars:
+     ansible_ssh_pass: "{{lookup('csvfile', 'webserver1 file=credentials.csv delimiter=,')}}"
+  tasks:
+    - name: create a dummy file on webserver
+      command: touch /tmp/csv_lookups.txt
+-----------------------------
+# Now password store in .ini file, so we will get password from .ini file using lookup
+
+vi credential.ini
+[webserver1]
+password=password
+
+[sqlserver1]
+password=password
+
+vi lookups.yml
+---
+- name: Test Connectivity
+  hosts: webserver1
+  vars:
+     ansible_ssh_pass: "{{lookup('ini', 'section=webserver1 file=credentials.ini)}}"
+  tasks:
+    - name: create a dummy file on webserver
+      command: touch /tmp/ini_lookups.txt
+
+ansible-playbook lookups.yml -i inventory.txt
+===========================================================================
+vi lineinFile1.yml
+---
+- name: this is our first play.
+  hosts: webserver 
+  sudo: yes 
+  vars:
+    status: disabled        
+  tasks:
+    - name: "create a dummy file on webserver1"
+      lineinfile: line="nameserver 8.8.8.8" dest=/etc/resolv.conf   # blockinfile module used for insert multiple line in file
+    - name: "Replacing word/content in file"
+      lineinfile:
+          path: /etc/selinux/config
+          regexp: '^SELINUX='
+          line: 'SELINUX={{ status }}'         # edited SELINUX=disabled in this line
+...
+
+# sudo is old version, latest used become: yes, become_user: root1
+
+ansible-playbook lineinFile1.yml          # this line "nameserver 8.8.8.8" inserted in resolv.conf file and edit word in config file on all servers.
+---------------
+hosts: node2
+tasks:
+- name: Run this cron job every two mins
+  cron:
+    name: "two-mins"
+    user: elliot
+    job: logger 'Two minutes have passed!'
+    minute: '*/2'
+- name: wait for five minutes
+  pause:
+    minutes: 5
+==============================================================================
+
+16. Ansible tutorial: dynamic inventory in ansible (hindi)
+
+The dynamic inventory script can do anything to get the data and pull information from a database or file, as it returns a JSON structure.
+
+vi dynamic.py
+import json
+import argparse
+def get_inventory_data():
+  data={
+     "database":{
+         "hosts":["sqlserver"],
+         "vars":{
+            "ansible_ssh_pass": "password",
+            "ansible_ssh_host": "192.168.25.15"
+          }
+       }
+  }
+  return data
+
+if __name__ =="__main__":
+    data = get_inventory_data()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--list', action='store_true')
+    parser.add_argument('--host', action='store')
+    arg = parser.parse_args()
+    if arg and arg.list:
+       print(json.dumps(data))
+    elif arg.host:
+       print(json.dumps({'_meta': {'hostvars':{}}}))
+
+
+
+ansible all -m ping -i dynamic.py            # ping all ip of whatever ip defined in script
+------------------------------
+
+Dynamic Inventories are script like shell/python for dynamic environments. Cloud is dynamic environments (AWS Ec2, OpenStack, Google computer Engine, 
+Spack walk). 
+Dynamic inventory fetch all ec2 ip but this ec2 will not ssh (because password less not configured)
+
+Download ec2.py (get ip) and ec2.ini (config) files from ansible official repo. develop by developer
+Store AWS Programmatic credentials on ansible Engine Or Assign AWS IAM Role to Ansible Engine server (select ansible server, goto action..)
+sudo pip2 install boto
+
+./ec2.py             # this script fetch facts with all servers group wise ip dynamically on terminal (ec2 group, vpc group, us-east-1a,...) 
+ansible -i ec2.py ec2 -m ping                # check ping only ec2 group ip
+
+----------------------------------
+# Suppose multiple ec2 instance is running on aws. And as per Autoascalling ec2 instance counting is increasing (new instance) and descring (old instance).
+So we will collect new ec2 ip using ec2.py and ec2.ini script.
+Using ec2.py and ec2.ini, we will get all ec2 instance ip as per ec2.ini configure. And update in dynamic inventory using below
+# install boto first
+# export EC2_INI_PATH=path of ini file
+# export AWS_ACCESS_KEY_ID=aws access key
+# export AWS_SECRET_ACCESS_KEY=aws secret key
+
+vi /etc/ansible/ansible.cfg
+[defaults]
+inventory= ec2.py
+host_key_checking= False
+remote_user= ec2-user
+private_key_file= /etc/ansible/mykey1122.pem
+ask_pass= False
+become= True
+
+[privilege escalattion]
+become= True
+become_user = root
+become_method= sudo
+become_ask_pass= False
+-------------------
+ansible all --list-host          # list all ec2 ip of inventory
+=====================================================================
+# Run-time Job Customization. command line prompting
+inventory
+credential
+job tags
+limits
+
+* There are 8 way to improve speed up execution of playbook.
+
+ 1) enable callback plugins to find a task's time consumption and identify which jobs are slowing down your plays.
+ callbacks_enabled = timer, profile_tasks, profile_roles           in /etc/ansible/ansible.cfg
+ 
+2) Disable fact gathering
+3) increase fork value: ansible-playbook site.yaml --forks 50        # or in ansible.cfg file
+4) configure SSH optimization : add below line in [ssh_connection] section.
+       ssh_args = -o ControlMaster=auto -o ControlPersist=60s      in ansible.cfg file
+5) Disable host key checking:
+     host_key_checking = False     in ansible.cfg file
+6) Use pipelining:
+     pipelining = True             in ansible.cfg file
+7) Use execution strategies: 
+        strategy: free             in playbook
+8) Use async and pool tasks:       in playbook
+       

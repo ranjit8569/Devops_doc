@@ -1,0 +1,1009 @@
+# For git work use visual studio code software.
+
+Git is a distributed version-control system for tracking changes in computer files and coordinating work on those file among multiple people. It is primarily used for source-code mangement in software development, but it can be used to keep track of changes in any set of files.
+
+Repository:  is a place where you have all your codes or kind of folder on server. contains files,history,config managed by GIT. 
+It is a kind of folder related to one product. Changes are personal to that particular Repository.
+
+Server:
+it store all repository. it container metadata also.
+
+Working directory:
+Where you see files physically and do modification. At a time you can work on particular Branch
+
+Commit:
+Store Changes in repository you will get one commit-ID. It is 40 alpha-numeric Characters. It uses SHA-1 Checksum Concept.
+Even if you changes one dot, Commit-ID will get changes. It actually helps you to track the changes. Commit is also named as SHA1 hash. 
+
+Commit-ID:
+Reference to identity each change. To identify who changed the file.
+
+Tags:
+Tags assign a meaningfull name with a spedific version in the repository. Once a Tag is Created for particular save, even if you create a new commit, 
+it will not be updated.
+
+Snapshots:
+Represents Some data of particular time. It is always incremental ie. it store the changes (appended data) Only Not entire copy
+
+PUSH: 
+Push operations Copies changes from a local Repository Server to a Remote or Central Repo. This is Used to store the changes permanently into the git 
+Repository.
+
+Pull:
+Pull operation copies the changes from a Remote Repository to a local machine. The pull operation is used for synchronisation between two repo.
+
+BRANCH:
+Product is same, so one repository, but different task. Each task has one separate Branch. Default branch is master branch. After done with code , 
+merge other Branches with master. Finally merges(code) all Branches.
+Usefull when you want to work parallely. Can create one branch on the basis of another Branch. Changes are personal to that particular Branch.
+Deafult Branch is 'Master'. Concept is usefull for parallel development. we can create any no of branches and work together all developer. 
+When create new branches, data of existing Branch is copied into new Branch for first time.
+If file Created in workspace it will be visible in all the branches workspace untill you commit. once you commit, then that file belongs to that 
+particular Branch, and not visible to all branches. Changes are personal to that particular Branch.
+
+Advantages of git:
+Free and open source. Fast and small as most of the operations are performed locally therefor it is fast.
+
+Security:
+git uses a common Cryptographic has function called secure hash function (SHA1) to name and identify objects writing its database.
+No need of powerfull hardware.
+
+Easier Branching: if we create a new branch, it will copy all the codes to the new branches.
+
+Type of Repository:
+Bare Repository (Central Repo)
+Store and share Only. All central Repository are Bare Repo.
+
+None Bare Repository( Local Repo):
+Where you can modify the files. All local Repository are non-bare Repository.
+
+
+sudo su
+yum update -y
+yum install git -y
+which git
+git --version   # 2.23.3
+
+git config --global user.name "ranjit kumar"
+git config --global user.email "ranjitmoonup@gmail.com"
+git config --global --list  # list user name and email
+
+git init mumbaigit   # mumbaigit is a name
+cd mumbaigit   # and work from there
+Local Git States
+Working Directory | Staging Area | Local Repository (.git folder) | Remot Repository
+all files      -->|    -->       |        --->                    | -->
+
+github-demo     # remote repository (login github and create remote repository)
+
+### region mumbai instance ####
+vi mumbai  # THis is first line
+git add .
+git commit -m " first commit"
+git remote add origin https://github.com/ranjit8569/ranjit_repo.git  # git remote rm origin, git remote -v (to check url). git add --all :/ (if not pushed)
+git push -u origin master    ( master is branch name and origin is path)  all code pushed on remote repo.
+cat > mumbai  # this second line of code
+git add .
+git commit -m " this is second commit"
+
+### verigina singapur instance ###
+
+git remote add origin https://github.com/ranjit8569/ranjit_repo.git     # testing in jenkins: https://github.com/gouthamchilakala/PetClinic.git
+git pull origin master  
+# git pull command is also used for pulling the latest changes from the remote repository to update the local repository.
+git show comit_id  # show all code. 
+vi mumbai # this is third line
+git add .
+git commit -m " commit from singapur"
+git push origin master  # all code pushed master branch in central repo
+
+www.github.com
+ranjit8569
+ranjit1gandhi           (token: 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
+git clone https://github.com/ranjit8569/ranjit_repo.git
+# git clone is used for copy whole remote repository to local system where git initialized
+git clone https://user_id:password@github.com/ranjit8569/ranjit_repo.git                    # direct provide id/pas while cloning
+=======================
+GIT CLONE
+# suppose current branch is master
+
+echo "# ranjit8569" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main      # rename branch master to main
+git remote add origin https://github.com/ranjit8569/ranjit8569.git
+git push -u origin main
+…or push an existing repository from the command line
+git remote add origin https://github.com/ranjit8569/ranjit8569.git
+git branch -M main            # renamed from master to main
+git push -u origin main
+------------------
+git pull origin master    # origin master HEAD master
+git push origin master     # files move from local repo to remote repo | and enter user and pass
+--------
+pwd
+/Users/training/projects/demo
+ls        # README.md file there
+git init .     # initialize empty git repository in /Users/training/projects/demo/.git/
+ls -l       # .git and README.md files there
+git status      # Untracked files: README.md
+
+==============================
+Tracked files
+vi ~/.gitconfig      # vi for edit file
+[user]
+     name=Jason Taylor
+     email=jason@git.training
+[core]
+     editor=vi -w
+-----------------------
+pwd
+/Users/Jason
+cd projects
+ls
+starter-web
+cd starter-web
+ls
+git status     # nothing to commit, working directory clear
+vi hipster.txt     # add some line
+git status   # modified: hipster.txt
+git commit -am "Adding more ipsume txt"   #  move from staging to local repo
+
+git ls-files   # list all files git is tracking
+vi newfile.txt     # fresh file and write "just a test of ls-files
+ls
+git status  # Untracked files: newfile.txt
+git ls-files     # now will not show this file "newfile.txt"
+git add newfile.txt         #after add this file "newfile.txt" will show
+git status      # move files from working dir to staging  (green)
+git ls-files    # now will show newfile.txt
+----------------------
+Recursive add
+pwd
+/Users/jason
+cd projects/starter-web
+git status
+mkdir -p level1/level2/level3/level5
+cd level1
+pwd
+/Users/jason/projects/starter-web/level1
+vi level1-file.txt      # write some line (new file)
+cd level2
+vi level2-file.txt     # write some lines (new file)
+cd level3
+vi level3-file.txt      # write some lines (new file)
+rm -rf level5   # no need to keep
+cd ../../..
+git status    # level1/ (red)
+git add .   # all dir and files add recursively to staging
+git status # 
+
+(green) new file: level1/level1-file.txt
+(green) new file: level1/level2/level2-file.txt
+(green) new file: level1/level2/level3/level3-file.txt
+git commit  # come in edit mode and write below
+(Adding several files recursively)  # version comment
+--------------------
+Backing out changing
+pwd
+cd /projects/starter-web/
+ls
+git status   # nothing to commit, working directory clean
+cd level1/
+vi file.txt   # add some lines (total 3 time entry)
+git status     # (red) modified: level1-file.txt
+git add file.txt
+git status     # (green) modified: level1-file.txt
+vi file.txt      # just only open and save
+git status        #(green) modified: level1-file.txt
+git reset HEAD file.txt   # files moved into working dir | but still file is unchanged
+get status # (red) modified: level1-file.txt
+git checkout -- file.txt # , (one version/step backed)
+vi file.txt   # now only two time entry there. (before checkout it was 3 time entry
+-------------------------
+Renaming and moving files
+cd level1/level2/level3
+ls    # level3-file.txt
+git status # noting to commit, corking directory clean
+git mv level3-file.txt level3.txt
+ls # level3.txt
+git status # (green) renamed: level3-file.txt -> level3.txt
+git commit -m "renaming level3 file" # renamed level1/level2/level3{level3-file.txt => level3.txt}
+--------------
+Deleting files
+
+pwd    # /Users/jason/projects/starter-web
+ls
+git status # nothing to commit, working directory clean
+vi doomed.txt # write one line (This file won't last long)
+ls # file there
+git statue     # Untracked files: (red) doomed.txt
+git rm doomed.txt  # in this case, fata: doomed.txt did not vich any files
+rm doomed.txt  # now deleted.
+git status # nothng to commit, working directory clean
+
+git ls-files          # newfile.txt 
+ls              # newfile.txt
+git rm newfile.txt   # now deleted newfile.txt
+git status      # (green) deleted: newfile.txt
+git commit -m "Deleting new files"
+git status  # nothng to commit, working directory clean
+
+ls   #  hipster.txt
+git ls-files   # hipster.txt
+git rm hipster.txt    # deleted file
+ls   # no file there
+git status     # (green) deleted: hipster.txt
+git reset HEAD hipster.txt     # Unstaged changes after reset" hipster.txt
+ls     # hipster.txt not there
+git status    # (red) deleted: hipster.txt
+git checkout -- hipster.txt 
+ls      # now back and see hipster.txt
+git status      # nothing to commit, working directory clean
+
+ls  # hipster.txt
+rm hipster.txt
+ls    # not there nopster.txt
+git status     #(red) delted: hipster.txt
+git add -A
+git status   # (green) delted: hipster.txt
+git commit         # edit Deleted hipster.txt file
+git status     # nothing to commit, working directory clean
+ls    # level1 dir
+rm -rf level1  # force delte dir, all file deleted in level1 dir
+git status 
+(red) deleted: level1/leve11.txt
+(red) deleted: level1/level2/level2.txt
+(red) deleted: level1/level2/level3/level3.txt
+git add -A    #  updated
+git status #
+(green) deleted: level1/leve11.txt
+(green) deleted: level1/level2/level2.txt
+(green) deleted: level1/level2/level3/level3.txt
+git commit -m "deleted level1 and all children"
+3 files changed, 9 deltions(-)
+delete mode.....
+delete mode ...
+delete mode ...
+git status  #  nothing to commit, working directory clean
+-------------------------
+--------------------
+GIT alias
+
+/Users/jason/projects/starter-web/
+git status  # clean working dir
+git log --all --graph --decoreate --oneline    # commit history
+git hist     # hist not found
+git config --global alias.hist "log --all --graph --decorate --oneline"
+git hist  # now found and show histroy details.
+
+vi ~/.gitconfig         # in this file hist command add (hist=log --all --decorate --oneline
+
+=============================================
+----------
+IGNORING UNWANTED files and folders
+
+Git Ignore Pattern Example
+vi .gitignore
+*.css
+*.java
+
+git status # Untracked files: 
+ls -al  # hiding files show
+git status # Untracked files: (red) .gitignore
+git add .gitignore
+git commit -m "This is ignore file"  
+
+touch abc.css aaa.java bbb.txt ccc.py ddd.txt
+git status # show untracked file: bbb.txt ccc.py ddd.txt (not show .java and .css, that means ignore)
+git add .   # move only bbb.txt ccc.py ddd.txt files to staging area
+git status   # add only bbb.txt ccc.py ddd.txt files to staging area
+git commit -m "ignore css and java files"
+git status   # nothing to commit, working directory clean
+git log # show details with commit id
+git show latest commit id # show code there
+when againg touch ranjit.java # git status then show working dir clean (not show)
+again touch sanjay.txt # git status then show this sanjay.txt file as untracked
+git log -1  # show only latest commit id
+git log -2  # show only last two commit id
+git log --oneline   # show only all commit id
+git log --grep "ignore" # show only ignore related commit id
+
+
+********comapring between WORKING DIRECTORY and STAGING area as below********
+
+git status # 
+(green) modified: README.md
+(red) modified: README.md
+
+git diff # show difference between two files or two commit id
+git difftool    #  show more redable forvi in seprate way difference last comment version between STAGING AREA and WORKING DIR of README.md files
+
+**********comparing between WORKING DIRECTORY and GIT REPOSITORY last commit*******
+
+git status # 
+(green) modified: README.md
+(red) modified: README.md
+
+git diff HEAD .   # show difference between last commited README.md files and working dir README.md (edited)
+git difftool HEAD    # show more redable forvi in seprate way difference last commit version between GIT REPOSITORY HEAD and WORKING DIR.
+
+**********comparing STAGING AREA and GIT REPOSITORY last commit*************
+
+git diff --staged HEAD         #  comparing stage area to head.(showing last commit comment in both staging area and git repository.
+git difftool --staged HEAD   #  showing last commit comment detail in both staging area and git repository in seprate redable forvi.
+**********Limitin comparing to ONE FILE***************
+
+ls  # README.md and simple.html
+vi simple.html       # Edit some html file
+git status      #
+
+(green) modified: README.md
+(red) modified : simple.html
+git status  # show difference details of both files (README.md and simple.html)
+git diff -- README.md     # showing last commit comment in both README.md and simple.html
+git difftool -- README.md   # showing last commit comment in both STAGING and WORKING DIR
+
+********comparing between commit *********
+git log --oneline  # history commit details
+
+git diff commit_id HEAD
+git diff HEAD HEAD^     # show commit comment details head and head -1 details. (git repository level)
+git diff commit_id_1 and commit_id 2  # show commit comment details between both commit id.(git repository level)
+git difftool commit_id1 and commit_id 2  # show readable forvi between two commit id  (git repository level)
+git difftool 22c2891 b196780 # showing commit details in redable forvi as seprate in both commit id. (git repository level)
+
+**********comparing Between Local and Remote Master branch************
+git diff master origin/master    # showing commit comment details in both local and remote repository
+git difftool master origin/master    # showing commit comment details in both master (local) and origin master (github)
+
++++++++++++++++ below BRANCHING +++++++++++
+
+/Users/training/projects/starter-web
+git log --online  #  show all commit id line wise
+git branch  # show all branch (current branch which is indicating by *, which is master)
+git status  # nothing to commit, working directory clean
+git branch -a  # List all branches (local and remote)
+git branch mynewbranch # to create new branch (first time copy all files and commit details to new branches)
+git branch -a  # List all branches (local and remote)
+git checkout mynewbranch  # now switched mynewbranch and also copy all files from master to mynewbranch, but only for first time
+git branch -a # List all branches (local and remote)
+git log --oneline --decorate  # now HEAD is on mynewbranch
+git checkout master    (switched to branch "master") 
+git branch -m mynewbranch newbranch # rename branch name
+git branch -a       # show now newbranch
+git branch -D mynewbranch # to delete newbranch (-D for force delete)
+git branch -a # List all branches (local and remote)
+git branch -d title-change # branch deleted  # if this branch not merged then got error if delete.
+
+if i create any file in one current branch, it will be refelected into all branches until commit. once commit in current branch then not refelected into other branches.
+
+If i swithched in branch1. and git log --online then showing all commit line is there of both branch (only till switched. but after switched, if any commited in other branch then not show those commitid there ). git ls then showing all files is there of both branch (first time only).
+git push origin master # pushed in git hub.
+
+========================================
+MERGE branch  (merge only in same region):
+Once the developer has finished his code/feature on his branch, the code will have to be combined with the master branch. This can be done using two ways:  (merge and rebase)
+
+You can't Merge branches of different Repository (means different country branches)
+We use pulling mechanism to merge branches.
+
+# All files show in each other branch till not commit. After commit, files show in only same branch, not show in other branches.
+
+Note: Git merge command used only on remote/master branches. And when use merge then history of the branch does not change OR Existing branches are not changed in any way.  it creates new commit ID in front of older commit ID. And this new commit id is isolated from another branches.
+
+Execute on master branch always, git merge <source-branch> 
+
+mkdir merge-test ; cd merge-test ; git init
+pwd # /Users/training/projects/merge-test
+git status # nothing to commit, working directory clean
+git branch # master branch
+vi humans.txt # edit some line
+git status 	# (red) modified: humans.txt
+git add .
+git commit -m "first commit humans"
+touch abc.txt
+git add .
+git commit -m "second commit abc"
+
+git checkout -b branch1     # created new branch and switched to branch1 branch  
+vi README.md       # edit some line.
+git status       # (red) modified: README.md
+git commit -am "Third commit README"
+touch xyz.txt
+git add .
+git commit -m " fourth commit xyz"
+git log --graph --pretty=oneline       # showing all commit details 
+git branch # show all and current branch name
+
+git checkout master              # swithched to master
+ls         # abc.txt, humans.txt
+git logs        # found first and second commit
+vi 5.txt
+git add .
+git commit -m "fifth commit 5.txt"
+git log  --graph --pretty=oneline
+git logs        # found first, second and fifth commit 
+
+git merge branch1  -m "Merging between master and branch1"            # merge data from source branch1 to current target branch.
+ls       # found all files of both branches.   (humans.txt, abc.txt, README.md, xyz.txt, 5.txt) 
+
+git log  --graph --pretty=oneline    # showing all commit ID, including merge commit ID also of both branches in master branch, because merged branch.
+
+* Merging between master and branch1
+|\
+| * fourth commit xyz
+| * Third commit README
+* | fifth commit 5.txt	
+|/
+* second commit abc
+* first commit humans
+
+
+=========================================
+
+Git Conflicting Mergs AND resolutions
+
+1st secnario :
+if same file name in different branches and totaly different content exist in same filename then if i try to merge branches then git got merge conflict. to resolve this using vi file name and edit which line is in first line and which line is in last line and save.
+
+if same file name in both branch but if atleast initiall code is same in both branch files then in this case merge will not conflict occur and will be merge in both branch file, because git will understand sequence of line of both branch file. 
+
+2nd scenario:
+We try to merge two branches, which have same file updated by two different developers.
+# branch/devloper A,  devlope below code
+main()
+{
+function()
+{
+//initial code
+}
+function2()
+{     // devloper A code
+}
+
+# branch/devloper B,  devlope below code
+main()
+{
+function()
+{
+//initial code
+}
+function3()
+{     // devloper B code
+}
+
+mkdir merge-conflict ; cd merge-conflict ; git init
+(master branch)
+vi function.c    # initial code      (write)
+git add .
+git commit -m "initial code"
+git branch dev1
+git branch dev2
+
+git checkout dev1           # first time autoamticaly copy code into dev1 branch
+vi function.c
+initial code              # already this code
+function1                 # edit this
+git add .
+git commit -m "dev1 changes"
+
+git checkout master
+vi function.c
+initial code         # already this code
+git merge dev1       # now merged without any issues.
+cat function.c
+initial code
+function1
+
+git checkout dev2
+cat function.c
+initial code
+vi function.c
+initial code
+function2           #edited
+git add .
+git commit -m "dev2 changes"
+
+git checkout master        
+cat function.c
+initial code
+function1
+
+git merge dev2       # getting merge conflict error (because git not understand which function is in first line and which is in second line)
+git status           # (red) both modified function.c
+
+git mergetool             # tool is used for resolved conflict issues
+# opend in graphically editing mode so will edit like move line in sequence order and save file function.c.
+ls     # found two files one is original merge issues file and another file is corrected edited file.
+function.c, function.c.orig
+
+cat function.c          # this one is corrected edited file
+initial code
+function1
+function2
+
+git status     # modified in staged (green)
+git commit -m "merges changes"
+
+# got merge conflict get issue incase another branch some code is modified. and will try to merge.
+------------------  another below merge conflict example
+
+/Users/training/projects/starter-web
+git status # nothing to commit, working dir clean
+git branch   # *master and branch1  (i am on master branch right now)
+ls  # 
+vi rajputfile
+hello rajput
+git add .
+git commit -m "first commit before conflict"
+
+git checkout branch1 #  switched into branch1  (now i am on branch1 right now)
+vi rajputfile
+hi rajput
+
+git add .
+git commit -m "commit from master"
+
+git branch # *branch1 and master
+git checkout master  #  now switched into master branch
+git branch  # *master and  branch1
+
+git merge branch1  # NOW showing merge conflict in rajput file. (git not understand which line is up and which line down)
+
+vi rajputfile  # now showing both file content there, so EDIT file and arrenge line as per requirement, and now RESOLVED conflict
+or git mergetool : is used for resolve merge conflict issues.
+
+git status  #
+git add .
+git commit -m "resolved conflict now"
+git log --oneline  # showing all commit line details for current branch.
+
+# git push origin master
+===========================
+
+GIT REBASHING:  In Git, there is two command to merge branches: the merge and the rebase. They are designed to integrate changes from multiple branches 
+into one. 
+
+* Rebase command will used on local branches only, keep remember this. 
+since, it is a local branch, you would want a cleaner or linear history, you decide to use git rebase  ( git rebase <source branch> .
+After a rebase, the commit was "rebased" from the first commit to the next commit. And if git log then show linear history, without branches.
+
+* Does not create any new commit ID and we get much cleaner and linear project hostory.
+* Moves the entire feature branch to begin on the top of the master branch.
+* The destination branch commit is pulled from "base" and "rebase" on the latest commit on the source branch. 
+* Re-write the project history.
+
+Git rebase command execute only on other branch (not master branch)  git rebase <master branch>. And git rebase is merge from remote branch to the local 
+branches.
+
+mkdir rebase-test ; cd rebase-test ; git init 
+git checkout master #  switched into master branch.
+vi m1.txt      # edit ALL my students!
+git status # (Red) modified: humans.txt
+git add .
+git commit -m "1st commit on master"
+
+git checkout -b myfeature  # branch created and switched into myfeature branch.
+touch m2.txt
+git add .
+git commit -m "first commit in myfeature ."
+git status   # should be working directory clean
+git log --oneline --decorate --all --graph # show commit details.
+
+git checkout master #
+touch m3.txt
+git add .
+git commit -m "2nd commit on master"
+git log         # two commit  first and second commit)
+
+git checkout myfeature
+got log        # 1st commit master and 1st commit myfeature
+
+git rebase master   # below msg show
+
+First, rewinding head to replay your work on top of it..
+Applying: 1st in test 
+ls        #  m1.txt, m2.txt and m3.txt
+
+git log --graph --pretty=oneline #    below is linear commit hostory
+
+* first commit in myfeature
+* 2nd commit on master
+* 1st commit on master
+
+touch m4.txt
+git add .
+git commit -m "2nd in myfeature"
+
+git checkout master                         # master is remote branch use merge command
+git log --graph --pretty=oneline # 
+
+* 2nd commit on master
+* 1st commit on master
+git merge myfeature                  # master branch is remote branch and use merge command only.
+
+* 2nd in myfeature
+* first commit in myfeature
+* 2nd commit on master
+* 1st commit on master
+
+------------ END
+
+-------------------------
+git Rebase Conflict
+
+(current master branch)
+vi human.txt    # edit some line.
+git commit -am "master: prior to rebase conflict"
+git checkout -b rebase-conflict        # branch created and swithched to this.
+
+Now branch rebase-conflict
+vi index.html  #
+<title> Rebase Demo </title>          changed to "Rebase Conflict Demo"
+href="apple-touch-icon.png"           changed to href="apple-touch-icon2.png"
+modernizr-2.8.3-respond               changed to modernizr-2.8.4-respond
+
+git commit -am "rebase-conflict -3 changes - index.html"
+
+git checkout master
+
+vi index.html  #
+<title> Rebase Demo </title>          changed to "Demonstration of Rebase Conflict"
+href="apple-touch-icon.png"           changed to href="apple-touch-icon5.png"
+modernizr-2.8.3-respond               changed to modernizr-2.8.6-respond
+
+git commit -am "master -3 conflicting changes - index.html"
+git log --oneline --decorate --graph --all    # show both comit details.
+git checkout rebase-conflict         #switched
+git rebase master  #  show conflict in index.html
+
+rease prompt $ git rebase --abort  
+               git rebase master         # now resolved conflict
+               git mergetool   #     opened graphic way changes details in 3 part (original master file, original rebase-conflict file and changes file)
+          and need to decide here, which data need to keep it using color mark maping. So edited and save it and exist.
+
+git status         # show all confilict has been fixed.
+git rebase --continue     # show Applying : rebase-conflict -3 changes - index.html
+
+vi index.html    # as per decided changed here.
+Rebase Demo
+apple-touch-icon2.png
+modernizr-2.8.6-respond
+
+git log --oneline --decorate --graph --all  #
+git checkout master
+git merge rebase-conflict     # now merged 1 file
+git log --oneline --decorate --graph --all  #  both branch merged and HEAD is on same lavel  index.html
+
+git branch -d rebase-conflict        # deleted branch.
+
+--------End rebase conflict
+# git pull --rebase          #
+---------------------
+pull with rebase
+/Users/training/projects/starter-web/
+git status # on branch master
+git pull origin master #  *branch  master   -> FETCH_HEAD
+git push origin master   # file uploaded on github.com online  (git push origin +master ,+ is for force push )
+git status # nothing to commit, working directory clean.
+vi simple.html   # edit some line.
+git commit -am " local: updating simple.html copyright notice."
+git status # nothing to commit, working dir clean
+IN GIT HUB. com # edit index.html    
+online (commit changes) remote: minor extended description
+
+git status # nothing to commit,
+git fetch origin master # -> FETCH_HEAD
+git status # 
+git pull --rebase origin master  # -> FETCH-HEAD
+# Git pull rebase is a method of combining your local unpublished changes with the latest published changes on your remote
+
+git status #
+git log --oneline --ALL --graph --decorate    # origin master origin head
+-----------------
+==============================
+GIT  STASHING  
+
+stashing is temprory storage area in local repository. some time customer ask to stop current writing code and need to write another code in working 
+dir in same branch, in this case need first current writing code stop writing and ( still not add and commited code), so we will save code in stashing 
+in same branch for some time without commiting the code, so working dir will be clean and hide code for other developer and start write in another 
+new code in same branch. After complete current work, we will fetch preview code from stashing memory and start working continusly in working directory 
+then add and commit. 
+
+before commit, all code refelcted into all branches and generate confusion due to code is mixup with all branches. to remvoe this confusion will use 
+stashing to save uncommit code.
+
+
+(simple stash example)
+
+/Users/training/projects/starter-web
+git status # nothing to commit, working directory clean
+touch first.html
+git add .
+git commit -m " first file"
+git branch  # to check branch
+
+vi first.html # edit and writing some code " first code for client" .suddenly need to work in another client code.
+git status # (red) modified: simple.html  (indicating M- modify file, A- Adding file)
+git stash   # current first.html content Saved in stashing, only file name exist in current dir and saved index wise and working dir clean. And Now this code is not refelecting into all branches. 
+git stash -u           # save untracked file also.
+git stash list    # list all stash files  stash@{0}
+cat fist.html   # now empty this file
+vi first.html      # start work and write "second code for client" . if again need work on another code then save in stash again.
+git stash  # again code saved in stash. working dir clean
+cat first.html   # again file is empty.
+git stash list   # now show stash@{0},stash@{1} first.html.     {0} always last latest code there
+vi first.html   # write code " for third client"
+git add .
+git status # 
+git commit -am "third code for client"  # now saved in local repository
+
+git status # nothing to commit, working directory clean
+git stash apply stash@{0} # if need again work in previw file code whatever in stash. so pull from stashing using git stash apply{0} # latest file pull
+or git stash pop            # same as fetch preview code from stash.
+now first.html file content " second code for client" is there and start work in this file.
+git add .
+git commit -m " this is first file"    # now GOT STASH CONFLICT
+
+STASH conflict   # if file name is same in stash and working dir and try to pull from stash to working dir then got stash conflict. if cat file 
+then will show both previw content and current content, so in this case i need to vi first.html and delete previw commit content to solved conflict. 
+( if file name is different then no conflict).
+
+git commit -m " this is first file"   # now saved in local repository
+
+git status # nothing to commit, working directory clean
+git log --oneline   # list all commit line
+git log show   commit id  # show code there
+git stash list    # exit two stash list  stash@{0}: stash@{1}: 
+
+git stash clear   # stash clear.
+git stash drop  # Dropped  refs/stash@{0}
+
+#git stash apply
+#git stash drop
+#git stash list
+#git stash save
+#git stash add file_name        (add in stash)
+#git stash pop   (retrive file from stash)
+=================
+
+GIT RESET     (Work Before commit)
+
+Git Reset is a powerful command that is used to go to preview version of code. 
+Using reset delete file from both staging area and working directory at a time also using (git reset --hard)
+
+Note: every commit create a folder in git internally. if use reset then remove the folder.
+
+git reset --soft: commit id will be delted but changes preserved, and come into stage area (green).
+git reset --hard: commit id will be deleted as well content also deleted but at local repository (completely destroy)
+git reset --mix:  file come at unstaged/working area(red) to edit purpose
+or git reset commit_id
+
+vi abc.txt  # this is first line
+git add .
+git commit -m "abc first commit"
+vi abc.txt   # add second line"
+git add .
+git commit -m "second commit"
+git log --oneline     # list all commit ID  (suppose i want to remove second commit, keep only first commit)
+
+git reset --soft first_commitID       # now removed second comit id as well data related to this commit also; 
+git log --oneline       # Now HEAD come into first commit;
+git status          # changes to be commited modifed: abc.txt(green)       (now at staged area)
+git commit -m "final commit"
+
+cat abc.txt       # now only first line is there     (remove second line awell second commit id)
+git push
+
+-------------
+git reset --hard  firs-commit_id  # Now HEAD is come at first-comit-id and completely destroy second_commit_id as well data related to this comit ID 
+from working/local dir also.   ( Note: removed at local repo only, But remote repo (github) second_commit_id and data is present)
+git log --oneline        # Now head is at first_commit_id
+git status             # nothing to commit, working dir clean.
+git push             # got error 
+git push origin +main          # + means forcely pushed to github.      (now removed second_commit_id and data to remote repo also, only firt_commit_id/data is there on remote repo.
+----------------------
+
+# git push origin --delete branch_1         # branch deleted on remote github.
+===================
+
+GIT REVERT  (work after commit) it revert into previw stat but file is present like undo
+
+git revert is used for if any code add and commited then again edit same file but by mistake wrong edited and again add and commited. now i want to undo 
+code/previw correct code. So i want to keep last second commit id only, not want to keep last first commit ID.
+The revert Command helps you undo/revert an last existing code into preview code and after reverted again commited automatically. 
+
+Note: whatever changed code using revert,it create another copy folder to keep this changed in git internally.
+
+
+vi revertfile  # write any line "shahipaneer"
+
+git add .
+git commit -m "This is first shahipaneer commit"  (after commit working dir clean)
+vi revertfile   # append write "mashroom"  for example by mistake wrong mashroom
+git add .
+git commit -m "this is mashroom commit"   # this is commited and now i want to revert previw, step as below
+git log  # show all commit there.
+cat revertfile  # both content is there "shahipaneer" "mashroom" , but now i want only shahipaneer, because by wrong insert mahsroom.
+git revert commitid (which will be mashroom commit id) # (mashroom data reverted but commit id is there so in future undo back)
+And now ask to enter new commit, so enter " wrong commit"
+cat revertfile   # now show only shahipaneer, so this is reverted (mashroom removed).
+git log --oneline   # show all commit id including "wrong commit"
+
+# if again we want preview code of "shahipaneer" "mashroom"
+git checkout commit_id           # now reverted and found code "shahipaneer" "mashroom"
+====================
+
+Suppose we want to build code till at particular commit ID, not whole
+git checkout commit_id           # Head comes at this commitID
+git tag stable commit_id       # make alias
+git push origin --tags          # push this code to till this tag on github.
+==========================
+git checkout --HEAD~1 file1        # recover deleted file in git.
+
+Webhook:
+
+vi webhook.rb        # api program
+require 'webrick'
+server = WEBrick::HTTPServer.new(:Port => ARGV.first)
+server.mount_proc '/' do |req, res|
+  puts req.body
+end
+
+trap 'INT' do
+  server.shutdown
+end
+server.start
+
+sudo apt install ruby -y
+ruby webserver.rb 9000       # executed and started on any port
+
+in EC2, configure security inbound rule Custom TCP : port 9000   anywhere    (need port enable)
+copy ec2 instance url      # http://ec2....:9000         (copy this)
+goto github > setting > webhook > URL : past this
+Content typ: application/json      and finally Add webhook
+
+Now edit any file, commit in GitHub then automatically exexute and app working fine.
+
+----------------------------
+how to remove untracked files.
+touch a.txt b.txt c.txt d.txt e.txt
+git status   # show untracked files
+git clean -n  # give warning to delete.
+git clean -f  # now deleted untracked files.
+ls   # now not exist untracked files.
+
+
+==========================================
+============================================
+GIT TAGGING
+
+tagging is used for suppose i need to reuse again and again in future on any particular commit. so tag him, to find easly.
+
+Tag Operation allows giving meaningful names to a specific Version in the repository.
+
+/Users/training/projects/starter-web
+git status # nothing to commit,working directory clean
+git log --oneline --decorate --graph --all  # it show history of all comment id
+
+git tag -a important -m "This is important commit"  commit_id    # commit id what make to tag.
+
+git log --oneline --decorate --graph --all   #  
+git tag  # list this tag "important"
+git show important  # showing every details here of this tag.
+git tag -d important  # deleted this tag.
+git tag    # nothin any tag list
+git log --oneline --decorate --graph --all  # remove tag details from there also.
+git tag       # list all tags
+# git push origin --tags      # pushed till this tag.
+===========================================
+
+Annotated Tags.
+/Users/training/project/starter-web
+git status # nothing to commit, woring dir clean
+git tag -a v-1.0  -m "message" commit id  # edit Realase 1.0 
+git tag --list    # v-1.0
+git log --oneline --graph --decorate --all # show history of commit.
+git show v-1.0
+-----------------
+comparing tag
+/Users/training/project/start-web
+git status # noting to commit,,,
+vi index.html # edit
+git commit -am    " Tweaking file"
+git log --oneline --all --decorate --graph # show all history of commit.
+git tag -a  v-a.a -m d7f5ed1           # Realase 1.1
+vi simple.html  # edit comparing tag
+git commit -am "Updating for tag 1.1"
+git commit --amend # edit Updating tag 1.2     # to fix broken commit.
+git tag v-1.2 -m "Release 1.2"  commit id  #
+git tag   # v-1.0, v-1.1, vi1.2
+git log --oneline --decorate --graph --all  #show all history of commit
+(HEAD, tag v-1.2, master Updating for tag 1.2
+(tag: v-1.1) Tweaking file for tagging example
+(tag: v-1.0, orign/master, origin/HEAD
+git diff v-1.0 v-1.2   # show differences what edited
+
+(red) Adding title for stash example
+(green) Title for Tagging Example
+in both file (a/simple.html, b/simple.html)
+(red) updating Title for stash Branch Ecample
+(green) Updating Title for Tagging compae Example
+git difftool v-1.0,v-1.2  # show difference in both seprate box
+------------------------
+Tagging a specific Commit
+/Users/training/projects/starter-web
+git status # nothin to commit,
+git log --oneline --graph --decorate --all # show all history of commit.
+git tag -a v-0.9-beta 96ef75b # edit Beta Release
+git log --oneline --graph --decorate --all # show all history of commit.
+git tag -a v-0.8-alpha ab0d621 # edit Alpha Release 0.8
+git log --oneline --graph --decorate --all # show all history of commit.
+------------------------------
+Updating tags
+git status # nothing to commit,....
+git log --oneline --graph --decorate --all # show all history of commit.  (HEAD is always on the last commit)
+git tag -a v-0.8-alpha -f bd35d46   #Alpha Releas 0.8 (f (FORCE) bd35d46 COMMIT ID)
+git log --oneline --graph --decorate --all # show all history of commit.
+-------------------------------
+Using Tags with GitHub
+/Users/training/projects/starter-web
+git status      # nothing to commit, working dir clean
+git tag --list # show list tag name
+v-0.8-alpha
+v-0.9-beta
+v-1.0
+v-1.1
+v-1.2
+git log --oneline --decorate --graph --all
+(show each tag associate with comment)
+git push origin v-0.9-beta # (v-0.9-beta tagname)
+(got to GitHub and click on tag and will show tag name)
+git push origin v-1.1   # got to GitHub.com and in Tag menu will show tag name v-1.1
+git push origin master --tags   # push all tags to GitHub.com in case any tag missing.
+git tag --list   # show below tag name
+v-0.8-alpha
+v-0.9-beta
+v-1.0
+v-1.1
+v-1.2
+git push origin :v-0.8-alpha  # below info
+
+============================
+HISTORY
+git reset -- files -> files come from HISTORY(local repo) to STAGING AREA  (git reflog - it show reset and commit details.)
+git checkout -- files -> files come from STAGING AREA to WORKING DIR
+--------
+git add files -> files add from WORKING DIR to STAGING AREA
+git commit     -> files add from STAGING AREA to HISTORY (local repo).
+============================
+Both fetch and pull are used to download data from remote repository.
+
+git fetch origin -  Fetch only download the new data from the remote repository to the local repository.
+and only used to get the data to the local repository but the data is not merged in the working repository
+
+git pull origin master - Git pull is used to update the working directory with the latest changes from the remote server.
+Git pull is used to get the data to the local repository and the data is merged in the working repository.
+
+git clone REMOTEURL foo - create a new git repository by copying and existing one located at the url you specify.
+------------
+
+A fork is a copy of a repository. Forking a repository allows you to freely expirement with changes without affecting the original project.
+
+why use git pull --rebase origin master ##  Below steps check
+
+Alice creates topic branch A, and works on it
+Bob creates unrelated topic branch B, and works on it
+Alice does git checkout master && git pull. Master is already up to date.
+Bob does git checkout master && git pull. Master is already up to date.
+Alice does git merge topic-branch-A
+Bob does git merge topic-branch-B
+Bob does git push origin master before Alice
+Alice does git push origin master, which is rejected because it's not a fast-forward merge.
+Alice looks at origin/master's log, and sees that the commit is unrelated to hers.
+Alice does git pull --rebase origin master
+
+Alice's merge commit is unwound, Bob's commit is pulled, and Alice's commit is applied after Bob's commit.
+Alice does git push origin master, and everyone is happy they don't have to read a useless merge commit when they look at the logs in the future.

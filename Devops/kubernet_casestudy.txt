@@ -1,0 +1,158 @@
+---------------------Kubernetes ---------------------------------
+
+we need 
+         1 ubuntu 20.04 ami , t2.medium , sg: all traffic.
+         1 ubuntu 20.04 ami, t2.micro , sg: all traffic.
+On Master & Worker node(s)
+sudo su
+apt-get update
+    apt-get install docker.io -y
+    service docker restart
+    curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg |sudo apt-key add -
+    echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" >/etc/apt/sources.list.d/kubernetes.list
+    apt-get update
+    apt install kubeadm=1.21.0-00 kubectl=1.21.0-00 kubelet=1.21.0-00 -y  
+
+--------------------------------
+ON master NODE:
+kubeadm init --pod-network-cidr=192.168.0.0/16
+//copy the token and paste in the worker node.
+
+  exit      # to become the normal user
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+  # to get the join command(if lost previously)
+  kubeadm token create --print-join-command         # get join command and execute on worker node
+
+kubeadm join 172.31.33.238:6443 --token f30znn.jml5rn3v6rc0qeo1 --discovery-token-ca-cert-hash sha256:414b133e6fc8968a3cce729bea370b337ddbf30af33c6cecc983d3389aa7a971
+
+curl https://docs.projectcalico.org/manifests/calico.yaml -O
+
+kubectl apply -f calico.yaml
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.49.0/deploy/static/provider/baremetal/deploy.yaml
+
+devopsintellipaat/application1_29_jan     # this image not working
+
+
+apache.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-deployment
+  labels:
+    app: apache
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: apache
+  template:
+    metadata:
+      labels:
+        app: apache
+    spec:
+      containers:
+      - name: apache
+        image: ubuntu/apache2
+        ports:
+        - containerPort: 80
+        
+kubectl create -f apache.yml   
+ 
+custom.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-deployment
+  labels:
+    app: custom
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: custom
+  template:
+    metadata:
+      labels:
+        app: custom
+    spec:
+      containers:
+      - name: custom
+        image: devopsintellipaat/kubernetese_28_img
+        ports:
+        - containerPort: 80
+
+
+docker pull devopsintellipaat/kubernetese_28_img
+# to get information of the ip of pods
+kubectl get pods -owide 
+# to create the deployment.
+kubectl create -f custom.yml
+
+#to create a service
+
+kubectl create service clusterip apache --tcp=80:80       
+kubectl create service clusterip custom --tcp=80:80
+
+vi ingress.yml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minimal-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /apache             # service name
+        pathType: Prefix
+        backend:
+          service:
+            name: apache
+            port:
+              number: 80
+      - path: /custom            # service name
+        pathType: Prefix
+        backend:
+          service:
+            name: custom
+            port:
+              number: 80
+
+
+Kubectl get svc –all-namespaces
+URL:masterPublicIP:NodePort/apache             # working fine
+http://3.110.174.11:31279/apache
+=============================================== END proj
+
+ingress on minikube
+minikube addons enable ingress
+kubectl get all -n kubernetes-dashboard
+vi ingress.yml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  namespace: kubernetes-dashboard
+spec:
+  rules:
+  - host: dashboard.com
+    http:
+      paths:
+      - backend:
+          serviceName: kubernetes-dashboard
+          servicePort: 80
+
+kubectl apply -f ingress.yml
+kubectl get ingress -n kubernetes-dashboard     # ready and output hosts and address also visible
+vi /etc/hosts
+ip dashboard.com          # same as above output
+
+URL: dashboard.com          # working fine

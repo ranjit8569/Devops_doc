@@ -1,0 +1,165 @@
+======= Minikube
+ec2 ubuntu 18.04  t2midium
+sudo su
+apt update && apt -y install docker.io
+
+install Kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x ./kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
+
+
+install Minikube
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+
+apt install conntrack
+minikube start --vm-driver=none 
+minikube status
+kubectl version
+kubectl get nodes
+kubectl describe node nod_name
+
+============ Setup kubernetes cluster master/worker node
+
+Master Node's minimum required 2 CPU, 4 GB RAM.
+
+Create Ubuntu Server 16.04 EC2 instance. (while creating, take t2 medium for master) can take 3 instance together.
+connect putty of 3 ec2. (login as ubuntu)
+
+# Run below all commands on all Master and Worker Nodes.
+
+sudo su
+apt-get update
+apt-get install apt-transport-https
+
+apt install docker.io -y
+docker --version
+systemctl start docker
+systemctl enable docker
+
+#below cmmand for communicate entire cluster
+sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg| sudo apt-key add     
+
+nano /etc/apt/sources.list.d/kubernetes.list    ## save below first command as it is. (for save ctrl+x and captical Y, Enter)
+deb http://apt.kubernetes.io/ kubernetes-xenial main
+
+apt-get update
+apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+------------------------------
+
+EXECUTE BELOW COMMAND (IN MASTER Node) only
+kubeadm init         # output save on text file
+
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+
+# Below command execute on all worker Node.  (so Nodes will be joine from Cluster/master Node).
+
+kubeadm join 172.31.6.165:6443 --token kl9fhu.co2n90v3rxtqllrs --discovery-token-ca-cert-hash sha256:b0f8003d23dbf445e0132a53d7aa1922bdef8d553d9eca06e65c928322b3e7c0
+
+GO TO MASTER AND RUN THIS COMMAND
+kubectl get nodes      # list all connect Node.
+
+==================== install Ansible master/node server
+
+Create 3 EC2 linux instance and connect putty and sudo su
+wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm   # to download rpm package
+ls  # found epel-release-latest-7.noarch.rpm
+yum install epel-release-latest-7.noarch.rpm    # many software there in this package
+yum update -y
+
+yum install git python python-level python-pip openssl ansible        ######### Ansible Server
+ansible --version   # 2.9.16
+
+****** vi /etc/ansible/hosts
+[demo]   # group name
+private or public ip
+
+****** vi /etc/ansible/ansible.cfg          # OR ansible-config init --disabled > ansible.cfg ; use for silent mode, vi ansible.cfg (host_key_checking=False)
+inventory = /etc/ansible/hosts     # uncomment
+sudo_user = root   # uncomment
+
+adduser ansible  # user created
+passwd ansible   # enter pass    # Ranjit#123
+
+sudo su
+visudo   # to give sudo priveleged  (first search root)
+ansible ALL=(ALL) NOPASSWD: ALL
+
+su ansible
+------
+######## another instance, connect putty and sudo su         ######### Node 1
+adduser ansible
+passwd ansible   # enter password
+
+sudo su
+visudo   # to give sudo priveleged  (first search root)
+ansible ALL=(ALL) NOPASSWD: ALL
+
+vi /etc/ssh/sshd_config 
+PermitRootLogin yes  # Uncomment
+PasswordAuthentication yes  # Uncomment
+PasswordAuthentication no  # Comment
+
+service sshd restart
+su - ansible
+------
+######## another instance, connect putty and sudo su        ######### Node 2
+adduser ansible
+passwd ansible   # enter password     Ranjit#123
+
+sudo su
+visudo   # to give sudo priveleged  (first search root)
+ansible ALL=(ALL) NOPASSWD: ALL
+
+vi /etc/ssh/sshd_config 
+PermitRootLogin yes  # Uncomment
+PasswordAuthentication yes  # Uncomment
+PasswordAuthentication no  # Comment
+
+service sshd restart
+su - ansible
+--------------------------------------
+Go to ansible server                                ########## Ansible Server
+sudo yum install httpd -y  # Now installed  (for testing install or not)
+su - ansible   
+ssh 172.31.41.240   # permission denied
+exit
+vi /etc/ssh/sshd_config 
+PermitRootLogin yes  # Uncomment
+PasswordAuthentication yes  # Uncomment
+PasswordAuthentication no  # Comment
+
+service sshd restart
+su - ansible
+ssh 172.31.41.240 (private ip)  # enter pass, now connected node1.
+exit
+ssh 172.31.42.228 (private ip)  # enter pass, now connected node2.
+exit
+
+su  ansible    # from ansible server
+ssh-keygen   # enter...... (password less)
+ls -a  			# .ssh file exit
+cd .ssh/ ; ls # id_rsa id_rsa_pub
+ssh-copy-id ansible@10.0.0.122  (node1)   # enter password
+ssh-copy-id ansible@privateIP  (node2)   # enter password
+cd
+ssh ansible@privateIP (node1)  # now connected without pass
+
+============================= Docker installation
+
+Create linux EC2 machine ( Linux AMI 2018 SSD volume Type (include Docker), second no) and login using ec2-user . 
+sudo su
+yum update -y   # update latest.
+yum install docker -y  #
+service docker status  # show stoped
+service docker start #
+docker --version        # Docker version 20.10.7.
+docker info  # show most configuration values for the engine and as well container details.
+docker --help          # to check docker modules
+===============
+
+

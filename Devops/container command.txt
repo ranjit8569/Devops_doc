@@ -1,0 +1,282 @@
+docker container attach	Attach local standard input, output, and error streams to a running container
+docker container commit	Create a new image from a container’s changes
+docker container cp	Copy files/folders between a container and the local filesystem
+docker container create	Create a new container
+docker container diff	Inspect changes to files or directories on a container’s filesystem
+docker container exec	Run a command in a running container
+docker container export	Export a container’s filesystem as a tar archive
+docker container inspect	Display detailed information on one or more containers
+docker container kill	Kill one or more running containers
+docker container logs	Fetch the logs of a container
+docker container ls	List containers
+docker container pause	Pause all processes within one or more containers
+docker container port	List port mappings or a specific mapping for the container
+docker container prune	Remove all stopped containers
+docker container rename	Rename a container
+docker container restart	Restart one or more containers
+docker container rm	Remove one or more containers
+docker container run	Run a command in a new container
+docker container start	Start one or more stopped containers
+docker container stats	Display a live stream of container(s) resource usage statistics
+docker container stop	Stop one or more running containers
+docker container top	Display the running processes of a container
+docker container unpause	Unpause all processes within one or more containers
+docker container update	Update configuration of one or more containers
+docker container wait	Block until one or more containers stop, then print their exit codes
+========================
+Q 1. How to communicate between two container through network.
+
+Containers can join multiple networks, By default a container will be created with one network attached. If no network is specified then this will be the default docker0 network. After the container has been created more networks can be attached to a container using the docker network connect command.
+
+$ docker network create bluenet
+$ docker network create rednet
+
+$ docker container run -itd --net bluenet --name c1 busybox sh     # busybox is image
+OR   # some time issu then use below code
+$ docker container create -it --net bluenet --name c1 busybox sh  # first network bluenet connect
+$ docker ps -a
+
+# Attached remaining network.
+$ docker network connect rednet c1     # now  rednet network attached to C1 container.  ( Now both network attached in container)
+
+$ docker container start c1      # if not container started.
+
+# Now verify that the running container is connected to multiple networks.
+
+$ docker container exec -it c1 bash         # prompt come in command mode. C1 is container name
+ifconfig
+=======================
+Q what is default network in docker    #  bridge network
+3. What are the important features of Docker?
+
+Here are the essential features of Docker:
+
+Easy Modeling
+Version control
+Placement/Affinity
+Application Agility
+Developer Productivity
+Operational Efficiencies
+
+5. What is Docker image?
+
+Docker image is the source of Docker container. In other words, Docker images are used to create containers. Images are created with the build command, and they’ll produce a container when started with run. Images are stored in a Docker registry such as registry.hub.docker.com because they can become quite large, images are designed to be composed of layers of other images, allowing a minimal amount of data to be sent when transferring images over the network.
+
+7. Explain Registries
+
+There are two types of registry is
+
+Public Registry
+Private Registry
+Docker's public registry is called Docker hub, which allows you to store images. In Docker hub, you can store millions of images.
+
+8. What command should you run to see all running container in Docker?
+
+$ docker ps
+9. Write the command to stop the docker container
+
+$ sudo docker stop container name
+10. What is the command to run the image as a container?
+
+$ sudo docker run -i -t alpine /bin/bash
+
+14. How can you monitor the docker in production environments?
+
+Docker states and Docker Events are used to monitoring docker in the production environment.
+
+15. What the states of Docker container?
+
+Important states of Docker container are:
+
+Running
+Paused
+Restarting
+Exited
+Stoped
+
+13. Explain Docker Swarm?
+
+Docker Swarm is native gathering for docker which helps you to a group of Docker hosts into a single and virtual docker host. It offers the standard docker application program interface.
+
+16. What is Docker hub?
+
+Docker hub is a cloud-based registry that which helps you to link to code repositories. It allows you to build, test, store your image in Docker cloud. You can also deploy the image to your host with the help of Docker hub.
+
+17. What is Virtualization?
+
+Virtualization is a method of logically dividing mainframes to allow multiple applications to run simultaneously.
+
+However, this scenario changed when companies and open source communities were able to offer a method of handling privileged instructions. It allows multiple OS to run simultaneously on a single x86 based system.
+
+19. Explain Docker object labels
+
+Docker object labels is a method for applying metadata to docker objects including, images, containers, volumes, network, swam nodes, and services.
+
+20. Write a Docker file to create and copy a directory and built it using python modules?
+
+FROM pyhton:2.7-slim
+
+WORKDIR /app
+
+COPY . /app
+
+docker build –tag
+
+21. Where the docker volumes are stored?
+
+You need to navigate:
+
+ /var/lib/docker/volumes
+
+22. List out some important advanced docker commands
+
+Command	Description
+docker info	Information Command
+docker pull	Download an image
+docker stats	Container information
+Docker images	List of images downloaded
+
+23. How does communication happen between Docker client and Docker Daemon?
+
+You can communicate between Docker client and Docker Daemon with the combination of Rest API, socket.IO, and TCP.
+
+24. Explain Implementation method of Continuous Integration(CI) and Continues Development (CD) in Docker?
+
+You need to do the following things:
+
+Runs Jenkins on docker
+You can run integration tests in Jenkins using docker-compose
+
+25. What are the command to control Docker with Systemd?
+
+systemctl start/stop docker
+service docker start/stop
+
+sudo systemctl enable docker
+
+docker ps        # if any error come then below command use
+sudo usermode -aG docker jenkin  # jenkin is username
+
+26. How to use JSON instead of YAML compose file?
+
+docker-compose -f docker-compose.json up
+
+27. What is the command you need to give to push the new image to Docker registry?
+
+docker push myorg/img
+28. How to include code with copy/add or volumes?
+
+In docker file, we need to use COPY or ADD directive. This is useful to relocate code. However, we should use a volume if we want to make changes.
+
+30. What is the method for creating a Docker container?
+
+You can use any of the specific Docker images for creating a Docker container using the below command.
+
+docker run -t -i command name
+
+31. What are the steps for the Docker container life cycle?
+
+Below are the steps for Docker life cycle:
+
+Pull
+Build
+Run
+32. How can you run multiple containers using a single service?
+
+By using docker-compose, you can run multiple containers using a single service. All docker-compose files uses yaml language.
+
+32. What is CNM?.
+ 
+Container Network Module
+
+35. Can you lose data when the container exits?
+
+No, any data that your application writes to disk get stored in container. The file system for the contain persists even after the container halts.
+
+36. What are a different kind of volume mount types available in Docker?
+
+Bind mounts- It can be stored anywhere on the host system
+
+39. What are Docker Namespaces?
+
+The Namespace in Docker is a technique which offers isolated workspaces called the Container. Namespaces also offer a layer of isolation for the Docker containers.
+
+40. What are the three components of Docker Architecture
+
+Client
+Docker-Host
+Registry
+
+41. What is client?
+
+Docker provides Command Line Interface tools to the client to interact with Docker daemon.
+
+42. What is the purpose of Docker_Host?
+
+It contains container, images, and Docker daemon. It offers a complete environment to execute and run your application.
+
+43. How do I run multiple copies of Compose file on the same host?
+
+Compose uses the project name which allows you to create unique identifiers for all of a project's containers and other resources. To run multiple copies of a project, set a custom project name using the -a command-line option or using COMPOSE_PROJECT_NAME environment variable.
+=========================
+What does the volume parameter do in a docker run command?
+docker run -v nginx-sites:/etc/nginx/sites-available nginx
+What is the use of the docker save and docker load commands?
+docker save -o <container-export-path>.tar <container-name>  # export image
+docker load -i <container-path>.tar             # import image also
+What is the default Docker network driver, and how can you change it when running a Docker image?
+Docker provides different network drivers like bridge, host, overlay, and macvlan. bridge is the default.
+Docker network create # network create
+What is a Docker image? What is a Docker image registry?
+A Docker image consists of many layers. Each layer corresponds to a command in an image’s Dockerfile. This image provides isolation for an application when you run a Docker image as a container.
+
+You can run many containers from a single Docker image. Docker images can be built from a Dockerfile.
+
+A Docker image registry is a storage area for Docker images. You can get images from them instead of building them.
+
+An image registry is either public or private. The best-known public registry is Docker Hub.
+
+What is container orchestration and why should we use it?
+the docker command alone does not suffice. You will face many problems automating scaling and health checks for containers. In this case, software teams use container orchestration tools like Kubernetes
+
+What is Docker Swarm and which network driver should be used with it?
+Docker Swarm is an open-source container orchestration tool that is integrated with the Docker engine and CLI. If you want to use Docker Swarm, you should use the overlay network driver. Using an overlay network enables the Swarm service by connecting multiple docker host daemons together.
+
+What is Docker Compose? What can it be used for?
+Docker Compose is a tool that lets you define multiple containers and their configurations via a YAML or JSON file.
+
+The most common use for Docker Compose is when your application has one or more dependencies, e.g., MySQL or Redis. Normally, during development, these dependencies are installed locally—a step that then needs re-doing when moving to a production setup. You can avoid these installation and configuration parts by using Docker Compose.
+
+Once set up, you can bring all of these containers/dependencies up and running with a single docker-compose up command.
+
+What are the most common instructions in Dockerfile? 
+Some of the common instructions in Dockerfile are as follows:
+
+FROM: We use FROM to set the base image for subsequent instructions. In every valid Dockerfile, FROM is the first instruction.
+LABEL: We use LABEL to organize our images as per project, module, licensing etc. We can also use LABEL to help in automation.
+In LABEL we specify a key value pair that can be later used for programmatically handling the Dockerfile.
+RUN: We use RUN command to execute any instructions in a new layer on top of the current image. With each RUN command we add something on top of the image and use it in subsequent steps in Dockerfile.
+CMD: We use CMD command to provide default values of an executing container. In a Dockerfile, if we include multiple CMD commands, then only the last instruction is used.
+
+Q15: What is the difference between Docker Image and Layer? 
+Image: A Docker image is built up from a series of read-only layers
+Layer: Each layer represents an instruction in the image’s Dockerfile.
+
+1. What is Docker?
+Docker is an open-source lightweight containerization technology.It allows you to automate the deployment of applications in lightweight and portable containers.
+2. What are the advantages of using Docker container?
+
+Here, are a major advantage of using Docker.
+
+Offers an efficient and easy initial set up
+Allows you to describe your application lifecycle in detail
+Simple configuration and interacts with Docker Compose.
+Documentation provides every bit of information.
+
+
+
+
+
+
+
+

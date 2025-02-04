@@ -1,0 +1,410 @@
+# There are two type of pipeline in Jenkins: Declarative and Scripted pipeline.
+Q. Which one pipeline we should use?:  Ans: Declarative pipeline
+
+Q. What is different between Declarative and scripted pipeline?
+a) Declarative start with pipeline{         But Scripted start with node{
+
+b) Declarative has code validation, if error found in any stage in pipeline then entire code failed.     But Scripted pipeline has not code validation as scripted follow, only error generate where which line has issue in stages.
+
+c) Declarative has conditional based statement, means suppose we have number of stages (block) we can skip any stage as requirement.    But Scripted pipeline has not any conditional statement. so can't skip stage.
+
+d) Declarative pipeline has option to Restarted from any stages as per required.           But in Scripted pipeline always Restarted from begining stage. As it has no this feture.
+
+
+Groovy is dynamic programing language(run time) and static programing language(compile time).
+
+# Below all job is pipeline
+
+pipeline{
+  agent any             # on which agent/machine code will run.
+        post {
+              always {
+                    emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+                     }
+             }
+  environment{
+     PATH=/opt/apache-maven-3.6.3/bin:$PATH     # env path where mvn is installed
+             }
+
+  triggers{                                      # crontab configured
+       pollSCM '*/5 * * * *'
+         
+    }
+  stages{
+          parallel {      # two block executed parallely.
+                stage('In Parallel 1') {
+                       steps {
+                                echo "In Parallel 1"
+                            }
+                        }
+                stage('In Parallel 2') {
+                            steps {
+                                echo "In Parallel 2"
+                                  }
+                        }
+                    }
+
+     stage("clone code") {     # any name
+         steps{                      # git should be installed first.
+              git CredentialsId: 'git_credentials', url: 'https://github.com/ravdy/hello-world.git'  # this line generate using pipeline syntex.
+              }
+          }
+     stage("mvn-build"){  
+       when {                      # incase multi branch pipeline. execute only in this branch
+          expression {
+              BRANCH_NAME == 'dev' || BRANCH_NAME == 'master'
+                     }
+            }     
+         steps{                # maven should be installed first
+           # sh 'mvn clean install'  # removed generated files and compile, package it (created .war file in local repo (.m2)).
+             sh 'mvn clean package'  # removed generated files and generate .war file in /target folder.
+             sh 'mv /target/*.war target/webapp.war'	
+           
+              }
+      stage("mvn-Deploy") {           
+                   steps{               # tomcat server should be configured first
+           sshagent(['deploy_user']){#installed "ssh agent" plugin in jenkins and use tomcat server credential to connect tomcat server in pipeline syntex
+                         sh """         # execute unix command
+
+                         scp -o StrictHostKeyChecking=no target/webapp.war  ec2-user@3.109.59.255:/opt/apache-tomcat-8.5.57/webapps
+                         ssh ec2-user@3.109.59.255 /opt/tomcat8/bin/shutdown.sh
+                         ssh ec2-user@3.109.59.255 /opt/tomcat8/bin/startup.sh
+
+                         """
+                       }              
+                   }
+                }
+                   }
+         }     # stages close
+     }         # pipeline close
+
+# when build this pipeline, then executed successfully.
+
+# suppose pipeline code file keept in git-hub, then also execute form jenkins using select " Pipeline script from SCM".
+SCM: Git
+Repository URL: url of github repo where pipeline code stored.
+Branch to build: */master
+Script path: jenkin-Declarative-Git           # pipeline code file name
+------------------
+
+
+##  Custom Build Display Name   (when click on "Build now" then show "Online shopping" insted of build number.
+Goto pipline syntex > Global variable Reference   # check syntex global variable name here
+
+currentBuild.displayName = "Online Shopping"+currentBuild.number   # use command top of pipeline
+pipeline{
+}
+
+
+###  CI/CD On Kubernetes Using Jenkins pipeline
+
+pipeline {
+   agent any
+   environment{
+        DOCKER_TAG = getDockerTag()       # function return latest tag.
+              }
+   stages {
+      stage('Build Docker Image') {
+        steps{
+           sh "Docker build . -t kammana/nodeapp:${DOCKER_TAG}"           # kammana dockerHub user name
+        }
+      }
+      stage ('dockerHub push') {        # first add credential of docker HUB using jenkins Global credentials
+           steps {
+            withCredentials([string(credentialsId: 'docker-hub',variable: 'dockerHubPwd')]) {         # pas stored in dockerHubPwd
+           sh "docker login -u kammana -p ${dockerHubPwd} " # generate bind pass variable using pipeline Syntex. (select Bind Credential to variable) 
+           sh "docker push  kammana/nodeapp:${DOCKER_TAG}"      
+                 }
+          } 
+      stage ('Deploy to K8s') {            # first install pluging "ssh Agent Plugin". and Add credentials of k8s cluster in global credentials.
+         steps {                           # use pipeline syntex to connect k8s using preview configured key.
+          sh "chmod +x changeTag.sh"
+          sh "./changeTag.sh ${DOCKER_TAG}"
+          
+          sshagent(['kops-machine']) {       # generated command using pipeline syntex.
+          sh "scp -o StrictHostKeyChecking=no services.yml node-app-pod.yml ec2-user@52.66.70.61:/home/ec2-user/"  # copy menefiest file to k8s.
+          script {
+              try {
+                    sh "ssh ec2-user@52.66.70.61 kubectl apply -f ."
+                  }
+              catch(error) {
+                 ssh "ssh ec2-user@52.66.70.61 kubectl create -f ."
+                           }
+                 }  # script 
+
+
+           }    # sshagent
+         }      # steps
+      }        # stage
+
+
+   }
+}
+
+def getDockerTag() {          # fetch latest commitID and store in tag. function return tag.
+    def tag = sh script: 'git rev-parse HEAD', returnStdout: true
+    return tag
+--------------
+#!/bin/bash      # changeTag.sh
+sed 's/tagVersion/$1/g' pod.yml > node-app-pod.yml
+--------------
+# pipeline code stored in git-hub and using jenkins, executed pipeline code using "Pipeline script form SCM" (there provide repo url, branch, pipline script path)
+# suppose deploy in kubernetes, already have kubernetes menifest file of pod, services. In menifest file dynamically chage image version using shell script.
+
+## Build it and got success this pipeline.  And website is runing fine.
+
+==================================
+# How to Run Ansible playbook using jenkins declarative pipeline.
+
+sudo yum-config-manager --enable epel
+sudo yum install ansible
+install Ansible plugin in jenkins. Goto Global tool configuration and add ansible >
+Name: ansible2
+Path ansible executable dir: /usr/bin/        then SAVE.
+# playbook and inventory file reside in GitHub.
+pipeline {
+  agent any
+  stages{
+     stage('SCM Checkout') {
+        steps{
+          git 'https://github.com/javahometech/myapp-ansible'
+          }
+       }
+     stage('Execute Ansible'{           # execute playbook using github using below command
+        steps{          
+          ansiblePlaybook credentialsId: 'private-key', disableHostKeyChecking:..........  ## In jenkins create pipeline-
+          syntex select: Invoke an ansible playbook, and fillup all details, then generate above command.
+             }
+        }
+    }
+ }  # deploy static website using ansible playbook.
+ # Now build pipeline job and successed, then website runing fine.   
+
+-----------------------------------------------------
+
+CICD Jenkins pipeline, Ansible, Docker.
+Developer -> Git -> Jenkins -> DockerHub,Ansible -> Docker.      (Architecture)
+vi deployDocker.yml
+---
+- hosts: dev
+  become: True
+  tasks:
+  - name: Install python pip
+    yum: name=python-pip state=present
+  - name: install docker
+    yum: name=docker state=present
+  - name: start docker
+    service: name=docker state=started enabled=yes
+  - name: Install docker-py python module
+    pip: name=docker-py state=present
+  - name: Start the container
+    docker_container: name=hariapp image="kammana/hariapp:{{DOCKER_TAG}}" state=started published_ports=0.0.0.0:8080:8080
+
+vi Dockerfile
+FROM tomcat:8
+COPY target/*.war /usr/local/tomcat/webapps/dockeransible.war
+vi dev.inv
+[dev]
+dev_server_ip ansible_user=ec2-user
+
+# all java project,dockerfile,ansibleplaybook,inventory file reside on GitHub.
+
+* Dev-server         # deploy container on dev server.
+* Jenkins-server.    # install jenkins plugin, 
+ssh -i ~/Downloads/hari.pem ec2-user@3.131.158.252       # connected jenkins server
+Installed git, maven, docker, ansible
+
+Login Jenkin console > Global tool and configuration > add ansible:
+name: ansible
+Path ansible executable dir: /usr/bin   
+
+* Create pipeline job
+pipeline{
+  agent any
+  tools{              # use when mvn not found, take help "Declarative Directive Generator"
+     maven 'maven3'
+       }
+       environment {              # for global variable.
+       DOCKER_TAG = "getVersion()"      # return tag.
+                  }     
+
+  stages{
+     stage('SCM'){
+       steps{
+          git credentialsId: 'github',url: 'https://github.com......   # generate using pipeline syntex.
+            }
+         }
+       stage('Maven Build'){
+       steps{
+              sh "mvn clean package"      # generated .war file and copy to tomcat server using dockerfile
+            }
+         }
+       stage('Docker Build'){
+       steps{
+              sh "docker build -t . kammana/hariapp:${DOCKER_TAG}"
+            }
+         }
+       stage('DockerHub Push'){      # snippet Generator, select  Bind Credentials to variable, scret text. and generate pipeline syntex.
+       steps{
+              withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')])
+                {
+              sh "docker login -u kammana -p ${dockerHubPwd}"
+                }
+              sh "docker push kammana/hariapp:${DOCKER_TAG}"
+            }
+         }
+      stage('Docker Deploy'){               # call playbook
+       steps{
+              sh "ansiblePlaybook credentialsId: 'dev-server', disableHostKeyChecking: true, extras: "-e DOCKER_TAG=${DOCKER_TAG}",..."  # generate using pipeline Syntex.
+            }
+         }
+         
+     }
+  def getVersion(){        # return version.
+        def commitHas = sh label: '',returnStdout:true,script: 'git rev-parse --short HEAD' # use pipeline syntex.
+        return commitHas
+ }  
+    
+## Build and success, and URL: devServer publicIp:8080/ansibleplaybook
+# website working fine.
+==============================================
+
+# How to validate Jenkins file syntaxex from local machine.
+Open visual studio code > install extension (jenkins Pipeline Linter Connector), vscode setting > configure jenkinURL, User/pass of jenkins
+
+For validate pipeline code: goto view > command... > validate jenkinsfile
+============================
+
+# Jenkins Shared Libraries. Reusable jenkins pipeline code.
+Project Root > vars (hello.groovy) > src (Utility.groovy) -> resources (config.json)
+src,vars is mandatory
+
+Goto GitHub, create repository, name: "sharedlibs", select public  > click on "Create repository"
+create Dir: vars > welcome.groovy
+def call(name){
+  echo "Hey ${name}, How are you?"
+   }     # commit on github
+------------------
+
+Now Login jenkins console. manage jenkins > configure system > goto Global Pipeline Libraries  > click add
+Name: javahome-demo
+default version: main    (default branch name)
+Retrieval method: select modern SCM
+Git: project repository: https://github.com/javahometech/sharedlibs  (SAVE)
+
+Create new jenkins job (pipeline)
+pipeline script
+
+@Library('javahome-demo')
+pipeline{
+    agent any
+    stages{
+       stage('demo'){
+        steps{
+          welcome("Hari kammana")
+          welcome("Kashvi kammana")
+          script{
+             calculator.add(25,75)
+             calculator.mul(25,75)
+               }
+            }
+         }
+    }
+
+# build and get successed. above mesage print on console.
+==================================
+
+Using Multiple Agents Jenkins Pipeline, Stash and Unstash
+
+create new jenkins job  (pipeline)
+
+pipeline{
+ agent any
+ tools {
+   maven 'maven3'
+    }
+
+ stages{
+    stage("Code Checkout"){
+      agent{
+        label 'master'
+      }
+     steps{
+       git url: "https://github.com/javahometech/my-app"
+       stash 'source'       # it store source code and used below machine using unstash
+        }
+     }
+    stage("maven Build"){
+        agent{
+          label 'linux-one'
+        }
+         steps{
+           unstash 'source'      # without this, get error due to project source code not there in this machine (linux-one)
+           sh "mvn clean package"
+         }
+       }
+    }
+}
+
+
+# goto snippet Generator > select: stash some files and used later in the build
+name: source    # click generate pipeline Script
+# build and get successed.
+
+=====================================
+
+ How to integrate AWS & jenkins
+
+install "CloudBase AWS Credentials" plugin in jenkins
+
+Login AWS console > IAM > User > add user > User Name: jenkins-demo, select "Access key- programmatic access"
+click Next permission > Attach existing policies directly
+select Ec2FullAccess  > create user.       # generated access key, secret key
+
+manage jenkins > manage credentials > global > add credentials > 
+select AWS credentials , ID: aws-jenkins-demo, Access key: past, Secret key: past    (OK)
+
+Create New Jenkins job  (pipeline)
+
+pipeline{                     # use pipeline syntex, select "Bind credentials to variable" Then select "AWS access key and secret"
+  agent any
+  stages{
+   stage("AWS Demo") {
+     steps{
+         withCredentials([[   # take help pipeline syntex, select "Bind credentials to variable" Then select "AWS access key and secret"
+           $class: 'AmazonWebServicesCredentialsBinding',
+           credentialsId: 'aws-jenkins-demo',
+           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+           
+            sh "aws s3 ls"
+            # sh "aws ec2 describe-instances --region=ap-south-1"
+            # sh "aws ec2 start-instances --instance_ids --region=ap-south-1"   # start instance
+           }
+         }
+      }
+   }
+}
+# another way connect AWS using create IAM role and attach to jenkins server. Action > security > Modifys IAM role.
+
+=============================
+
+# How to use parameters in jenkins Pipeline.
+
+Create new pipeline job. And use pipeline syntex, select "Directive Generator" > parameters > Add > Select String parameter.
+pipeline{
+    agent any
+    parameters{
+      string defaultValue: 'Hari Kammana', descritption: 'Choice your name', name: 'name'    # access this variable, use ${params.name}
+          }
+     stages{
+        stage("param Demo"){
+           steps{
+            echo "Hi ${name}, welcome to jenkins"
+            }
+         }
+      }
+ }
+# when build parameter, ask value run time.
+==================================
+sedtransformer

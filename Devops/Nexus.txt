@@ -1,0 +1,153 @@
+Nexus Repository | Nexus Repository DevOps | DevOps Tool | Intellipaat
+https://www.youtube.com/watch?v=yZFvJEygn_g
+
+
+What is an artifact?
+Ans:
+The files that contain both the compiled code and the resources that are used to compile them are known as artifacts. They are readily deployable files.
+java artifact would be .jar,.war,.ear file
+NPM  artifact would be .tar.gz file
+.NET artifact would be .dll file.
+
+
+What is an artifact repository?
+ANs:
+AN artifact repository is a repository which can store multiple different versions of artifact. Each time the war file or tar.gz file is created 
+it is stored in server dedicated for the artifacts.
+
+What is Nexus Repository?
+ANs:
+Nexus Repository is a tool used in DevOps methodology for multiple purposes. One of it's main purpose is to store artifacts(readily deployable code) 
+that have been created in the code pipeline. Another one of it's purpose is to act as a sort of buffer for downloading and managing dependencies for 
+the build tools and languages.
+
+Features of Nexus:
+It Crowd support
+Staging and Building Promotion
+Taging
+User Token support   : Nexus  uses a two-part token system to overcome the limited security of the build tools and removes the need to store 
+sensitive information in text.
+
+Enterprise support : Nexus also provides full time support of a skilled team focused on resolving issues.
+
+Nexus provides staging feature that can easily be integrated with a organizations's software development lifecycle.
+Nexus has feature called High Avilability clustering, that keep multiple nodes inside the data center to increase the availability of the artifacts 
+incase anyone of the node crashes or becomes unavailable due to some reason.
+
+Nexus vs Artifactory:
+Nexus:
+Uses File system for storage
+Cannot Generate and save setting.xml
+Limited in replicating repositories
+Limited build time
+
+Artifactory:
+Uses Derby DB for storage by default
+Can generate and save settingx.xml
+Easily replicate your repositories to other Artifactory instances
+Faster build time.
+======================
+
+LAB:
+1) Create EC2 instance (centos) t2.medium, vol 20GB , security ALL trafic aywhere
+
+2) yum install -y yum-utils device-mapper-persistent-data lvm2
+3) yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+4) yum install docker-ce docker-ce-cli containerd.io
+5) systemctl start docker
+6) systemctl status docker
+7) docker pull sonatype/nexus3         # nexus image downloaded
+
+docker images   # found sonatype/nexus3
+docker run -d -p 8081:8081 --name nexus image_id            # container started
+docker exec -it cont_id bash
+cat nexus-data/admin.password          # password found
+exit
+
+URL: publicIP:8081         # Nexus runing
+
+
+cd opt
+git clone https://github.com/gouthamchilakala/sample-maven-project
+yum install -y wget
+wget http://us.mirrors.quenda.co/apache/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin/tar.gz
+tar zxf apache-maven-3.6.2-bin.tar.gz
+cd apache-maven-3.6.2/bin
+./mvn -version          # working fine
+export PATH=$PATH:/opt/apache-maven-3.6.2/bin
+cd ../../
+cd /root
+cd .m2  ;         # using setting.xml, maven connected to nexus
+vi settings.xml         # new file (copy content from google as search nexus setting.xml)
+
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
+
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+    
+    <mirrors>
+    <mirror>
+      <id>central</id>
+      <name>central</name>
+      <url>http://13.232.234.158:8081/repository/maven-public/</url>           # url from nexus repository maven-public copy
+      <mirrorOf>*</mirrorOf>
+    </mirror>
+  </mirrors>
+
+</settings>
+
+cd /opt/sample-maven-project/
+ls       # pom.xml, src, target
+
+
+vi pom.xml           # configured pom.xml and using this generate artifact and upload to nexus
+<groupId>flipkart</groupId>
+<artifactId>offers </artifactId>
+<version>1.1-released</version>   # if keep 1.1-SNAPSHOT then always update same version in nexus, but if keep release then upload seprate version in nexus.
+<packaging>jar</packaging>
+
+# Edited this block
+ <distributionManagement>
+    <repository>
+      <id>nexus</id>
+      <name>maven-releases</name>
+      <url>http://13.232.234.158:8081/artifactory/libs-release-local/</url>
+    </repository>
+
+    <snapshotRepository>
+      <id>nexus</id>           # id should be same as setting.xml id
+      <name>maven-snapshots</name>
+      <url>http://13.232.234.158:8081/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+</project>
+
+cd /opt/sample-maven-project/
+mvn compile        # download dependency in maven-public folder in nexus repo and compile the project
+mvn deploy     # download dependency, packaging artifact and upload to nexus.
+
+goto nexux repo > Browse > maven-release  (all release is there) 
+(when change version 1.2-release in pom.xml and mvn deploy again then this version also upload in nexus maven-release. And  1.2-SNAPSHOT in pom.xml 
+then this snapshot upload in maven-snapshot folder
+
+Nexus Repository Hands On
+-------------------------
+1) Run Nexus Repository and setup the admin
+2) Install Git to get the sample code
+3) Install Maven to compile and package the sample code
+4) Connect manven to Nexus
+5) Check how the artifact versioning works in Nexus
+
+Sign in Nexus app               (user: admin)
+
+
+goto setting > Repository
+

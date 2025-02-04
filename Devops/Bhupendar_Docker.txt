@@ -1,0 +1,1655 @@
+What is Devops ?
+Ans:
+Implementing Automation at each and every stages.
+
+What is virtualisation ?
+It is the technique of splitting a physical resource into as many logical Resource as we want eg: CPU, Memory.
+Virtualisation is a technology that transform hardware into software (physical into logical). host O.S based and hardware based virtualization.
+
+What is Hypervisor/baremetal and kind of Hypervisor.    
+Hypervisor is a piece of software or formware that create and run virtual machine, A Hypervisor is sometimes also called a virtual machine Manager (VMM). 
+VMware EXSi is a Type-1 Hypervisor that run directly on Hardware, without any Operating System. Using this easyly extand the hardware if required.
+After hypervisor, install multi Guest OS.
+it provides a virtualization layer that abstracts the CPU, Storage, memory and networking Resources of the Physical host into multiple virtual machine. 
+-------------------
+Docker is a advance version of virtualisation. Docker is used to create container to run the application inside container. 
+Container is combination of OS,software, library, binaries,config files and dependency.
+Container is like a virtual machine. Docker is a tool which create this V.M. Docker is a advance version of virtualization.
+Docker engine is create container. Docker is client server architecture and written in GO language. Container has less isolate, flexible than VMs.
+But container is fast, use less memory. Container are process and run on Kernal not Docker, docker daemon communicate with kernal to run container.
+
+Cluster: is a set of master and worker nodes.
+OpenShift is built on top of Docker and Kubernetes. it is Orachastration tool. Kubernetes is manage by openshift tool command line as well console wise.
+
+Advantage of Docker:
+No pre-allocation of RAM. Docker enables you to build a container image and use that same image across exatly step of the deployment process.
+Less cost. It is light in weight. It can run on physical h/w / Virtual h/w or on cloud. you can re-use the image. it took very less time to create container.
+
+Disvantage of Docker:
+Docker is not a good solution for application that requires rich GUI. 
+Docker does not provide cross-platform compatibility means if  an application is designed to run in a docker container on windowm then it can't run on linux or vice-versa.
+Docker is suitable when the development OS and testing OS are same. If the OS is different, we should use VM.
+
+Docker Daemon : it run on the Host OS. it is responsible for running container to manges docker services. 
+
+Docker client : Docker users can intract with docker through a Client. Docker client uses commands to communicate with the docker daemon.
+Docker Host : Docker host is used to provide an environment to execute and run application, it contain the docker daemon, images, contianers, 
+network and storages.
+
+Docker Hub/Registroy :
+Docker registroy manages and stores the docker images. There are two type of registries in the docker.
+1) public Registry : public registry is also called as docker hub.
+2) Private Registry : is is used to share images within the entriprise.
+
+Docker Images: 
+Docker images are the read only binary templets used to create docker containers OR Single file with all dependency and configuration required to run a program.
+
+Ways to create an Images:
+1) Take image from docker hub.
+2) create images from docker file.
+3) Create image from existing docker contianers.
+
+Docker Container:
+Container hold the entire packages that is needed to run the application. Container is like a virtual machine. Images becomes container when they run 
+on docker engine.
+
+Docker vs Virtual Machine Architecture:
+
+Docker Architecture :-  Hardware Infra > Host O.S > Docker Engine > multiple Containers/app   # used same kernal, lightweight/portable/scalable/interchagable.
+
+Virtual Machine Architecture : Hardware Infra > Hypervisor > Multi O.S. (vm)              # os used seprate kernal, take much RAM/CPU
+
+Job : shell script, command (one time execute)
+Service : running all time.
+
+Create linux EC2 machine ( Linux AMI 2018 SSD volume Type (include Docker), second no) and login using ec2-user . 
+sudo su
+yum update -y   # update latest.
+yum install docker -y  #
+service docker status  # show stoped
+service docker start #
+docker --version        # Docker version 20.10.7.
+docker info             # show all container status details and aswell container most configuration details.
+docker --help          # to check all docker modules (means all commands)
+
+
+docker run --name bhupicontainer -it ubuntu /bin/bash  # created container and login into container.
+ls 
+cd /temp
+touch bhupifile
+exit
+
+docker diff bhupicontainer   # to check diff between image and container.
+C /root                         #some change
+A /root/.bash_history           # Add something
+C /temp
+A /tmp/bhupifile
+
+docker commit bhupicontainer updateimage   # create image from container. there is docker commit is use for saving changes to container.
+docker images  # show
+docker run -it --name rajputcontainer updateimage /bin/bash # create container from created image.
+cd /temp
+ls  # now bhupifile is there.
+exist
+
+Dockerfile:
+Dockerfile is basically a text file it containes some set of instruction. Automation of Docker image creation.
+Docker Components:
+Docker client, Docker Host and Docker Registry.
+
+RUN echo ranjit kumar  # shell form
+RUN ["/log-event.sh", "image created"] # exec form
+
+MAINTAINER : Author/Owner/Description
+COPY : Copy files from local linux system to docker container, we need to provide source, destination (we can't download file from internet and any 
+remote repository).
+
+ADD : Similar to COPY but, it provides a feture to download files from internet, also we extract .zip file at docker image side.
+
+EXPOSE : To expose (open/enable) ports such as port 8080 for tomcat, this port not accessed from outside internet. And port 80 for nginx using "-p" , 
+it accessed from outside internet.
+
+WORKDIR : To set working directory for a container in container server.
+
+CMD and ENTRYPOINT differences 
+
+docker stats/events     # to monitor container in production 
+--------------------------------
+CMD is the default set of arguments that are supplied to the ENTRYPOINT process. Override parameter.
+ENTRYPOINT is the process that’s executed inside the container. Append parameter.
+-----------------------------------
+
+
+CMD : Execute commands inside container. start service "CMD apachectl -D FORGOUND",
+started. if multiple CMD define in Dockefile then execute only the last CMD command. And must override parameter. (shell and executable form)
+
+CMD ["/log-event.sh", "container started"]   # in this script defined $@ to print parameter
+
+ENTRYPOINT :  Similar to CMD, Execute commands inside container but has higher priority then CMD. ENTRYPOINT append parameters.
+suppose need to start service "ENTRYPOINT apachectl -D FORGOUND", this service will be started when container started. In case of multiple entrypoint entries, only the last one is considered. (shell and executable form)
+
+ENTRYPOINT apachectl -D FORGOUND or (suppose need to pass paramater to shell script, then use below)
+
+ENTRYPOINT ["/log-event.sh"] 
+CMD ["container started"]  
+
+ENTRYPOINT ["echo"]
+CMD ["Welcome India"]       # if pass argument docker run time then overwrite the argument
+
+ARG: An ARG is something you can pass at build time, to the builder
+LABEL: can add any key=val as a LABEL
+
+# CMD and ENTRYPOINTE differences is argument at docker run command.
+
+ENV : Enviornment Variable.
+ARG : home work
+
+Dockerfile:
+1) Create a file named Dockerfile
+2) Add instruction in Dockerfile
+3) Build dockerfile to create image.
+4) Run image to create container.
+--------------------
+vi Dockerfile
+FROM ubuntu
+RUN echo "Subscribe technical guftgu" >/tmp/testfile
+------
+docker build -t test .   # buld docker file to create image.
+docker run -it --name testcontainer test /bin/bash  #
+cat /tmp/testfile  # output subscribe technical guftfu.
+--------------------
+vi Dockerfile
+FROM ubuntu
+WORKDIR /tmp
+RUN echo " LIKE SUBSCRIBE MY CHANNEL" >/tmp/testfile
+ENV myname bhupinderrajput
+COPY testfile1 /tmp
+ADD test.tar.gz /tmp
+----
+touch testfile1 test
+tar -cvf test.tar test
+gzip test.tar
+rm test
+docker build -t newimage .
+docker images   # show newimage
+docker run -it --name newcontainer newimage /bin/bash
+
+/tmp# ls # test testfile testfile1
+/tmp# cat testfile   #  show LIKE SUBSCRIBE MY CHANNEL
+/tmp# echo $myname  # show bhupinderrajput
+exit
+----------------------
+Docker Port Expose:  without expose a port the services in the container is not accessible from Outside docker. but it can be access inside between condtainers in host and if using -p,services accessed from outside public internet and internal also.
+-------
+docker -v  # docker version 19.03.
+docker run -it --name techserver -p 80:80 ubuntu  #    80:80 attach between local server port and container port.
+docker ps  # runing and showing mapped 80:80 tcp
+docker port techserver  # show port tcp 80:80
+docker exec -it techserver /bin/bash  # logined into container
+apt-get update      # ubanut command
+apt-get install apache2 -y   # installed
+enter area asia
+time zone: Kolkata
+cd /var/www/html
+echo "subscriber technical guftgu channer" >index.html    # remember webpage make in container not linux instance. but accessed using maped port.
+service apache2 restart  #
+# copy public ip if instance and past in URL then found page. anyone can accesss this page.
+
+exit
+docker run -d --name myjenkins -p 8080:8080 jenkins/jenkins  # run jenkins container   # run into background 
+Now goto instance security group and edit inboud rule, Add rule Custome TCP: 8080  (CIDR 0.0.0.0/0) and SAVE. 
+URL: public ip:8080  # jenking is opened Now
+-------------------------------------
+Docker Volume & How to Share it|How to Create Volumes | Docker Storage
+
+Docker volume is just like special type of directory. we can share directory to each containers and host to  container also. Every container can see directory. And directroy is presist even container is deleted.
+
+Volume is simply a directory inside our container. Firstly we have to declare the directory as a volume and then share volume. Even if we stop container, still we can access volume. volume will be created in one container. You can declare a directory as a volume only while creating container.
+you cann't create volume from existing Container. You can share one volume across any number of Containers.
+
+Volume will not be included when you update on image. you can mapped volume in two ways.
+1) Container <-> Container
+2) Host <-> Container
+
+Benefits of Volume:
+Decoupling container from storage. Share volume among different containers. Attach volume to containers. On deleting container volume does not delete.
+
+touch file1 file2
+vi Dockerfile
+FROM ubuntu
+VOLUME ["/myvolume"]              # volume created from Dockerfile.
+
+docker build -t myimage .    # build image from Dockerfile
+docker images
+docker run -it --name container1 myimage /bin/bash       # container create and run and logined into this container
+ls  # show myvolume
+cd myvolume; touch filex filey filez
+ls  # show above files
+exit       # below shared volume between each containers
+
+docker run -it --name container2 --privileged=true --volumes-from container1 ubuntu /bin/bash
+ls  # show myvolume
+cd myvolume/ ; ls # show filex filey filez
+exit
+
+docker start container1
+docker attach container1
+ls # show myvolume
+ls myvolume/    # show filex filey filez
+exit
+---------------
+
+# Volume create using command line and shared between containers.
+docker run -it --name continer3 -v /volume2 ubuntu /bin/bash
+
+cd volume2; touch vol1 vol2 vol3
+exit
+docker run -t --name container4 --privileged=true --volumes-from container3 ubuntu /bin/bash
+ls  # show volume2
+cd volume2; ls # show vol1 vol2 vol3
+touch rajputfile
+exit
+docker start container3
+docker attach container3
+cd volume2; ls # now show rajputfile vol1 vol2 vol3  (means shared all files between containers)
+exit
+------------
+# Now how to volume shared between Host system and Containers.
+
+pwd  # /home/ec2-user     (host system path)
+ls # Dockerfile file1 file2
+docker run -it --name hostcont -v /home/ec2-user:/rajput --privileged=true ubuntu /bin/bash  # host_path:container_path , conn establish
+ls  # show rajput (dir)
+cd rajput/ ; ls # show Dockerfile file1 file2
+exit
+ls  # Dockerfile file1 file2
+docker start hostcont      # container started
+docker attach hostcont     # logined into container
+cd rajput
+touch xyz mmh hhun    # file make in container
+exit
+
+ls  # show in host system Dockerfile file1 file2 hhun mmmh xyz 
+----------------------------------------
+A Docker volume is a mountable entity which can be used to store data in the docker filesystem.
+
+docker volume ls   # volume list
+docker volume create <volume name>    # volume create
+docker volume rm < volume name>  # remove runing volume
+docker volume prune    # it removed all unused docker volume
+docker volume inspect <volume name>   # show all information of volume
+docker container inspect < container name >   # show all information of container (ip, image ID, network etc)
+docker container logs cont_id            #  logs of container.
+docker container top cont_id             # to check what process runing in container.
+docker container stats              # list usage of cpu , memory, input/output etc.
+docker stop $(docker ps -a -q)  # Stop all runing containers in system.
+docker rm $(docker ps -a -q)   # removed all stopped Containers from system.
+# docker rm -f container_id         # removed runing container from system.
+docker rmi -f $(docker images -q)  # Removed all images.
+
+
+====================================
+How to push docker image in DockerHub.
+
+docker run -it ubuntu /bin/bash
+touch file1 file2 test1 test2 xyz  # ex: file created and some sofware installed in container.
+cd tmp ; touch file5 filez
+exit
+docker images  # show ubuntu
+docker ps -a   # show container name  vigilant_tharp
+docker commit vigilant_tharp image1     # image1 created from container vigilant_tharp (create copy)
+docker images  # show image1
+
+URL: hub.docker.com   # create account and logined  ( continue with free, and goto gmail and verify). ranjit1234/Ranjit@123
+
+docker login    # enter id/pass  (what make in time of creation of docker hub)
+docker tag image1 technicalguftgu/project1                 #       (docker hub user_id/image name)
+docker push technicalguftgu/project1       # pushed in docker hub and project1 found in docker hub
+
+Other Region:
+Now create EC2 linux instance (including docker) top 2nd   (security group SSH, HTTP anywhere)
+connect putty using puclic IP.
+sudo su ; yum update -y
+yum install docker -y   # installed docker
+service docker start  #
+docker images   # nothing any image
+docker pull technicalgugtgu/project1  # pulled from docker hub     (now not need pass, because public)
+docker images   # show image  technicalgugtgu/project1
+docker run -it --name mycontainer technicalgugtgu/project1 /bin/bash    # create and run container
+ls   # all file exist
+cd /tmp ; ls  # all file and all software exist
+exit
+--------
+
+goto docker hub and make private image in docker hub
+Clicke on image and click on Makeprivate , enter any name project1 ,click Make private
+
+docker pull technicalgugtgu/project1  # Now Access denied  (because now is private in docker hub)
+docker login  # enter id/pas
+docker pull technicalgugtgu/project1   # now pulled  technicalgugtgu/project1
+docker images  # show technicalgugtgu/project1
+
+docker rmi -f $(docker images -q)   # deleted all images.
+# and can delete repository in docker hub.
+==================================end============
+FROM ubuntu:18.04
+RUN mkdir ranjit
+COPY . ranjit
+RUN ranjit/test.sh
+=========================
+
+Q. What will be happen in case container is runing and server is rebooted.
+
+Ans:
+1) As below container command, in case server goes down, then Docker daemon stoped, that container would go down and not automatically restart as below.
+docker run --name docker-nginx -p 8080:80 -d nginx
+
+2) if we deploy that container like below, it will always restart container:
+
+docker run --name docker-nginx -p 8080:80 -d nginx --restart always             # automatically container will be up.
+OR
+in compose file
+Versions: 
+services:
+  nginx:
+    image: nginx:latest
+    restart: always
+----------------------------------------------------
+ifconfig -a
+apt-get update
+apt-get install inetutils-ping  #ping/ifconfig install
+
+================================END Bhupender==============================
+
+--------------- Gaurav sharma-------------------
+
+docker container run -d ubuntu sleep 10          # -d for detach from terminal or run in background till 10 second. After 10 second exist container.
+docker container run -it ubuntu /bin/bash      # -it for interactively and give tty (terminal type), and run and logined into this container.
+cat /etc/os-release         # show ubuntu machine
+CTRL + pq         # only exist from logined container. Still container is runing. (docker container ls)
+
+docker container run ubuntu cat /etc/os-release
+docker container rm $(docker container ls -aq)         # removed all containers
+docker container run -d -p 3600:80 --name ngix_test nginx           # Now nginx 80 port maped with 3600 port, to access nginx outside server
+
+netstat  -nltp       # to check 3600 port open or not.   (but now opened)
+docker container inspect cont_id       # to check ip of this container.
+
+URL : server ip:3600     (server ip where container runing)         # Now nginx runing out of current server. 
+
+docker container ls    #list nginx runing containers.
+docker container exec -it cont_id /bin/bash         # Now logined into container
+# Now i can install any software/package on this container/nginx machine
+
+docker container rename cont_id Cont_new_name        # to rename container name.
+docker container stats       # check cpu/memory details.
+========================================
+
+9. Docker (in Hindi) : Attach to running container, kill, wait, pause, unpause, prune, port
+
+docker container run -itd ubuntu /bin/bash          # interatively run in background
+docker container attach ubuntu_cont_id             # logined into container. 
+# but incase nginx container attached and try to access nginx server using URL then return logs on nginx container.
+
+docker container kill/stop/pause nginx_cont_id       # Now not access using URL
+docker container unpause nginx_cont_id    # Now accessed nginx server.
+
+docker container wait cont_id          # wait till container stopped.
+
+# when stopped container from other terminal then exist with status is 0 above command.
+
+docker container port cont_id        # to check container port.
+=============================================
+
+10. Docker (in Hindi) : create docker container, diff docker container and copy file into container
+
+docker container create ubuntu sleep 60      # only container create not run. (when start manually this container then auto execute sleep command.)
+docker container start cont_id           # Now run the container with sleep 60.
+docker container ls          # showing Runing.
+
+docker container cp  abc.txt cont_id:/temp           #copy host file to container.
+docker container attach cont_id       #logined into container
+cd /temp; ls    # exist abc.txt file
+
+=============================================
+11. Docker (in Hindi) : Export/Import docker container
+
+docker container run -it ubuntu /bin/bash     # install below software in this container.
+apt-get update
+apt-get install tree git -y
+CTRL + pq      # just come local host prompt.
+
+docker container ls       # container runing.
+docker container export cont_id > my_ubuntu_tree_git.tar           #container exported.
+or 
+docker container export cont_id -o my_ubuntu_tree_git1.tar           #container exported.
+ls       # listed my_ubuntu_tree_git.tar my_ubuntu_tree_git1.tar
+
+Now import of tar file as below
+-------------------------------
+docker image import my_ubuntu_tree_git.tar ubuntu_image        # create image from .tar file 
+docker image ls         # list ubuntu_image
+docker container run -it ubuntu_image /bin/bash         #
+git --version
+tree            #  software exist in this container.
+
+docker container run -it ubuntu /bin/bash
+touch a b c d
+CTRL+pq
+
+docker container commit cont_id ubuntu_image         # ubuntu_image image created from runing container.
+docker image ls      # image found
+docker container run -it ubuntu_image /bin/bash          # container created using created image.
+ls    # found a b c d files.
+
+==================================
+
+14. Docker (in Hindi) : How to inspect remove,inspect, list and history for the docker image
+
+docker image ls --format '{{.ID}},{{.Repository}}'
+
+list only id and image name   (33l3kj3jlk4j3  image_name)
+
+docker image history jenkins      # check details of jenkins image
+docker image rm jenkins      # image removed.
+or docker image rmi jenkins       # image removed. (rmi remove image)
+docker image inspect jenkins           # to check every details of image. (what is installed in image)
+docker image prune              # removed all image
+========================================
+
+15. Docker (in hindi ) Docker save/docker load. Diff between export and save & load &import
+
+docker image save logstash(image name) > logstash.tar         # image compressed save in .tar
+ls           # .tar file found
+docker image rm logstash         # image removed.
+docker image load < logstash.tar            # image recovered from logstash.tar file
+
+# docker image save ubuntu:14.04   : if give without tag(10.04) then save all ubuntu image related to this name in .tar file
+# docker container export cont_id -o abc.tar         #it save whole container in .tar file (except volume) and no any layer
+# docker image import abc.tar test_image                # it create image from .tar file
+
+# docker image load     # it recover image with all info from .tar file.
+# docker image import   #  it also create image with single layer from .tar file.
+==============================================================
+
+16. Docker (in Hindi) : Layered Architecture and Dockerfiles
+
+vi Dockerfile
+FROM ubuntu:14.04
+RUN apt-get update && apt-get install -y tree
+RUN touch /tmp/1.txt
+RUN touch /tmp/2.txt
+RUN touch /tmp/3.txt
+
+# above command/line create a layer.
+docker image build -t ubuntu:1 .
+docker image ls -a         # list this image with all layer ID.
+
+docker container run -it ubuntu:1 /bin/bash
+cd /tmp; ls    # list 1.txt 2.txt 3.txt 
+tree        # working
+exit
+
+# if docker build again and again without editing docker file then execute command from cache not from docker file.
+# But if edit command any where in docker file then ownward editing line, below all commands execute from docker file not cache. 
+# if execute command from cache then it will take less time to execute.
+================================================================
+17. Docker (in Hindi) : Dockerfile (Label, Run, Env, Workdir)
+
+vi Dockerfile
+FROM ubuntu:14.04
+LABEL name="Ranjit kumar"
+LABEL email="ranjitmoonup@gmail.com"
+ENV SUB devops
+
+docker image build -t myubuntu:2 .
+docker image inspect myubuntu:2            # label value will show in image details.  (just for infomation)
+
+docker container run -it myubuntu:2 /bin/bash
+echo $SUB        # print devops
+
+# cd command not work in Dockerfile, use WORKDIR to change dir.
+==================================================
+
+18 Docker (in Hindi) : Dockerfile (add, copy, user) difference between copy and add in docker file
+
+vi Dockerfile
+FROM ubuntu:14.04
+ENV NAME gaurav
+ENV PASS password123
+RUN apt-get update && apt-get install -y openssh-server && apt-get install -y python
+RUN useradd -d /home/gaurav -g root -G sudo -m -p $(echo "$PASS"|openssl passwd -l -stdin) $NAME         # create gaurav user
+RUN whoami > /tmp/1stwhoami.txt
+USER $NAME           # to switch user.
+RUN whoami > /tmp/2stwhoami.txt
+RUN mkdir -p /tmp/project
+COPY testproject /tmp/project              # copy from local server to container path
+ADD testproject1.tar /tmp/project       # copy and extracted .tar file in container
+ 
+
+docker image build -t ubuntu:4 .
+docker container run -it ubuntu:4 /bin/bash      
+cat /tmp/1stwhoami.txt         # root
+cat /tmp/2stwhoami.txt         # gaurav
+==================================================
+
+20. Docker ( In hindi) : Dockerfile ( Expose and create a SSH container using dockerfile)
+
+vi Dockerfile
+FROM ubuntu:14.04
+ENV NAME gaurav
+ENV PASS password123
+RUN mkdir -p /var/run/sshd
+RUN apt-get update 
+RUN apt-get install -y openssh-server
+RUN useradd -d /home/gaurav -g root -G sudo -m -p $(echo "$PASS"|openssl passwd -l -stdin) $NAME         # create gaurav user
+CMD ["/usr/sbin/sshd",".D"]         # start ssh server in background
+
+docker image build -t ubuntu:5 .
+docker container run -p -itd ubuntu:5          # container run into background.
+docker container ls      	# container runing , with no port
+
+
+docker container inspect cont_id      # find IPAddress
+
+ssh gaurav@IPAddress
+pas: password123        # Now connected this server.
+
+cat /etc/os-release     # show server details.
+----------------
+vi Dockerfile
+FROM ubuntu:14.04
+ENV NAME gaurav
+ENV PASS password123
+RUN mkdir -p /var/run/sshd
+RUN apt-get update 
+RUN apt-get install -y openssh-server
+RUN useradd -d /home/gaurav -g root -G sudo -m -p $(echo "$PASS"|openssl passwd -l -stdin) $NAME         # create gaurav user
+EXPOSE 22         #Now can port expose  (for multi port 22 80)
+CMD ["/usr/sbin/sshd",".D"]         # start ssh server in background
+
+docker image build -t ubuntu:5 .
+docker container run -itd ubuntu:5          # container run into background.
+docker container ls      	# container runing with port
+# PORTS 32788->22/tcp   (maped local system port 32788 with container port 22)
+
+# Now send request of local machin port Then goto container server.
+
+ssh gaurav@local system IP -p 32788        #  container server connected.
+pass: password123         (container user password)
+
+cat /etc/os-release     # show server details.
+==================================================
+21. Docker (in Hindi) : Dockerfile (Entrypoint)
+
+vi Dockerfile
+FROM ubuntu:14.04
+RUN apt-get update 
+RUN apt-get install -y python tree
+ENTRYPOINT ["tree"]       # execute tree command and print on terminal when container run
+or
+
+ENTRYPOINT ["tree"]       
+CMD [" --version"]        # treat both as a one command tree --version and execute and print on terminal when container run
+or
+
+ENTRYPOINT ["tree"]       # treat both as a one command tree --help and execute and print on terminal when container run
+CMD [" --help"] 
+
+docker image build -t myubuntu:4 .
+docker container run -p -it myubuntu:4 
+-----------------
+vi test.sh
+echo "this is first line"
+echo "my name is $1"
+
+vi Dockerfile
+FROM ubuntu:14.04
+RUN apt-get update 
+RUN apt-get install -y python tree
+COPY test.sh /tmp/
+ENTRYPOINT ["/tmp/test.sh"]             # when container run then execute this script
+
+docker image build -t myubuntu:4 .
+docker container run -p -it myubuntu:4 
+output:
+this is first line
+my name is
+
+docker container run -p -it myubuntu:4 Ranjit          # Ranjit is argument
+output:
+this is first line
+my name is Ranjit
+
+## using ENTRYPOINT execute script and give argument parameter to shell script when container run.
+==========================================
+
+22. Docker (in Hindi) : Docker Volume ( Docker Storage), mysql data persist in docker container
+
+docker volume ls                    # now no any volume
+docker image inspect mysql |less       # to check volume path which already defined in image
+
+docker container run -d --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql     #container run into background and mysql connect without pass.
+docker volume ls      # now default volume found
+docker volume inspect volume_id         # to check local server mount point /var/lib/docker/volumes/
+
+cd /var/lib/docker/volumes/volume_id      ; ls   Now found files data.
+
+docker container exec -it cont_id       # logined
+mysql     # enter and connect
+show database
+create database gaurav       #
+create database test
+create database example
+exit              # all database stored in defult volume of this container.
+
+docker container rm -f cont_id     # Now removed container
+docker container run -d --name mysql1 -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql
+docker exec -it cont_id /bin/bash
+mysql
+show databse      # not found any above created database  (Now data losted)
+
+docker volume ls      # two volume found  (old and current, old volume have created databases exit)
+
+docker container run -itd -v old_volume_id:/var/lib/mysql mysql              # Now maped with old volume.
+docker container exec -it cont_id /bin/bash
+mysql
+show database        # now founded created database.
+=======================================================================
+======================================================================
+
+25. Docker (in Hindi) : Docker Bind mount
+
+mkdir bind
+cd bind ; pwd /home/gaurav/bind
+vi index.html
+<html>
+<head> 
+        <title>test</title>
+</head>
+<body>
+        <h1 align="center"> Docker BindMount Point Test</h1>
+</body>
+</html>
+
+docker container run -it -v /home/gaurav/bind:/tmp/test/ ubuntu:14.04 /bin/bash
+or docker container run -it -v $(pwd):/tmp/test/ ubuntu:14.04 /bin/bash
+or docker container run -it --mount type=bind,source=$(pwd),target=/tmp/test/ ubuntu:14.04 bash
+
+ls /tmp/test/index.html          # Now found in container.
+exit
+# Now mapped between local path and container path. if i change any content of index.html then reflect in both path.
+docker volume ls  # found bind volume
+
+## Three type of volume available in Docker. (default (/var/lib/docker/volumes/), volume or mount, tempfs (not used systemfile)
+========================================================
+
+26. Docker (in Hindi) : Docker Networking ( Bridge Network Overview )
+
+
+# Overlay network connect multiple Docker daemons together and enable docker swarm services to communicate with each other host. 
+it also communicate between swarm service and a standalone container.
+
+# Bydefault Bridge Network : Bridge drivers provides intercontainer connectivity on the same machine. it run standlone containers that need to communicate 
+in single host locally. Bridge network must need to mapping port using -p 80:80 to access services outside network.
+
+# Host network: , using this automatically container communicate with docker Host. and remove network isolation between the container and the docker
+ host.  There is No need to required port mapping in host network container, service access directly outside network using docker host ip. we can not
+ create more then one container of same service. host networking driver only works on Linux hosts
+
+# None network : disable all networking. This is usually used to conjunction with a custom network driver. None is not available for swarm services.
+
+docker network ls       
+Network ID	Name	DRIVER
+kd3k323j	bridge	bridge
+5k4j3jl3j	host	host
+65j4j3lj3	none	null
+
+
+
+docker network inspect bridge      # as checked, bridge network not attached with any container.
+
+docker container run -itd nginx         
+docker network inspect bridge         # now container attached with bridge network
+docker container ls           # list same attached container name.
+docker container run -it ubuntu:14.04 /bin/bash
+ping 8.8.8.8         #pinging.. means network accessed.
+exit
+
+docker container run -itd -P nginx       # -p created hostly random port 32771 and maped with default container 80 port
+docker container ls
+# maped PORTS 32771->80/tcp        (host port 32771->container port 80)
+
+URL: hostpublicIP:80   # Not run nginx server.
+URL: hostpublicIP:32771   # run nginx server.  (Now nginx server accessed from outside server.)
+
+docker service create...
+docker service scale service_id=3       #make 3 replica
+docker service ls  #
+docker network ls  # found test network on all worker1, worker2 node also
+docker network create -d overlay --attachable test1   # overlay network created and this network is attachable to any container.
+
+docker container run -itd --name=n1 --network=host nginx       # using host, we can not create more then one container of same service.
+==============================================
+
+27. Docker (in Hindi) : Docker Networking (Bridge Network)
+
+ifconfig    		#Now list 3 hosts  (means 3 Network)
+docker network ls
+docker network create --help
+docker network create -d bridge test         # test network creted.
+
+ifconfig    		# Now list 4 hosts  (means 4 Network)
+
+docker container run -it --network test ubuntu:14.04 bash
+ifconfig      # eth0 network attached
+
+docker container run -itd --name cont1 --network test ubuntu:14.04   
+docker container run -itd --name cont2 --network test ubuntu:14.04 
+docker container run -itd --name cont3 ubuntu:14.04      #attached default network
+
+docker container ls       # listed 3 containers
+
+docker container inspect cont1     # find IP 172.18.0.3
+docker container inspect cont2     # find IP 127.17.0.4
+docker container inspect cont3     # find IP 127.17.0.2          # default network
+
+docker container exec -it cont1 /bin/bash
+ping 127.17.0.2             # Not pinging...   because cont1 and cont3 is in different network
+ping 127.17.0.4        # now pinging...   because cont1 and cont2 is in same network
+-----------
+
+docker container run --network=test -itd -P nginx      # cont id 063.. IP 172.18.0.4
+docker container run -it ubuntu:14.04 bash            # cont id 1fc8   IP 172.17.0.3
+wget 172.18.0.3  # not connect                 # yum update -y ; yum install wget
+exit
+
+docker container run --network=test -itdP nginx        #contID a9c (PORTS 32776->80/tcp) 172.18.0.5
+# host port 32776 opend and mapped with container port 80 using -P option
+
+docker container exec -it contID(1fc8)
+wget 172.18.0.5    # not connect
+wget 192.168.25.20(local hostIP):32776    # Now connected to local host server from other nginx server.
+# save nginx page in html
+=============================================================
+
+28. Docker (in Hindi) : Docker Networking (DNS Enable)
+
+docker network create test
+docker container run -it --network=test ubuntu:14.04 bash
+hostname    # k34j3j3k
+ctrl+pq       # goto background
+
+docker container run -it --network=test ubuntu:14.04 bash
+ping k34j3j3k/cont_id            # Now pinging. connected between both container
+=============================================================
+
+29. Docker (in Hindi) : Docker Networking (Host Network)
+
+docker network ls 	#bridge, host, null
+
+docker container run -itd --network=host nginx
+URL: 192.168.25.20(local hostIP)        # withoug port maping, Nginx runing fine. Host network used insted of port maping.
+
+# Host network is isolated, only one network can create using Host driver.
+docker network create -d host test      # come error...(not create other network of host driver)
+# And if assign host network to any container then other network can not assign to same container. and can not create multi container who has assign 
+host network to container.
+=====================================================
+
+30. Docker (in Hindi) : Docker Networking (Null Network, None Network)
+
+# If i create any container then it bydefault assign bridge network. 
+# Now i want to assign null network to container. I don't want to assign any network to container.
+
+docker network ls    # bridge, host, none .
+docker container run -it --network=none ubuntu:14.04 bash
+ifconfig         #not assign any network to this container.
+====================================================
+
+31. Docker (in Hindi) : Docker Networking (Connect, Disconnect)
+
+# How to assign multiple network to container
+docker network ls
+docker network create test.
+
+docker container run -itd --network bridge ubuntu:14.04 bash  # contID 3d53j2k3
+
+docker network connect test 3d53j2k3      # test network add to this container.
+
+docker container exec -it 3d53j2k3 /bin/bash
+ifconfig           # Now list 2 Network interface. (bridge, test)
+ctrl+pq
+
+docker network disconnect test 3d53j2k3          # Now removed one network interface from container.
+docker network rm test       # delete test network
+docker network prune        # delted unused network  ( but realy not execut this command)
+=====================================================
+
+33. Docker (in Hindi) : Docker Registry/Repository (Insecure)
+
+# Docker Hub is gloably location but docker registery is seprate privately location.
+# I will upload imageses in docker local registry server
+
+docker image ls        # one registry image exist
+docker container run -d -p 5000:5000 --name simple_registry registry         # make my private registery to store images.
+
+URL: 127.0.0.1:5000/v2/_catalog               # check private registry, how many image is there. But now show empty repository {}
+
+docker container inspect contID        # to check default attached volume source /var/lib/docker/volumes/.... and destination path  var/lib/registry
+docker image ls
+
+docker image tag redis:alpine 127.0.0.1:5000/redis:alpine      # make path tag of redis image
+docker image ls              # found 127.0.0.1:5000/redis:alpine
+
+docker image push 127.0.0.1:5000/redis     # Now redis image pushed to local private resistery.
+
+Referesh: URL: 127.0.0.1:5000/v2/_catalog       # Now found redis image in local private registry server. {repository [redis]}
+
+docker image rm 127.0.0.1:5000/redis:alpine
+docker image rm redis:alpine
+
+# Now internet is off from my system
+docker image pull 127.0.0.1:5000/redis:alpine           # Now image pulled from local unsecure registry without internet.
+--------
+
+ifconfig       # checking from another server ip  10.0.1.15
+docker image ls
+docker image tag  rabbitmq 10.0.1.15:5000/rabbitmq   
+docker image push 10.0.1.15:5000/rabbitmq      # bydefault not pushed, coming error 
+ 
+# except this 127.0.0.1 ip, for another IP need to edit in below file.  then image will push to registry, but unsecurly
+vi daemon.json
+{
+"insecure-registries" : ["10.0.1.15:5000"]
+}
+
+mv daemon.json /etc/docker/       # if certs.d file is there, means it secured. 
+service docker restart
+docker image push 10.0.1.15:5000/rabbitmq    # Now image pushed.
+docker container rm contID       # now registry/repository not worked
+
+==============================================================
+
+34. Docker (in Hindi) : Docker Registry/Repository (secured setup)
+
+cd /etc/docker
+rm -f daemon.json
+service docker restart
+mkdir certs
+
+# Now install certificate for secure purpose.
+openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt
+Enter .... , common Name: repo.docker.local     # any name ,but same use further
+
+cd certs/ ; ls domain.crt, domain.key
+cd /etc/docker ; mkdir certs.d
+cd certs.d ; mkdir repo.docker.local:5000
+cd
+cp certs/domain.crt /etc/docker/certs.d/repo.docker.local\:5000/ca.crt        # put certificate to this repo.docker.local
+service docker restart
+
+docker container run -d -p 5000:5000 --name secure_registry -v $(pwd)/certs/:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e 
+REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry
+
+docker image ls
+docker image tag mariadb repo.docker.local:5000/mariadb
+
+vi /etc/hosts
+10.0.2.15	repo.docker.local    # our machine IP
+
+docker image push repo.docker.local:5000/mariadb            # Now pushed to registry and securly
+===================================================
+
+35. Docker (in Hindi): Docker Registry With Basic Authentication
+
+mkdir auth
+docker container run --entrypoint htpasswd registry -bnB gaurav password >auth/htpasswd 
+cat auth/htpasswd
+gaurav encrypted password
+docker container ls 	# Now any container
+docker container run -d \
+--name registry_basic\
+-v "${pwd}"/auth\
+-v "${pwd"/certs:/certs\
+-e "REGISTRY_AUTH=htpasswd"\
+-e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm"\
+-e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd\
+-e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.cert\
+-e REGISTRY_HTTP_TLS_EKY=/certs/domain.key \
+registry
+
+# container runing and setup credential to registry.
+
+docker container ls    #Now create one container
+docker login repo.docker.local:5000
+Username: gaurav
+Password: password
+Logined Successed.
+
+docker image push repo.docker.local:5000/mariadb    # Now image pushed to docker registry server with credential.
+
+Q. how to setup like suppose nginx image is not exist in docker registry. But docker user want to pull image from docker registry. So first time nginx image pull from docker hub to docker registry and then user get nginx image from registry. In second time direct pull from docker registry not from docker hub.
+===========================================================================
+
+1. Docker Compose (In Hindi) : Installation
+
+Docker-compose work only on single host even i defined multiple replicas of containers. And it docker-compose can't work on docker swarm.
+docker compose is a tool for defining and runing multi container docker application and it use yml file to configure application services. with single command you can create and start all the services.
+
+sudo curl -L https://github.com/docker/compose/releases/download/1.24.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+$ chmod +x /usr/local/bin/docker-compose
+
+# sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+docker-compose --version
+
+docker container run --name some-mysql -e MYSQL_ROOT_PASSWORD=mypassword -d mysql:5.7  # Run database container
+docker container inspect contId        # to check ip  17.17.0.2
+
+docker container run --name some-wordpress -e WORDPRESS_DB_HOST=17.17.0.2:3306 -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=mypassword -d wordpress
+
+# wordpress container dependent on mysql db container.
+# wordpress container created (web server container) and connected with mysql   (open two tier server)
+
+docker container inspect wordpress_contID      # find IP 17.17.0.3
+
+URL: 17.17.0.3    # Now runing wordpress web application
+
+Docker compose is a tool for defining and running multi-container Docker application. Use YML language to write compose file. And with single command, you can create and start all the services from the configuration.
+-------------------------------------------------------
+
+vi docker-compose.yml
+version: '3.3'
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always                            # if due to anyreagion container is stopped then container automatically started again. 
+    environment:
+      - MYSQL_ROOT_PASSWORD=somewordpress
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wordpress
+
+  wordpress:         # this is for web
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - :8000:80"
+    restart: always
+    environment:
+       - WORDPRESS_DB_HOST=db:3306
+       - WORDPRESS_DB_USER=wordpress
+       - WORDPRESS_PASSWORD=wordpress
+       - WORDPRESS_DB_NAME=wordpress
+volumes:
+    db_data:{}
+
+docker-compose up -d    #  Now created two container wordpress_wordpres, wordpress_db_1
+docker network ls         # default bridge network created
+docker volume ls      # volume created.
+docker-compose down --volume     # container down as well volume removed.
+=============================================
+
+3. Docker Compose (in Hindi) : Create First docker-compose.yml file
+
+vi docker-compose.yml
+version: '3'           # check version with docker engin suppor in docker-component documentation.
+services:
+  webapp1:                  # this is container
+     image: nginx
+     ports:
+       - "8000:80"         #8000 localserver port:80 container port
+
+
+docker-compose up -d       # -d for background
+docker container ls       # runing 
+docker network ls            # one default network created.
+URL: serverIP:8000       # nginx runing
+docker-compose down
+
+vi docker-compose.yml
+version: '3'           
+services:
+  webapp1:                 
+     image: ranjit1234/newimage
+     ports:
+       - "81:80"
+     volumes:
+      - /home/ec2-user/docker:/var/www/html/
+
+  webapp2:                 
+     image: ranjit1234/newimage
+     ports:
+       - "82:80"
+     volumes:
+      - /home/ec2-user/docker/folder1:/var/www/html/
+  webapp3:                 
+     image: ranjit1234/newimage
+     ports:
+       - "83:80"
+     volumes:
+      - /home/ec2-user/docker/folder2:/var/www/html/
+
+  webapp4:                 
+     image: ranjit1234/newimage
+     ports:
+       - "84:80"
+     volumes:
+      - /home/ec2-user/docker/folder3:/var/www/html/
+  webapp5:                 
+     image: ranjit1234/newimage
+     ports:
+       - "85:80"
+     volumes:
+      - /home/ec2-user/docker/folder4:/var/www/html/
+
+docker-compose up -d       # -d for background
+
+Note: docker compose up command will check whether anything changed in compose file or not. if edited compose file then recreate same container otherwise don't do anything.
+vi docker-compose1.yml
+version: '3'           
+services:
+  webapp1:                 
+     image: nginx
+     ports:
+       - "8002:80"            #only port changed means recreate same container and reflect changed port only.
+  webapp2:                 
+     image: nginx
+     ports:
+       - "8001:80"           # everything is same in this container, So Nothing happend anything in this container.
+
+docker-compose -f docker-compose1.yml up -d    # if file name is other then docker-compose.yml, then use -f
+docker-compose -f docker-compose1.yml down
+
+# we can convert YML file to JSON file format using online
+
+==================================================================
+4. Docker Compose (In Hindi) : Basic Command ( create, start, stop, rm, up, down)
+
+docker container ls      # list only runing container
+docker container ls -a   # list all container stoped or runing.
+
+docker-compose create      # container created but not runing, also no network created
+docker-compose rm      # removed all container.
+docker-compose up      #  container/network/volume created and runing.
+docker-compose up --no-start   # container created with network but not runing.
+docker-compose start          # start container if stoped.
+docker-compose stop       # stoped all container
+docker-compose rm           # all container removed but network not removed
+docker-compose down     # delete container/network/volume
+============================================================
+
+5. Docker Compose (In Hindi) : Basic Command ( ps, pause, unpause )
+
+docker-compose images               # no any image
+docker-compose up -d
+docker-compose ps       # show container is UP
+docker-compose pause
+docker-compose ps       # show container is Paused
+docker-compose unpause
+docker-compose ps       # show container is UP
+==================================================
+6. Docker Compose (in Hindi) : Kill, exec, run, help, log
+
+docker-compose kill         # show container is Exist
+docker-compose start          # started container.
+docker-compose port webapp1 80      # list maped IP
+docker-compose logs -f           # list continiusly logs.  (to check logs runing, access continer application in URL)
+docker-compose --helps
+docker-compose exec webapp1 ls     #ls execute inside already runing webapp1 container .  list dir mnt,opt,run,sbin,usr,var etc..
+docker-compose run webapp1 ls     # create new container and  execute ls command within container. afterthat automatically container stopped.
+to check, docker-compose ls -a
+
+docker-compose restart          # simply restart container
+docker-compose pull         #  pull image from all runing runing container
+docker-compose --version         # show version of file
+======================================================
+
+7. Docker Compose (in Hindi) : Scale, Top
+vi docker-compose.yml
+version: '3'
+services:
+   webapp1:
+      image: nginx
+   webapp2:
+      image: nginx
+
+docker-compose up -d
+docker-compose ps           # show container is UP
+docker-compose scale webapp1=4 webapp2=2           #
+docker-compose ps         # Now list total 6 container.
+docker-compose top            # show container process details.
+docker-compose down            # down all container
+====================================================
+
+8. Docker Compose (in Hindi) : Bind Mount
+
+vi docker-compose.yml
+version: '3'
+services:
+  frontend:
+     image: 'httpd:alpine'
+     ports:
+        - "8000:80"
+     volumes:
+       - ./ot/:/usr/local/apache2/htdocs/
+
+docker-compose up -d
+URL: ec2IP:8000          #run fine.
+===============================================================================
+
+9. Docker Compose (in Hindi) : use build, image, dockerfile in Docker-Compose.yml
+
+vi Dockerfile
+FROM python:3.4
+ADD . /code
+WORKDIR /code
+RUN pip install -r requirements.txt          # installed, whatever defined all software name in requirements.txt file
+CMD ["python", "app.py"]
+
+vi docker-compose.yml
+version: '3'
+services:
+  web:
+    build: .              # build above default Dockerfile
+    ports:
+     - "5000:5000"
+    image: 'coolgourav147/mypythonimage:latest'      # create image name  (can be anyname)
+  redis:
+    image: "redis:alpine"
+
+docker-compose up -d
+URL: ec2IP:5000        # Runing Application
+
+docker image ls        # found image coolgourav147/mypythonimage:latest
+===========================================================
+
+10. Docker Compose (in Hindi) : args in Docker-Compose.yml
+
+vi Dockerfile
+ARG PYTHON_VERSION                 # must declare same variable name of compose file.
+FROM python:$PYTHON_VERSION             # pick variable value from compose file. "python:3.4-alpine
+ADD . /code
+WORKDIR /code
+RUN pip install -r requirements.txt
+CMD ["python", "app.py"]
+
+
+
+vi docker-compose.yml
+version: '3'
+services:
+  web:
+    build:
+      context: .     # give path where default/none default dockerfile exist.
+      dockerfile: Dockerfile         	    # dockerfile name
+      args:
+        - PYTHON_VERSION=3.4-alpine         # pass variable to dockerfile
+    image: python-redis-2                   # create image with this name.       
+    ports:
+      - "5000:5000"
+  redis:
+    image: "redis:alpine"
+
+docker-compose up -d
+URL: ec2IP:5000           # application runing fine.
+=============================================================
+
+11. Docker Compose (in Hindi) : Networks and Volumes in Docker-Compose.yml
+
+
+
+vi docker-compose.yml
+version: '3'
+services:
+  web:
+    build:
+      context: .     # give path where default/none default dockerfile exist.
+      dockerfile: Dockerfile         	    # dockerfile name
+      args:
+        - PYTHON_VERSION=3.4-alpine         # pass variable to dockerfile
+    image: python-redis-2                   # create image with this name. And container created with this image     
+    ports:
+      - "5000:5000"
+    networks:
+      - appnetwork        	 # assign this network to web container.
+
+  redis:
+    image: "redis:alpine"
+    volumes:
+       - myredisdata:/data
+    networks:
+       - appnetwork      	 # assign this network to redis container.
+
+  redis2:
+    image: "redis:alpine"
+    volumes:
+       - myredisdata2:/data
+    networks:
+       - appnetwork2     	# assign this network to redis2 container.
+
+networks:                       # create two networks.
+  appnetwork:
+  appnetwork2:
+
+volumes:                        # create two volume
+  myredisdata:
+  myredisdata2:
+
+docker-compose up -d
+
+docker container ls -a         # container runing
+docker volume ls               # 2 volume created
+docker network ls              # 2 network created
+==================================================================
+
+12. Docker Compose (in Hindi) : variable, .env and include variable file in docker-compose.yml
+# to make generic file
+
+vi docker-compose.yml
+version: '3'
+services:
+   web:
+     build: .
+     ports:
+       - "5000:5000"
+     environment:
+       - Name=Gaurav
+       - Add=Rajasthan
+  redis:
+    image: "redis:alpine"
+
+docker-compose up -d
+docker-compose exec web env         # Print environment variable and value whatever assigned
+-----------
+
+vi env.txt
+Name=Gaurav
+ADD=jaipur
+
+vi docker-compose.yml
+version: '3'
+services:
+   web:
+     build: .
+     ports:
+       - "5000:5000"
+     env_file:
+       - env.txt             #all environment variable list in env.txt file.
+  redis:
+    image: "redis:alpine"
+
+docker-compose up -d
+docker-compose exec web env         # list environment variable and value
+-----------------------
+
+vi .env
+PYTHON_VERSION=3.4
+REDIS_IMAGE=redis.alpine
+
+vi Dockerfile
+ARG PYTHON_VERSION
+FROM python-$PYTHON_VERSION            # version value pick from compose file.
+ADD . /code
+WORKDIR /code
+RUN pip install -r requirements.txt       # all software install from requirement.txt file
+CMD ["python", "app.py"]
+
+
+vi docker-compose.yml
+version: '3'
+services:
+  web:
+    build:
+      context: .                        # give dockerfile path.
+      dockerfile: Dockerfile
+      args:
+        - PYTHON_VERSION=${PYTHON_VERSION}   # search .env file in current location and pik vlue from .env file
+    image: python-redis-1
+    ports:
+      - "5000:5000"
+  redis:
+    image: ${REDIS_IMAGE}              # search .env file in current location and define variable "REDIS_IMAGE" there, and pick value from .env file and assign in image.
+
+docker-compose down
+docker-compose up -d
+
+URL: ec2IP:5000        # application working fine
+
+============================ Docker END =======================
+Q. What is Container Orchestration?
+Ans:
+Application are typically made up of individually containerzied components (ofter called microservices) that must be organized at the networking level
+ in order for the application to run as intended. The process of organizing multiple containers in this manner is known as container orchestration.
+
+Q what is service?
+Ans:
+Container on the cluster are deployed using services on Docker Swarm. A service is a long runing Docker container that can be deployed to any node worker.
+
+
+Docker SWARM :
+Docker swarm provide a docker cluster incase production machine is down due to any region. Many docker host maked a docker cluster and a docker cluster
+ have many docker machine and container is runing. Docker swarm is take care of all cluster's containers.  If any runing container machine is down, 
+in that case docker swarm is move all runing contianer to another machine which is currently runing. And it is provide continusly service, means 0 down
+ time service using docker service. There is structure of master and worker node, which is must mapped using security key between master/manager and worker. A worker must have attached a manager. master node assigen task to worker using docker service, when execute docker service command then create container to any worker node. A manager node can be alone, it can work as master or worker but as worker can't alone, a worker node must have a manager node. A every worker node have a agent installed, which worker node provide his current status to the manager node, because manager node assign taks to worker node. in case any worker node is down due to any reasion and not provide his curernt task status to the manager node, in this case manager node assing task to another worker node. Use Overallay network.
+
+without swarm all container connected through bydefault Bridge network.
+THere is 3 machine (master, worker1 and worker2)
+
+######## MASTER Node machine
+First create security group inbound with port (custom UDP: 4789,7946 and custom TCP: 2377,7946 |HTTP/HTTPS) and outbound: custom TCP: 8080 and all trafic and this attach with all node. 
+ 
+docker info     # swarm inactive
+docker swarm init   #certificate created ( docker swarm join --token SWMTKN-1-1fu8kw18c4k44j4q49yf1lg1xlwz0j5mz5e0elq51m2k4dxb3q-37sv0xvezb25icf5ztans7bp5 172.31.43.85:2377
+
+docker node ls   # only 1 node cluster availbe which is master  (now execute "docker swarm join token" command on worker1 node first) manager_status Leader
+docker node ls  # now show 2 node cluster (master and worker1) it will show after join token for worker1.
+docker node ls  # now show 3 node cluster (master and worker1,worker2) it will show after join token for worker2 as below
+
+(docker node ls, this command work only in master node)
+
+docker swarm join-token manager  # provide key of manager, when i jonined this key in any worker node then it will be join/add as manager node not worker node
+docker swarm join-token worker  # provide key of worker, when i jonined/execute this key in any worker node then it will be join/add as worker node not manager node
+#docker swarm join --token .......
+docker node ls   # show cluster worker2 node is down
+docker node rm worker2   # now exists from manager node.
+docker node rm -f worker1   # now worker1 node forcely removed from manager/master cluster and with need to execute docker swarm leave on worker1 node
+docker node ls     # now only show Active master/manager node
+docker info|less    # now show Down
+
+We can again add/join token in worker node using: docker swarm join --token ......., this token generate using, docker swarm join --token worker
+
+
+
+##### WORKER1 Node machine
+docker swarm join --token........ (copy and past)        # after executed, This worker1 node add/joined with master swarm manager cluster
+docker info|less   # swarm Active
+docker swarm leave        # This worker1 node left the master swarm, (docker node ls execute on master node then status will be Down for worker1)
+
+watch docker container ls             # auto list container when run service on master
+
+##### WORKER2 Node machine
+docker swarm join --token........ (copy and past)        # after executed, This worker2 node add/joined with master swarm manager cluster
+docker info|less   # swarm Active
+docker swarm leave        # This worker2 node left the master swarm, (docker node ls execute on master node then status will be Down for worker2)
+docker info|less   # swarm InActive
+
+watch docker container ls             # auto list container when run service on master
+-------
+MASTER Node machine
+docker service --help
+
+docker run -it alpine ping 172.31.36.169      (master private ip) pinging...
+
+
+--------------------------------------
+
+
+Docker Service(create,ls,logs)
+
+manager Node. 
+# docker service is used for continously up the container, incase down the container then automatically and immediatly up the container. means 0 downtime container. And docker service command always on docker swarm and execute on only manager node.
+docker service is used for single service only but docker stack deploy is used for multiple service.
+
+docker container run -it alpine ping 192.168.25.10  # container created and ping
+docker service create  # This command run only on master/Manager server
+docker service create -d alpine ping 192.168.25.10  (manager ip), it assign on any worker node
+docker service ls  #
+docker service inspect service_name     # to check details of service.
+docker service log service_name  # check log details of a particular container
+-------------------------------
+
+docker node promote worker1 worker2      # node1 and 2 promoted as manager
+docker node demote worker1 worker2      # node1 and 2 demoted again as worker
+docker node inspect self    # show status swarm or not 
+
+--------------------------------
+Docker Swarm Labels and Constraint
+docker service create --replicas=3 --constraint="node.role==manager" alpine ping 192.168.25.30  # 3 container created on manager node only
+docker service create --replicas=7 --constraint="node.role==worker" alpine ping 192.168.25.30   # 7 container created on all worker node only
+THis ip 192.168.25.30 past in URL, it show all node details.
+# Now attach level on node. if attach lavel after crated container then not move container between node for load balance. level always attach before container created.
+docker node update --help|grep label
+docker node update --label-add="ssd=true" worker01  # attach ssd harddrive on worker01 node and must execute on only master node. this way is node lavels 
+docker service create --constraint="node.labels.ssd=true" --replicas=3 -d alpine ping 192.168.25.30  # 2 container created on which node has SSD harddrive
+
+docker service ls
+# we can attach lavel from another engine lavels way also.
+worker02 node : 
+cd /etc/docker/
+vi daemon.json
+{
+"labels" :["name=gauravnode"]
+}
+
+service docker restart
+docker node inspect worker02|less     #now we can check there, gauravnode lavel attached
+
+manager node:
+docker service create --name service1 --constraint="engine.labels.name==gauravnode" --replicas=3 -d alpine ping 192.168.25.30  #3 container created on worker02 node.
+docker service ls  #
+docker service ps service1
+-----------------------------------
+
+===================== END DOCKER SWARM
+
+Docker Stack:         # docker stack work alway on multiple node cluster (manager/master node,worker_node1,worker_node2), not only work on single host. 
+However docker-compose work only on single node cluster.
+(docker-compose file and docker stack file are same, only little bit command not support to each other).
+docker run -it -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock dockersamples/visualizer    # 
+
+vi docker-stack.yml
+version: "3.8"
+services:
+ nginx:
+   image: nginx
+   ports:
+     - 81:80
+   deploy:
+     mode: replicated
+     replicas: 2
+     restart_policy:
+       condition: on-failure
+     placement:
+       constraints: [node.role == manager]
+ visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]           # service created only on manager node.
+
+docker stack deploy -c docker-stack.yml nginxweb
+docker stack ls    # list stack name
+docker stack ps nginxweb
+docker stack services nginxweb   #only show stack service 
+docker service ls   # it show all docker services, suposse including as below service
+docker service create -d ubuntu:14.04 ping 8.8.8.8
+docker service  ls     # list including above service
+docker service rm 
+docker stack rm nginxweb
+--------------------------------
+
+Swarm stacks And production grade compose
+
+We use DOCKER STACK deploy rather then docker service create. docker stacke is command that embedded CLI. And docker-compose is tool.
+Compose now ignores deploy, depend_on, Swarm ignores build.
+SWARM STACK
+node1
+vi example-voting-app-stack.yml  #  docker-compose file
+
+version: "3"
+services:
+  radis:
+    image: redis:alpine
+    ports:
+     - "6379"
+    networks:
+     - frontend
+    deploy:
+     replicas: 2
+     update_config:
+       parallelism: 2
+       delay: 10s
+     restart_policy:
+       condition: on-failure
+  db:
+    image: postgres:9.4
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+  vote:
+    image: dockersamples/examplevotingapp_vote:before   # docker pull dockersamples/examplevotingapp_worker
+    ports:
+      - 5000:80
+    networks:
+      - frontend
+    depends_on:
+      - radis
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 2
+      restart_policy:
+        condition: on-failure
+  result:
+    image: dockersamples/examplevotingapp_result:before
+    ports:
+      - 5001:80
+    networks:
+      - backend
+    depends_on:
+      - db
+    deploy:
+      replicas: 1
+      update_config:
+         parallelism: 2
+         delay: 10s
+      restart_policy:
+         condition: on-failure
+  worker:
+    image: dockersamples/examplevotingapp_worker  #  docker pull dockersamples/examplevotingapp_result
+    networks:
+      - frontend
+      - backend
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels: [APP-VOTING]
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.role == manager]
+
+---------
+docker stack deploy -c example-voting-app-stack.yml votapp     # -c for compose file, after execute this as below
+Creating network voteapp_frontend
+Creating network voteapp_backend
+Creating network voteapp_default
+Creating service voteapp_result
+Creating service voteapp_worker
+Creating service voteapp_visualizer
+Creating service voteapp_radis
+Creating service voteapp_db
+Creating service voteapp_vote
+
+docker stack   # info ls,ps,rm, services
+docker stack ls    # NAME (voteapp)        SERVICES (6)
+
+docker stack ps voteapp       # Runing 8 ID	NAME	IMAGES  NODE  DESIRED_DATE   CURRENT_STATE  ERROR  PORT
+docker container ls  # show 2 runing container
+
+docker stack services voteapp   # Runing 6 services  (entire application running)
+ID	NAME		MODE		REPLICAS	IMAGE
+9j3h4g	voteapp_redis	replicated	2/2		redis:alpine (below 5 more)
+
+docker network ls  # runing 8
+NETWORK ID	NAME		DRIVER	SCOPE
+9kj4n3h		bridge		bridge	local   (below 7 more)
+
+============================================================
+DOCKER SECRETS storage
+
+What is Secret?
+	Usernames and paswords
+        TLS certificates and keys
+        SSH keys
+-------------------
+
+Using secrets in Swarm Services
+ls    			# psql_user.txt
+cat psql_user.txt 	# mypsqluser
+docker secret create psql_user psql_user.txt    # secret created
+echo "myDBpassWORD"|docker secret create psql_pass -    # created
+
+docker secret ls    #
+ID		NAME		CREATED		UPDATED
+ku8g8d8dd	psql_user	3 minutes ago	3 minut ago
+raur8ckdkfl	psql_pass	2 minut ago	2 minutes ago
+
+docker secret inspect psql_user         # about info show
+
+docker service create --name psql --secret psql_user --secret psql_pass -e POSTGRES_PASSWORD_FILE=/run/secrets/plsql_pass -e POSTGRES_USER_FILE=/run/secrets/psql_User postgres    # service created
+
+docker service ps psql  # info ID NAME IMAGE NODE DESIRED STAT CURRENT STATE
+
+docker exec -it psql.1.u8ektdceki(service id) bash   #  executed and come bash prompet
+ls /run/secrets/     # psql_pass psql_user
+cat /run/secrets/psql_user      # mypsqluser
+
+docker logs psql.1.u8ektdceki(service id)     # 
+docker service ps psql   # running 1 service
+docker service update --secret-rm   #
+----------------------------------------
+
+Secrets with Swarm Stack
+
+ls    # docker-compose.yml, psql_password.txt, psql_user.txt
+docker service create --name search --replicas 3 -p 9200:9200 elasticsearch:2   #  elasticsearch:2 image name, service created
+
+vim docker-compose.yml     #
+version "2.1"
+services:
+  psql:
+    image: postgres
+    secrets:
+      - psql_user
+      - psql_password
+    enviornment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/psql_password
+      POSTGRESS_USER_FILE: /run/secrets/psql_user
+
+Secrets:
+   psql_user:
+     file: ./psql_user.txt
+   psql_password:
+     file: ./psql_password.txt
+
+docker stack deploy -c docker-compose.yml mydb    #
+docker secret ls    #  2 showing
+ID		NAME		CREATED		UPDATED
+3klj33l3lj	mydb_psql_user	17 min ago	17 min ago
+9jdf334jnn3	mydb_psql_pass  17 min ago	17 min ago
+
+docker stack rm mydb     # rmoving all secret,service,network name
+========================================================================================
+Q What are the drawback of Docker.
+Ans:
+a) No storage options
+b) poor monitoring
+c) Unable to reschedule automatically in active node
+d) Complicated horizontal autoscaling

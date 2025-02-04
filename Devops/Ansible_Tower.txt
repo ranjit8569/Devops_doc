@@ -1,0 +1,49 @@
+Benefits of Ansible Tower : it is developed by RedHat, and known as Red Hat Ansible automation. Ansible Towers provides a centralized and user-friendly interface for automating in one console.
+
+Features of Ansible Tower is 
+
+Centralized control: Ansible Tower provides a single dashboard to control and manage all your Ansible infrastructure, playbooks, inventories, credentials etc. This simpliﬁes the management of automation playbooks, reducing the need to manually run Ansible commands on individual machines
+
+Role-based access control (RBAC):  Tower allows managing users and teams with ﬁne- grained permissions. This enhances security and allows collaboration between teams by limiting access. You can deﬁne different user roles and permissions
+
+Restful API: Tower provides APIs to integrate and manage Tower using external tools and custom scripts. and extend Ansible Tower's functionality
+
+Graphical interface: Tower provides a web-based graphical interface to visualize inventories, launch jobs, monitor performance etc. 
+
+Credential management: Ansible Tower allows you to securely store and manage sensitive credentials.
+
+Ansible updates: Tower helps keep your Ansible playbooks and roles updated by tracking code changes in source control.
+
+Notifications and logging: It provides notiﬁcations through various channels, such as email and messaging services
+
+Enterprise scalability: Tower is designed for large organizations with complex hybrid environments
+
+Support and Maintenance: Being a Red Hat product, Ansible Tower beneﬁts from professional support, security updates, and ongoing maintenance
+
+Inventory Management: Ansible Tower simpliﬁes the management of inventories, including dynamic inventories that can automatically update based on predeﬁned criteria
+
+Integration: It can be integrated with various external systems and tools, including version control systems, cloud platforms, monitoring solutions, and more.
+
+* How to use Ansible Tower.
+Install
+Inventory
+Credentials
+Projects
+Templates
+Workflows
+Schedule jobs
+Launch jobs
+Users and Teams
+Monitory Activity
+Integrations.
+
+* How Ansible Tower can be Used.
+Configuration management
+Application deployment
+Patch management
+Dynamic inventory management
+Scheduled backup
+Multi Tier application deployment
+User and access management
+Integration with version Control.
+Cloud infrastructure provisioning.

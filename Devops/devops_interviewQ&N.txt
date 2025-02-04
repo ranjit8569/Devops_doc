@@ -1,0 +1,2086 @@
+Q What are the NRPE plug-in Nagios?
+Ans:
+The NRPE addon is designed t allow you to execute Nagios plugins on remote Linux/Unix machines. Then main reason for doing this is to allow Nagios 
+to monitor "local" resources (like CPU load, memory usage) and remote services status on remote machine.
+
+Q. What is the difference between Active Checks and Passive Checks in Nagios?
+Ans:
+Only defference is Nagios tool use for Active Checks, However in Passive Checks Third parti tool use for server monitoring.
+
+------------------------------------------------------------GIT ---------------------------------------------------------------------
+Q Explain the Git Architecture?
+Ans:
+Many developer write the code in his seprate branch for same project and suppose first developer write code then commit and finally push to remote
+repository (github) then Next day second developer pull the same code repository on his branch and start the working and finally commit the code and 
+push to github. Again first devloper pull same code repository from github and start working. whenever developer pull the repository then pull only 
+changes code, not whole code.
+
+Q. Git workflow?
+Ans: long runing branches - master and develop.
+
+Q. what is git bisect? How do you use it to determine the source of bug?
+Ans: 
+bisect is tool the help you to find the commit that introduced a bug.
+git bisect <subcommand> <option>
+
+Q. what is git cherry-pick?
+Ans: Used to move commits ID from one branch (dev_branch) to another branch (master_branch). Incase bymistake commited ID in another branches.
+git checkout master      # first change branch where want to move commitID.
+git cherry-pick commit_id  (copy commitID from dev branch)        # now moved comitID from dev to master branch.
+
+
+Q. what is git reflog?
+Ans: Keeps a track of every single change made in the reference  of a repository. command: git reflog
+
+Q. How to recover a deleted branch using git reflog?
+Ans: 
+git reflog     # get history log with all commits ID references.
+git checkout -b preprod HEAD@{4}             # it switched to a new branch "preprod".
+
+Q. Mention some of the git reflog sub commands?
+Ans: git reflog --help/show/expire/delete/exists.
+
+1. Why we need git? What makes git unique from other tools like SVN?
+Ans: 
+Git is the most commonly used version control system. Git tracks the changes you make to files, so you have to record of what has been done, 
+and you can revert to specific versions. And Git allowing changes by multiple people to all be merged into one source.
+Git has two type repository, CENTRAL REPOSITORY, REMOTE REPOSITORY. 
+CENTRAL/LOCAL REPOSITORY : commit and update command.
+REMOTE REPOSITORY : push, pull, fetch
+
+2. Let's say i have maven repo cloned on to my local, did some changes and i have build the code now target folder with jar file will be generated. 
+So now when i do git operations like git add, git commit or any other git operations target folder should not be considered, how would you achieve the same?
+Ans:
+Ex - git clone https://github.com/ranjit1234/sample-web-application.git
+     cd sample-web-application
+     ls  # all project code is there. ansible.yaml, deployment.yaml, Dockerfile, hosts, jenkinsfile, pom.xml, README.md, src
+     mvn install          # target folder created, within this folder .jar/war file created.
+     git status  # Untracked file target/.
+     vi .gitignore   # edit target/
+     git status  # now target/ folder is not consider
+
+3. difference between git pull and git fetch?
+Ans:
+git fetch origin -  Fetch only download the new data from the remote repository to the local repository. but the data is not merged in the working directory (it has only task, fetch)
+
+git pull origin master - Git pull is used to update the working directory with the latest changes from the remote repository.
+Git pull is used to get the data to the local repository and the data is merged in the working directory. (it has two task, fetch + merge)
+
+Q. what is git pull rebase?
+Ans: Git pull rebase is a method of combining your local unpublished changes with the latest published changes on your remote.
+
+Q. How to find a list of files that changed during a commit?
+Ans: git diff-tree -r {hash}
+
+Q. what does commit object contain?
+Ans: 
+A set of files. Reference to a parent commit objects. An SHA-1 name (which is 40 char string for uniquely).
+
+Q. How to remove a file from Git without removing it from your file system?
+Ans: git reset filename or echo filename >>.gitignore     # file come into working dir
+
+Q. What is Git LFS (large file system)?
+Ans: it is extension for git that allow you manage large file audio, video and graphic. Git LFS stores a pointer to the large file in the repo and 
+the actual file is stored in a seprate GIT LFS server.
+
+git branch -a  # show branch list. /remote/branch_name - if show remote prefix then this is remote branch otherwise local branch.
+
+GoTo : GitHub and in this project changed some content in README.md file, and commit.
+# Now ansible-sonar (local branch name)
+git fetch   # fetch done
+cat README.md   # still not changed
+git checkout origin/ansible-sonar (remote branch name) 
+cat README.md   # now show changed.
+git checkout ansible-sonar (local branch)
+cat README.md   # not changed
+git merge origin/ansible-sonar     # (remote branch)
+cat README.md   # Now changed in local branch.
+ # but in git pull directly changed into loacal branch from remote branch.
+
+
+4. How to clone specific branch in git?
+   Ans:  
+  cd sample-web-application   # repository folder
+  git branch -a   # many branches is there
+  cd ..;  rm -rf sample-web-application
+  ls # nothing anything
+git clone --single-branch -b branch_name https://github.com/DeekshithSN/sample-web-application.git # clone only backup branch using --single-branch
+  ls ; cd sample-web-application; ls  # show all project files.
+  git branch -a  # show only remotes/origin/backup  branch.
+
+5 How to register GitHub path for git push/pull.
+Ans:
+git remote add origin 'github path'
+
+6. What is different between merge and rebash ?
+Ans :  
+git merge combines changes from one branche into another branch, creating a new merge commit id that has two parent commits.
+
+But git rebash maintain liniear history, rewrite the history of a branch by moving the branch to the top of another branch
+and applying the changes in linear fasion. This creates a cleaner, easier-to-understand commit history, but can lead to conflict if multiple people
+are working on the same branch.
+
+
+7. what is merge conflict ?
+Ans:
+a) if same file name exist in two branches with totaly different contents and then if try to merge branchs than git got merge conflict. 
+and Because not understand which line is up or down. And to resolve this, using vi file_name and edit which line is in first line and which line is in 
+last line.
+
+b) if file name is same in both branch and some code is changed in one branch then if merge between both branch the got conflict. and to resolve 
+open file and edit.
+
+And if file name is same in different branches but atleast any one line is common in both branches, then in this case merge not conflict.
+
+Q. What is git index?
+Ans:
+The index is one of the most important data structures in git.
+Working Dir > git add --> Staging Area --> Commit  --> Local Repository.
+
+Q how to check who branch is already merged.
+And: git branch --merged.
+     git branch --no-merged       : list who branch is not merged.
+
+Q. How to check last commit ID with message for all branch.
+Ans: git branch -v
+
+Q. What is git config.
+Ans:
+We can specify Git configuration settings with the git config command. for example as below.
+git config --global user.name "John Doe"
+git config --global user.email johndoe@example.com
+
+Q. How to edit last commit message in Git or fix broken commit.
+Ans:
+git commit --amend  # open edit mode.
+git commit --amend -m "New commit message."         #direct  edit latest commit message with new message.
+
+Q. How To change older or multiple commit messages?
+Ans:
+git rebase -i HEAD~N
+
+Q. How to initialize empty git repository.
+Ans:
+git init        # create .git folder.
+
+2. What is a git repository?
+Ans: 
+A repository is a file structure where git stores all the project-based files. Git can either stores the files on the local or the remote repository.
+
+3. What does git clone do?
+Ans: 
+ it is used to get a copy of the remote repository to the local repository.
+
+Q 5. Can you explain head in terms of git and also tell the number of heads that can be present in a repository?
+Ans:
+A head is nothing but a reference to the last commit object of a branch.
+For every repository, there will always be a default head referred to as “master” or now “main” (as per GitHub) but there is no restriction to the 
+count of heads available. In other words, it can have any number of heads.
+Usages:
+
+- To go or checkout to 1 commit before the latest commit, we use git checkout HEAD~1
+
+- To uncommit the last 3 commits without losing the changes, we first run git reset HEAD~3. Then we can see the changes made in the last 3 commits and then update it manually and commit it finally.
+
+- In order to uncommit the last 3 commits and also remove the changes, we can run the command: git reset --hard HEAD~3. This command will completely remove all the changes.
+
+- To see the changes made in the last 3 commits, we can run git diff HEAD~3
+
+- To make a new commit by reverting the last 3 commits, we can run the command: git revert --no-commit HEAD~3...HEAD
+
+Q. What is different betwenn git diff and git status?
+Ans:
+git diff works showing the differences between commits data and in a similar to git status show difference between the working directory and index.
+
+Q. What is different between central repository and distributed repository.
+Ans:
+CVCS is Centralised version control system and this is client server relationship, every user direct push code to server side central repository.
+Do not keep any copy locally, if in case central repository crupted then all data will be lost.
+ 
+GIT is distributed version control system. and every user has a local copy of the repository and remote server repository also.
+
+Q. In Git how do you revert a commit that has already been pushed and made public?
+
+Ans:     Using revert command.  Below example
+
+cd /var/www/html; 
+git clone https://github.com/hshar/devopsIQ.git
+ls; cd devopsIQ; ls  # images, index.html
+
+URL : ip/devopsIQ/devopsIQ       # Runing fine. (2.jpg)
+vi index.html
+<body background="images/1.jpg">    # edit from 2.jpg to 1.jpg
+git add .
+git commit -m "changed background"      # e43k232324j5 (commit ID)
+git push origin master
+
+URL : ip/devopsIQ/devopsIQ           # Now runing 1.jpg (different background)
+# But Now need to change preview background.
+git log
+git revert e43k232324j5         # Now reverted with preview 2.jpg.
+git push origin master              # Now found 2.jpb in GitHub.
+
+Q. You have made a commit that contains sensitive information, such as password and want to remove it form repository. what is best way?
+Ans: git filter-branch command.
+
+Q. if accedentally deleted file and was commited to git repository, what is best way to restore file.
+Ans: git checkout <commitid> -- <file>
+
+#if the file was deleted in the most recent commit. then use git reset HEAD~1 to reset the branch, then use git checkout to restore the file.
+
+Q. What is git reflog?
+Ans: is a log of all changes to git reference such as (branches, tags, HEAD) that have occourred in repository.
+it can be used to recover lost commits, branches, or tags that have been deleted. 
+git reflog
+
+Q. what is Git blame?
+Ans: It allow you to see who last modified each line of file, and when they made the changes in details.
+
+Q. what is Git worktree?
+Ans: it is a feature that allow you to work on multiple Git branches at the same time, without having to switch between branches in the same working
+dir. Each worktree has its own seprate directory, but share the same Git repository. Useful for working on multiple branches simultaneously.
+
+---------------------------------------------------------Maven -----------------------------------------------------------------
+Q What is maven ?
+Ans:
+It is project management tool and Build tool. it manage dependency and java project. 
+
+Q. how to install maven?
+Ans:
+(Windows):
+first download apache maven and java JDK and copy and past in C drive softwar/any folder. extract this and copy bin path and past in environment variable. 
+And work mvn command now.
+
+(Linux):
+download apache-maven and JAVA JDK using wget command. tar -xvf apache-maven-3.5.2-bin.tar.gz ; cd apache-maven-3.5.2 ; ls bin,etc. Now copy path till bin
+vi .bashrc
+M2_HOME=path
+JAVA_HOME=path
+PATH=$PATH:$JAVA_HOME:$M2_HOME
+export $PATH
+
+mvn -version  # working fine
+
+5. when i issue mvn install what all things happen in background?
+Ans:
+mvn install is one utility that could download most of the dependencies. And create target folder and .jar/war file created inside target folder.
+
+Default lifecycle:
+validate - validate the project is correct and all necessary information is available.
+compile - compile the source code of the project.
+test - test the compiled source code using a suitable unit testing framework. 
+package - take the compiled code and package it in its distributable format, such as a JAR.
+verify -  run any checks on results of integration tests to ensure quality criteria are met.
+install - install the package into the local repository, for use as a dependency in other project locally.
+deploy - done in the build environment, copies the final package to the remote repository for sharing with other developers and projects.
+
+6. what are the settings you need to do before running mvn deploy?
+Ans :
+git clone https://github.com/DeekshithSN/nexus--maven-samples.git
+cd nexus--maven-samples; ls # demo, README.md, setting.xml 
+mv setting.xml ~/.m2/
+cd demo
+mvn deploy       # BUILD success
+ex: Uploading http://35.188.22.253:8081/repository/maven-snapshots/com/example/demo/maven-metadata.xml
+
+
+7. why maven takes much time for 1st execution and from 2nd execution it will take less time?
+Ans:
+git clone https://github.com/DeekshithSN/Jenkinsfile.git      #clone this repository
+cd Jenkinsfile
+ls    # basic-maven-example, jenkinsfile, pom.xml, README.md
+mvn clean install   #Build success              (also mvn clean package)
+mvn install  #   Now immediately BUILD SUCCESS. because now executing from local repository.
+and first time execute from remote repository thats why taking much time.
+cd ~/.m2/           # .m2 is local repository of maven.
+cd repository
+ls    # all files there
+
+8 what is mvn package
+Ans: 
+It will compile your code and also package/build it.  For example, if your pom says the project is a jar, it will create a jar for you 
+when you package it and put it somewhere in the target directory (by default)
+
+9 What is mvn install?
+Ans:
+It will create target folder as well jar file create in target folder. so compile and package it, and download most of the dependencies. 
+but it will also put the package in your local repository. This will make it so other projects can refer to it and grab it from your local repository.
+
+9 what is mvn clean install package
+
+11 what is different between free style project and pipeline project.
+Ans : pipeline project has advance feture then free style project.
+12 what is mvn clean.
+Ans:
+deletes all the generated files
+
+13 mvn clean install 
+Ans:
+Tells Maven delete all generated files before running the install phase for each module.
+
+13 why use maven project ?
+Ans:
+it is powerfull project management tool that is based on POM  (project object model ) and with help of maven project we can develop core java, 
+advance java project, webapplication project etc. There is pom.xml configuration file of maven, i can define needed dependency name, plugin name, 
+java name in this file. it download jar file and put in class path automatically. (without maven we need to do manyally define dependency in class path).
+ maven build jar or war file to deploy.
+it provide Build, Documentation, Dependency, Release, etc.
+
+--------------------------------------------- Unix and Shell Scripting ------------------------------------------------------------
+8. How to get present working folder?
+Ans:
+pwd   #/home/spovedd
+cd .. ; pwd #/home
+cd spovedd/
+basename "$PWD"  # spovedd
+cd .. ; pwd  # /home
+basename "$PWD"  # home
+cd spovedd/nexus--maven-samples
+basename "$PWD"   # nexus--maven-samples
+pwd|rev|cut -d '/' -f1|rev    # nexus--maven-samples   (same output)
+pwd|cut -d '/' -f3   # same output
+
+9. How to copy files from local windows machine to cloud based Linux machine?
+Ans:
+open window powershell and execute below command
+pscp file.txt root@35.202.104.9:/home/oracle       #enter and provide root user password (root is unix user)
+pscp -P 22 -i latest_key.ppk agent.jar ec2-user@ec2-13-235-90-129.ap-south-1.compute.amazonaws.com:/home/ec2-user/slave1
+
+10. A shell script named test.sh can accept 4 parameters i.e, a,b,c,d. the parameters wont be supplied in order always and number of parameters might also vary( only 2 parameters user might supply sometimes), how to identify position of letter c?
+Ans:
+i=0
+for ii in "$@"; do
+i=$((i+1))
+if [ "$ii" = "c" ]; then
+echo "user supllied c has a parameter, in $i position"
+fi
+done
+
+Q. How to check port open or not?
+Ans: sudo netstat -tulpn | grep LISTEN or telnet ip port
+
+Q. How to check how many server connected from your system.
+Ans:
+ifconfig 
+
+Q. what is Run level?
+Ans:
+Runlevel 0 - shuts down the system
+Runlevel 1 - single-user mode
+Runlevel 2 - multi-user mode without networking
+Runlevel 3 - multi-user mode with networking
+Runlevel 4
+Runlevel 5
+Runlevel 6  - reboots the system to restart it
+
+Q. how to enable/desable SELinux?
+Ans:
+$sestatus          # command to check enable/disable
+SELinux status:                 enabled
+vi /etc/selinux/config    # edit below to permanent SELinux disable.
+SELINUX=disabled
+
+# reboot your CentOS system
+sudo shutdown -r now
+
+# How to chek available package in O.S.
+rpm -qa     # list all packages
+yum list installed
+
+# Where we can get the update.
+cat /etc/os-release      # version information here
+# how to check particular repository?
+cat /etc/yum.rpos.d/redhat-rhui*       # where from download the packages. link is there
+
+# how to upgrade os. update/upgrade the packages
+yum check-update;     # tocheck install/runing kernal version
+yum repolist ; yum update -y
+
+
+
+
+
+-------------------------------------------------------Ansible--------------------------------------------------------------
+11. Why we need ad-hoc ansible commands, scenario where you have used ansible ad-hoc command?
+Ans:
+An Ansible ad-hoc command uses the /usr/bin/ansible command-line tool to automate a single task on one or more managed nodes. 
+ad-hoc commands are quick and easy, but they are not reusable.
+ex:
+ansible all -i '146.148.67.44,' -m ping
+ansible dev -i hosts -m ping     # dev is group name and hosts is inventory file name
+ansible dev -i hosts -m setup    # print software install details, server name/ip, cpu details, services details.
+ansible dev -i hosts -m copy -a 'src=/home/deekshithsn2/hosts dest=/home/deekshithsn2/'
+# cat hosts
+[dev]
+35.202.104.9
+
+12. When i need detailed logs on executing ansible playbook what option i need to use?
+Ans:
+ansible-playbook -i inventory_file copy.yml -vvvv    (-vvvv option)
+
+Q how many type of ansible inventory file.
+Ans: static inventory : bydefault /etc/ansible/hosts
+and dynamic inventory : it generated by script written in python or other
+
+13. what is ansible.cfg file?
+Ans:
+Present by default under /etc/ansible
+you can define certain setting in ansible.cfg
+inventory = /etc/ansible/hosts     # uncomment, connect bydefault ip under hosts
+sudo_user = root   # uncomment, bydefault root user
+
+14. what are the modules have you worked on? which module will you use for getting the file from node server to master server?
+Ans:
+copy, fetch, yum, debug, get_url, except, templete, file, apt, command, shell, file, setup, ping, service,cron,template,alternative,
+ex: fetch.yml
+---
+- hosts: dev
+  user: ansible
+  become: yes
+  gather_facts: false
+  tasks:
+     - name: copy from remote to local
+       fetch:
+         src: /home/spovedd/a.txt                   # Node server
+         dest: /home/spovedd                    # Ansible server
+
+ansible-playbook -i hosts fetch.yml
+ls  # 35.202.104.9 folder created (subdir created)
+cd 35.202.104.9/home/spovedd/
+ls  # a.txt file is there
+
+15. Lets say i have a playbook which has 5 tasks in playbook, first 2 tasks should run on local machine and other 3 tasks should run on node?
+Ans:
+vi test.yml
+---
+- name: THis is playbook
+  hosts: localhost
+  become: yes
+  user: ansible
+  tasks:
+    - name: installing wget
+      apt:
+        name: wget
+        state: present
+    - name: download jenkins
+      get_url:
+         url: https://updates.jenkins-ci.org/download/war/2.248/jenkins.war
+         dest: /home/spovedd
+  hosts: dev
+  become: yes
+  gather_facts: false
+  tasks:
+   - name: copy jenkins war to host machines
+     copy:
+       src: /home/spovedd/jenkins.war
+       dest: /home/jenkins.war
+   - name: creating folder structure
+     shell: |
+       mkdir -p /home/spovedd/jenkins
+       mv /home/jenkins.war /home/spovedd/jenkins
+       nohup java -jar /home/spovedd/jenkins/jenkins.war &
+
+ansible-playbook -i hosts test.yml
+# in URL: server public_IP:8080        jenking is runing...
+
+Q. How will error handel in playbook?
+Ans:
+Will use, block:, rescue, always and  using when condition.
+OR direct use ignore_errors: True  where task fail
+OR ignore_unreachagle: True    # if any server unreachable
+
+Q48. Write an Ansible playbook to automate the starting of EC2 instance.
+
+---
+ - name: Create an ec2 instance
+   hosts: web
+   connection: ssh
+   user: ansible
+   become: yes
+   gather_facts: false
+  
+  vars:
+      region: us-east-1
+      instance_type: t2.micro
+      ami: ami-05ea7729e394412c8
+      keypair: priyajdm
+  
+  tasks:  
+    - name: Create an ec2 instance
+      ec2:
+         aws_access_key: '********************'
+         aws_secret_key: '****************************************'
+         key_name: "{{ keypair }}"
+         group: launch-wizard-26
+         instance_type: "{{ instance_type }}"
+         image: "{{ ami }}"
+         wait: true
+         region: "{{ region }}"
+         count: 1
+         vpc_subnet_id: subnet-02f498e16fd56c277
+         assign_public_ip: yes
+    register: ec2
+
+
+Q46. Does Ansible support AWS?
+Ansible has hundreds of modules supporting AWS and some of them include:
+
+Autoscaling groups
+CloudFormation
+CloudTrail
+CloudWatch
+DynamoDB
+ElastiCache
+Elastic Cloud Compute (EC2)
+Identity Access Manager (IAM)
+Lambda
+Relational Database Service (RDS)
+Route53
+Security Groups
+Simple Storage Service (S3)
+Virtual Private Cloud (VPC)
+
+12. What are “facts” in the context of Ansible?
+Ans:
+You can get all the facts by using this command:
+
+$ ansible all- m setup
+
+
+15. Explain the difference between a playbook and a play.
+Plays is consist of one or more tasks. A playbook consists of one or more plays.
+
+
+17. What are Ansible tags?
+When large playbook, sometimes need to run just a part of it as opposed to the entire Playbook. That’s what tags are for. (--tags, --skip-tags)
+Ex:
+tasks:
+     - debug:
+         msg: "This is first task"
+       tags: first
+
+24. What are handlers?
+Handlers are like special tasks which only run if the Task contains a “notify” directive. 
+
+tasks:
+  - name: install nginx
+    apt: pkg=nginx state=installed update_cache=true
+    notify:
+     - start nginx
+ handlers:
+   - name: start nginx
+     service: name=nginx state=started
+
+
+25. How to generate encrypted passwords for a user module?
+Ans:
+ansible all -i localhost, -m debug -a "msg={{ 'mypassword' | password_hash('sha512', 'mysecretsalt') }}"
+OR mkpasswd
+
+31. Explain Ansible register.
+Ans:
+Ansible register is used to store the output of first task execution and will use in another task as input. 
+
+27. How does Ansible synchronize module works?
+Ans:          # recursively copy file
+---
+- hosts: host-remote tasks:
+  name: sync from sync_folder
+  synchronize:
+     src: /var/tmp/sync_folder dest: /var/tmp/ delegate_to: "{{inventory_host}}"
+
+Here we are transferring files of /var/tmp/sync_folder folder to remote machine’s /var/tmp folder
+
+Q. what is ansible set_fact module?
+Ans: used to set new variable values on host-by-host basis.
+-set_fact:
+var1: value1
+var2: value2
+
+Q. what is different between import and include task?
+Ans:
+All import* statements are pre-processed at the time playbooks are parsed.
+All include* statements are processed as they encountered during the execution of the playbook.
+So import is static, include is dynamic.
+
+Q How to run task only one time on any one server.
+Ans: run_once: true    (this use within task)
+--------------
+
+Q how to use git module
+- name: Clone a repo with separate git directory
+  git:
+    repo: https://github.com/ansible/ansible-examples.git
+    dest: /src/ansible-examples
+    separate_git_dir: /src/ansible-examples.git
+
+- name: Example clone of a single branch
+  ansible.builtin.git:
+    repo: https://github.com/ansible/ansible-examples.git
+    dest: /src/ansible-examples
+    single_branch: yes
+    version: master
+---------------------------------
+Q how to copy file from node1 to node2
+
+    - name: Transfer files from node1 to node2
+      copy:
+        src: /tmp/a
+        dest: /tmp/
+      delegate_to: node2
+
+  delegate_to: node1
+-----------
+Q. How to copy file on remote only.
+
+– name: copy file between locations on the same remote host
+copy:
+src: $HOME/test_file
+remote_src: true
+dest: $HOME/test_file2
+--------------
+
+– name: write text content into a file on remote
+copy:
+ dest: $HOME/test_file
+ content: “Hello, {{ ansible_user }}!”
+
+Q. How to setup a jump host to access servers having no direct access?
+Ans: ansible_ssh_common_args:'-O ProxyCommand="ssh -W %h:%p -q user@gateway.example.com"'
+
+Q. How to automate the password input in playbook using encrypted files?
+ANs: ansible-playbook launch.yml --vault-password-file ~/.vault_pass.py           # vault_pass has key of encrypted password file.
+
+Q. what are callback plugins in ansible?
+Ans: Callback plugins basically control most of the output. ex: log_plays callback is used to record playbook events to a log file, 
+and mail callback is used to send email on playbook failures.
+------------------------------------------------------Jenkins-----------------------------------------------------------------
+# all jenkins job in /var/lib/jenkins/jobs
+
+Q. What is CI/CD pipelines?
+Ans:
+CI/CD pipeline is Continuous Integration, Continuous Delivery (release) and Deployment pipelines, are a way of running jenkins jobs in a sequence, 
+which resembles a pipeline view.
+
+Q what is different between continious Deployment and continious Delivery.
+Ans:
+Delivery : build/release deliver to repository or artifactory.
+Deployment: build/release deploy to Production
+
+Q. What is Continuous Integration?
+Ans:
+it is a development practice where developer integrate code into a shared repository frequently, preferably sereral times a day. Each integration 
+can then be verified by an automated build and automated tests and merged using Jenkins. Testing is optional in a CI lifecycle.
+
+The process of having release cycles (sometime, several time a day) creating small features and integrating them to source code and employing 
+automated build and test process for quicker feedback is called Continuous integration.
+
+Q. Create a CI/CD pipeline using Git and Jenkins to deploy a website on every commit on the main branch.
+Ans:  
+Developer > GitHub - > Jenkins > BuildServer
+
+1. configure jenkins jobs with GIt project and Git path
+Checked: pool SCM.
+Build Shell: 
+sudo docker rm -f $(sudo docker ps -a -q)
+sudo docker build /var/lib/jenkins/workspace/demojob/ -t jenkins
+sudo docker run -it -p 82:80 -d jenkins
+GoTo GitHub > Setting > Webhooks > Add webhook > Enter jenkins URL/github-webhook > Add Webhook
+
+vi devopsIQ/index.html  # edit
+git add . ; git commit -m "test push"
+git push origin master     # code pushed to github and job is builded automatically
+URL: working fine
+# Now i want revert pereview version of code.
+git logs --oneline
+git revert last_commit_id         # reverted preview version application.
+git push origin master          
+URL:                            # Now preview version Application working fine.
+
+Q. How to change port in Jenkins server.
+Ans:   direct execute: java -jar jenkins.war --httpPort='9090'
+or
+go to /etc/default/jenkins
+add --httpPort=9999
+sudo service jenkins restart
+
+16. How to save only last 5 builds of jenkins job?
+Ans:
+cd ~/.jenkins/jobs/jenkins/builds/
+ls  # show no of build counts. (suppose show  1 2 3 4 5 6
+login jenkins> and build again jobs   # ls now show 1 2 3 4 5 6 7
+#due to all build save, memore is waistage.
+Now goto configure > General > checked "Discard old builds"
+Max No of builds to keep : 5
+APPLY and SAVE.
+
+Now build jenkins jobs again and after that if check below path.
+cd ~/.jenkins/jobs/jenkins/builds/
+ls  # show no of latest build counts. (only show  4 5 6 7 8 )
+
+
+17. Have you worked on Jenknsfile? can we use docker container as a node in Jenkinsfile? Who will handle docker container creation and deletion?
+ If i am building a maven project always docker container is fresh instance it will try to download dependency from repository, what measures 
+you will take to reduce build time?
+
+Ans:
+cd ~/.m2/  # in .m2 have all the dependency
+ls #repository, all this repository can be copy into container and it used this dependency in local repository of this container, so take less time.
+# EDit Jenkins file
+pipeline{
+  agent {
+    docker{
+        image 'maven';;  
+        args '-v /root/.m2:/root/.m2         # add this line for copied into container /root/.m2
+         }
+
+commit changes;
+
+Now jenkins build and run. and took 11.862 seconds first time.
+If now again build and run then took 5.444 seconds in second time.
+
+
+18. Why we need multi branch pipeline?
+Ans:
+The Multibranch pipeline project type enables you to implement different jenkinsfiles for different branches of  the same project.
+
+In a Multibranch pipeline project, jenkins automatically discovers, manages and executes pipelines for branches which contain a jenkinsfile 
+in source control.
+
+19. If you forget Jenkins password, how would you login back?
+Ans:
+
+cd ~/.jenkins/
+vi config.xml   # edit True to false in below line
+<useSecurity>false</useSecurity>
+
+ps -aef|grep java
+kill -9 pid first     #kill job runing jenkins.jar file 
+# Again try to login jenkins without ID/PAS
+cd /home/spovedd/jenkins          # now again found jenkins.jar file
+java -jar jenkins.war       # deploy war file
+Now Refereshed URL      # now logined jenkins without id/pas
+
+20 Example of pipeline project?
+Ans:
+
+pipeline{
+  agent any
+  environment{
+     PATH=/opt/apache-maven-3.6.3/bin:$PATH     # path where is mvn install
+  }
+  stages{
+     stage("clone code") {     # any name
+       steps{
+         git CredentialsId: 'git_credentials', url: 'https://github.com/ravdy/hello-world.git'
+       }
+    }
+    stage("build"){  
+       when {                      # incase multi branch pipeline. execute only in this branch
+          expression {
+              BRANCH_NAME == 'dev' || BRANCH_NAME == 'master'
+          }
+         }     
+        steps{
+           sh 'mvn clean install'  # removed generated files and compile and package it (builded and created .war file in local repo (.m2)).
+           
+        }
+    }
+  }
+} 	
+ 	
+21. what is plugin in jenkins?
+Ans:
+It enhancing the functionality of jenkins. Plugins are small libraris that add new abilitys to jenkins. with help of plugin, java JDK, git, 
+ansible sh, pipeline, war/ear to a container communicate with jenkins. (example plugin: Maven 2 project, Git, EC2, HTML publisher, COPY artifact, 
+join, Green ball,JUnit, publish ssh, etc)
+   
+Q. How is monitor of any URL, server reachable or not.
+Ans: Using Nagios   ( website monitoring, HTTP monitoring, Protocol monitoring.)
+
+Q. Suppose we have thousand of jobs created, how to search any particular jobs in jenkins.
+Ans: Using search pannel (top of jenkins screen).
+
+Q. What is manage jenkins?. What configuration option is there.
+Ans:
+
+Configure system : Configure globle settings and path. And for display to any notice to all users. And configure no of time build job, 
+SCM checkout retry count. 
+
+Global tool configuration : configure any tools related. (like maven, git location path, automatic installer etc)
+Manage plugins: Add, remove, disable or enable plugins that can extend the functionality of jenkins.
+Manage Node and Clouds : Add, remove, control, and monitor the various nodes that jenkins runs jobs on. And for distribute the jobs load.
+Configure Global Security : Security jenkins, define who is allowed to access/use the system.
+Manage Credentials: configure credentials.
+Mange Users : Create/delete/modify users that can log in to this jenkins.
+Reload Configuration from Disk: Discard all the loaded data in memory and reload agian everything from file system. Useful when modify config files directly on disk.
+Jenkins CLI : Access/manage jenkins from your shell or from your script.
+
+
+Q. What is Role Base Access Control(RBAC)?
+Ans:
+If we create any user then bydefault this user acesss all jobs of another user. But using "Role Based Authorization strategy" plugins, we can restrict 
+this and give any particular roles (create,read,modify jobs etc.) to specific users.  (installed this pluging and checked "Role based starategy" 
+in Configure Global Security then visible configure option is "Manage and assign role").
+
+Q. What is clean workspace?
+Ans:
+checked Delete workspace before build start. (empty this directory before build)
+or can use Git plugin to clone repository.  (in this case not use delete workspace)
+
+Q. How to execute jenkins job remotely and command line also.
+Ans:
+Checked "build remotely".  (Build part)
+Enter Token: mysecrettoken  (URL is there to execute, Jenkins url:8080/job/job_1/build?token=mysecrettoken )   # job build on same browser
+
+Other Server Browser : Jenkins url:8080/buildByToke/build?job=job_1&token=mysecrettoken              #job build
+Terminal: curl jenkins url:8080/buildByToke/build?job=job_1\&token=mysecrettoken. (first install plugin "Build Authorization Token Root")  #build
+
+Q. What is UpStream Job
+Ans:
+checked Post Build Action
+Build other Project > Project to build : MyFirstJob
+
+Q. What is DownStream Job
+Ans :
+checked: Build after other project are build.
+Project to Watch: other_job_name
+
+Q. What is build periodically?
+Ans:
+Checked build periodically
+just configure cron schedule. So job execute on particular time.
+
+Q. What is POLL SCM.
+Ans: 
+first time execute as per cron schedule. and after that it execute whenever edit code and commit on github or code push to github.
+first define the GIT path and checked POLL scm, configure cron schedule.
+
+Q. What is GitHub WebHook triger for gitscm polling.
+Ans:
+it execute job whenever code commit or pushed to Github.
+
+Q What is environment variable in JENKINS.
+Ans :
+environment variable is predifine system variable.
+
+Q. What is global environment variable?
+Ans:
+we make manully global env variable. it visible for all project. goto "configure system" > Global properties > checked Environment variable and define Name: NAME and Value: Ranjit.
+goto Build > shell > echo $NAME          # when execute job then print Ranjit
+
+Q. What is file parameterize.
+Ans:
+Checked "This Project is parameterized" > select File Parameter. File location: filePath.   (filePath any name)
+
+Shell : cat filePath   (any name)             #
+When execute job Then ask file path.        # output file content.
+
+
+Q. What is timeout?
+Ans:
+Select Abort the build if it's stuck.
+Timeout minutes: 3   (minuts)
+Shell: sleep 300                 # for check
+Incase any job take much time and goes to stuck, then we can set timeout on specific time. So automatically will be aborted if job take more than 3 minuts.
+
+Q. What is Enable/Desable job.
+Ans:
+We can Enable/Desble job, so build option is removed and no any body can build this job.
+
+Q. What is build a job concurrent or parallel?
+Ans:
+Checked "Execute concurrent builds if necessary.
+Using this if i click on build no of time then, it build together all. Not one by one.
+
+Q. What is Retry count?
+Ans:
+checked: Retry Count 
+SCM checked retry count: 3
+if job fail due to any reason then it will retry to execute job again as per retry count configure.
+
+Q. What is throttle Build?
+Ans:
+Checked Throttle builds
+Number of builds: 3
+
+Time Period : Minut
+
+# i can build max 3 time in a minut, it should be 20 seconds gap in every build.
+
+Q. What is custome workspace?
+Ans: 
+checked Use custom workspace
+I can define own path of workspace ( /tmp/abc/). bydefault JENKINS_HOME is /var/lib/jenkins/workspce/project_name
+execute Shell: touch abc.txt     # file creat on /tmp/abc path
+
+Q. How to configure Email Notification in case job failed.
+Ans:
+Using Email Extension Plugin
+GoTo Manage Jenkins > Configure System > Enter SMTP server name: smtp.gmail.com in Email Notification Box. > 
+checked Use SMTP Authentication > Enter User, password.
+
+Select the ‘E-mail Notification’ value, while create job.
+
+Enter the recipient email id in the ‘E-mail Notification’ box and select the checkbox next to the ‘Send e-mail for every unstable build’ option
+
+Q. How to configure Email Notification in pipeline job.
+Ans:
+pipeline {
+    agent any
+    post {
+        always {
+            emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+        }
+    }
+}
+
+Q. How to execute parallel stages in jenkins pipeline.
+Ans:
+Using parallel
+                    parallel {
+                        stage('In Parallel 1') {
+                            steps {
+                                echo "In Parallel 1"
+                            }
+                        }
+                        stage('In Parallel 2') {
+                            steps {
+                                echo "In Parallel 2"
+                            }
+                        }
+                    }
+                
+Q. How you can use to start jenkins manuall?
+Ans: jenkins.exe start/stop/restart
+
+Q. How will you secure jenkins?
+Ans: Authentication, Authorization, Secure Realms,Role Base Access Control.
+
+Q. Explain how you can deploy a custome build of a core plugin?
+Ans:
+stop jenkins
+copy the custom HPI to $Jenkins_Home/plugins.
+Delete the previously expended plugin directory
+Make an emptyfile called <plugin>.hpi.pinned.
+Restart jenkins
+
+Q. What are the various ways in which build can be schedule in jenkins?
+Ans:
+SCM commit.
+Completion of other builds
+Run at specific time
+Manual build request
+
+Q. What is use of pipeline in jenkins?
+Ans:
+Pipeline plugin is used in jenkins for making the jenkins pipeline, which gives us the view of stages or tasks to perform one after the other 
+in the pipeline form.
+
+Q. Explain the terms Agent, post-section, jenkinsfile
+Ans
+Agent : Directive to tell jenkins to execute the pipeline in a particular manner and order
+Post-Section: Need to add some notification and to perform other task at the end of a pipeline
+Jenkinsfile: text file where all the definitions of pipeline are defined.
+
+Q. Is it possible to run automated tests on jenkins?
+Ans: 
+it is done through Selenum and Maven.
+
+Q. suppose first job is successed and second job is failed in pipeline, what can do?
+And:
+just restart the pipeline from point where it failed by doing the restart from stage.
+
+Q. What is the use of JENKINS HOME directory?
+ANs:
+All the settings, logs and configuration are stored in the JENKINS_HOME directory. Configuration details are stored in form of a set of XML files.
+
+Q. What is a backup plugin? why is it used?
+Ans:
+This is helpful plugin that backs up all the critical settings and configurations to be used in the future.
+
+Q. What are the way to configure jenkins node agent to communicate with jenkins master?
+ans: 1) browser jnlp and command line SSH.
+
+Q. How does jenkins authenticate users?
+Ans
+There are 3 ways : default way, application server, LDAP server.
+
+Q. What are the types of pipeline in jenkins?
+Ans: 
+1) CI CD pipeline 
+2) Scripted pipeline
+3) Declarative pipeline
+
+Q. What syntax does jenkins use to schedule build or SVN pooling?
+ANs: Cron syntax is represented using five asterisks each seprated by space.
+
+Q. list of Continuous integration tool other then Jenkins
+Ans: TeamCity, Bamboo, Perforce, Circle CI, Go, Thoushtworks, Integrity, Travis CI.
+
+Q. Name a jenkins environment variable you have used in shell script or batch file
+Ans:
+$JOB_NAME,$NODE_NAME, $WORKSPACE, $BUILD_URL, $JOB_URL
+
+Q. What is a DSL plugin Jenkins?
+Ans:
+The jenkins "job DSL/ Plugin" is made up of two parts, Domain specific language, and jenkins plugin.
+
+Q. How do you create multibranch pipeline in jenkins?
+Ans:
+Multibranch pipeline project type enables you to implement different jenkinsfiles for different branches of the same project.
+
+Q. what are the types of jobs or projects in jenkins?
+Ans:
+Freestyle project
+Maven project
+Pipeline
+Multibranch pipeline
+External job
+Multi-configuration project
+Github organization
+
+Q. What is blue ocean in jenkins?
+Ans:
+
+Q. What is the different between continuous delivery and continious deployment?
+Ans:
+Continious delivery has manual intervention to deploy code in production using CI/CD pipeline
+Continious Deployment has no any manual intervention, it deploy code automatically in production using pipeline, it automatically process all steps.
+DevTeam -> SCM/GIT -> CI Server -> UAT/QA -> Deploy-Prod   # CI/CD pipeline
+
+Q. How to Restrict any job to a particular User. Means access job to a particular user.
+Ans:  
+Using "Project-based Matrix Authorization strategy"
+goto manage Jenkins > Configure global security > Enable security > Authorization section > Project-based Matrix Authorization strategy
+Add user and assign permission. 
+
+-------------------------------------------------------Docker-----------------------------------------------------------------------
+Q What is Docker components?
+Ans:
+Docker client, Docker Host, Docker Registry.
+
+Q What is Docker Compose?
+Ans:
+Docker compose is tool and yaml file which contains details about the services, sharing multi-container application. 
+it running multiple containers as a single service. Using single command all container will be up and down.
+
+Q. What is Docker Swarm?
+Ans: A Docker Swarm is a group of either physical or virtual machines that are running the Docker application and that have been configured to join 
+together in a cluster.
+
+Q. What is Docker Namespace?
+Ans: A Namespace is one of the Linux features and Namespace adds a layer of isolation in containers. it provide isolated workspace. container runs in 
+a separate namespace and its access is limited to that namespace.
+
+Q. What is Docker machine?
+Ans: Docker machine is a tool that let you install Docker engine on virtual hosts.
+
+Q. How to check for docker client and docker server versions?
+Ans: docker version        # show details of both client and server
+
+Q. How do you get the number of continers running, paused and stopped?
+Ans: docker info         # list all container status
+
+Q. How do you get help of any docker command?
+Ans: docker --help
+
+Q. How to login into docker repository?
+Ans: docker login
+
+Q. If yhou wish to use a base image and make modification or personalize it, how do you do that?
+Ans: docker pull image_name
+
+Q. Can you use a container, edit it, and update it?
+Ans:
+docker commit <containerID> <username/imageName>
+
+Q. How to delete stopped container?
+Ans: docker rm container_ID
+
+Q. How to delete an image from the local storage system?
+Ans: docker rmi <image-id>
+
+Q. What does docker system prune?
+Ans: Removed all stoped container, all networks which not used, and dingaling images and build cashes.
+
+Q. Will you lose your data, when a docker container exists?
+Ans: No, we won't lose any data when docker container exist, any data that your application write to the container gets preserved in disk, 
+until unless explicitly delete continer.
+
+Q. Where all do you think docker is being used?
+Ans: Simplifying configuration, Code pipeline management, Developer productivity, Application isolation, Debugging capabilities, Multi-tenancy, 
+Raid Deployment.
+
+Q. How docker different from other containerization method?
+Ans:
+Docker container are very easy to deploy in any cloud plateform. it can get more applications running on the same hardware when compared to other 
+technologies.
+
+Q. How far do Docker container scale? Are there any requirement for the same?
+Ans:
+Large web deployment like Google and Twitter and plateform providers such as Heroku and dotCloud, all run on container technologies.
+
+Q. Can you remove a pause container from docker?
+Ans: No, container has to be in the stopped state before it can be removed.
+
+Q. Can a container restart by itself?
+Ans: No, its not possible for a container to restart by itselef. bydefault the flag -restart is set to false.
+
+Q. How many containers can run per host?
+Ans: many containers can run as you wish per host. Docker does not put any restrictions on it.
+
+Q. is it good practice to run statefull applications on Docker?
+Ans:
+the concept behind stateful application is that they store the data onto the local file system.
+
+Q. Will docker compose wait for the current container to be ready to move to the running to the next service?
+Ans: Docker compose always runs in the dependency order.
+
+Q. How will you monitor docker in productions?
+Ans: Docker provides functionality like docker stats and docker events to monitor docker in production.
+
+Q. Is it a good practice to run Docker compose in production?
+Ans: Yes, using docker compose in production is the best practical application of docker compose.
+
+Q. What changes are expected in your docker compose file while moving it to production?
+Ans: 
+* Remove volume binding
+* Binding to different ports on the host
+* Specify a restart policy
+* Add extra service like log aggregator
+
+Q. Are you aware of load balancing across containers and hosts? how does it works.
+Ans: while using docker service with multiple containers across different hosts, need to load balance the incoming traffic. Load balancing 
+and HAProxy is basically used to blance the incoming traffic across different available (healthy) container.
+
+
+20. Any 3 best practices of docker?
+Ans :
+cd /home/spovedd/jenkins
+ls abc.txt ddd.txt      
+vi Dockerfile
+FROM busybox
+RUN touch a
+
+docker build .     # Sending build context to Docker daemon 67.4MB
+cd ..
+mkdir Docker
+cd Docker       # Now empty folder  
+vi Dockerfile
+FROM busybox
+RUN touch a
+
+docker build .   # Now Sending build context to Docker daemon 2.048KB and take less time if empty folder, so we should always keep Dockerfile on empty folder.
+vi Dockerfile
+FROM openjdk
+COPY target/app.jar /app
+CMD ["JAVA","-jar", "/app/app.jar"]
+
+REPOSITORY	TAG		SIZE
+openjdk		8		624MB
+openjdk		8-jre-alpine 	83MB
+
+Q How to reduce docker image size.
+
+Just using multi stage build in docker file to reduced the image size by 540 MB
+* minimum use RUN command in docker file
+* don't install debug tool like vim,curl,nano
+* try to install all package in one RUN command
+* use apt-get remove curl or wget in last
+
+
+#Multi-Stage builds to remove build deps:
+FROM maven:3.6-jdk-8-alpine AS builder
+WORKDIR /app
+COPY pom.xml .
+RUN mvn -e -B dependency:resolve
+COPY src ./src
+RUN mvn -e -B package
+
+FROM openjdk:8-jre-alpine
+COPY --from=builder /app/target/app.jar /
+CMD [ java, "-jar","/app.jar"]
+
+21. Difference between docker stop and docker kill?
+Ans:
+Seprate Terminal
+docker events # show live, what is hapening in docker host
+signal=15     # come this, when execute docker stop as below (take grace time)
+signaal=9     # come this, when execute docker kill as below
+
+docker run -d -it busybox /bin/bash   # created
+docker ps # busybox container is there
+docker stop  container_id   #  it give 10 seconds Grace period to final stopd process
+docker kill container_id   # it doesn't give any grace period. Directly killed process.
+
+
+22. Command to list conatiners which state is exited?
+Ans:
+docker ps -a -f status=running        # come only Running process
+docker ps -a -f status=exited         # come only existed process
+docker rm $(docker ps -a -f status=exited -q)
+
+23. command to clean-up docker host ( deleting stopped conatiners, dangling images and unused networks)?
+Ans:
+docker system prune   # deleted all as below 
+
+-all stopped container
+-all networks not used by at least one container
+-all dangling images
+-all dangling build cache
+Deleted containers.
+Total reclaimed space: 4.456kb
+
+24. What version of docker you have used? Specific reason to use that particular version?
+Ans:
+19.03
+25. Can we have multiple CMD in Dockerfile?
+Ans:
+No, only last cmd command can executed.
+
+26. Have you worked on docker swarm and docker compose?
+Ans:
+A Docker Swarm is a group of either physical or virtual machines that are running the Docker application and that have been configured to join together
+in a cluster.
+
+Docker SWarm is a container orchestration tool, meaning that is allows the use to manage multiple containers deployed across multiple host machines.
+
+Docker compose :
+Compose is a tool for defining and running multi-container Docker applications on single host machine. with compose you use a YAML file to configure
+your application's services. Docker compose always runs in the dependency order
+
+Q what is means of Docker stack deploy -c abc.yml  xyx
+Ans:  Docker stack deploy is generally used for docker compose file because docker stack run on multiple host machine at a time.
+
+Q. In case server is rebooted where container is runing, So in this case container will Down or runing always?.
+Ans:
+If use below command then container will be down in case server is rebooted.
+docker run --name docker-nginx -p 8080:80 -d nginx
+
+If use below command then container will always up when server is rebooted.
+docker run --name docker-nginx -p 8080:80 -d nginx --restart always
+
+Q. What is different between docker exec and docker attach.
+Ans:
+exec create a new process in the container's environment, while docker attach just connects the standard input/output/error of the main process(with PID 1) inside the container to corresponding standard input/output/error of current terminal
+
+
+---------------------------  GIT 
+Devops Interview questions and answers | Devops mock interview 2 Answers
+
+git pull -rebase 
+turns your local and remote branches into a single branch. Git pull --rebase contain four major git action pull,fetch,merge,rebase
+If you pull remote changes with the flag --rebase, then your local changes are reapplied on top of the remote changes.
+
+Q. Lets say your organization has github and bitbucket store code, you have cloned a repo on to your local and changed directory name, 
+after some days one of your team members asks you to share clone link, how would you provide the same?
+
+ANs:    git remote -v
+git clone https://github.com/DeekshithSN/kubernetes.git      # cloned first
+cd kubernetes ; ls     # all files is there in kubernetes dir.
+cd ..
+mv kubernetes/ xyz1234
+ls    # xyz1234 dir is there.
+cd xyz1234
+git remote -v  # output - https://github.com/DeekshithSN/xyz1234.git (fetch, pull)
+
+Q. I have shell script to delete particular dependency in a repo (repo is maven project). before running this script, i need to clone repo to my local, 
+here point note i should only clone master branch and only the last commit (as it contains full code) how would you do this?
+
+Ans:
+git clone -b master --single-branch --depth 1 https://github.com/DeekshithSN/kubernetes.git   # clone master branch with last commit only
+## --refrence /opt/local_repo    (cloned on particular path)
+cd kubernetes; 
+git log --oneline   # show only last commit;
+
+Q. What is submodule and why we need sub module?
+Ans:
+
+Q. Let's say you have changed 5 files a,b,c,d,e in repo and you did git add., now all 5 files are in staging area, now i decided to not to commit file d. how would i delete from staging are to local.
+
+Ans:
+touch a b c d e
+git status  #Untracked files
+git add .
+git status     # now all files is in staging area (all files green)
+git rm --cached d     # to do unstage
+git status     # Now d file is in local/working dir (d red)
+git commit -m " only a b c e file commited"            #
+
+
+Q. What is multi module project? configurations you need to do in parent and child project? what is dependency management?
+Ans:
+A multi-module project is builtfrom an aggregator POM that manages a group of submodules.  (like addition and substraction etc module)
+In most cases, the aggregator is located in the project's root directory and must have packaging of type POM.
+Now, the submodules are regular Maven project, and they can be built separately or through the aggregator POM.  (pom is xml code)
+
+Q. What is Dependency management ?
+Ans:
+Dependency management is a core feature of Maven.
+Managing dependencies for multi-module projects and applications that consist of hundereds of modules is possible.
+Maven helps a great deal in defining, creating, and maintaining reproducible builds with well-defined classpaths and library versions.
+
+git clone https://github.com/DeekshithSN/Maven_Example.git
+cd Maven_Examples/Maven_Examples/dependency_management/
+ls      # addition, pom.xml, substraction
+mvn dependency:tree       #  to check dependency
+
+Transitive dependency : - 
+means that if A depends on B and B depends on C, then A depends onboth B and C. Transitivity brings a very serious problem when different versions of the same artifacts are included by different dependencies. it may cause version mismatch issue in runtime.
+
+Q. Have you worked on commit based job in jenkins? what all configurations you need do in jenkins and github?
+Ans:
+login jenkins > Enter New Item name 
+Git > Repository URL : https://github.com/DeekshithSN/kubernetes.git
+Build Triggers > select GitHub hook trigger for GITScm pooling       (Apply and Save)
+
+Goto github > setting> Webhooks > Add webhook > Enter jenkins URL > Add webhook    (add webhook only for first time)
+
+In GitHub just any thing Edit README.md file  > commit changed
+Build and console output : success.    # automatically
+
+Q. You want to create 50 freestyle jobs, with same configuration but only change is job name? how would you do this?
+Ans:
+
+jenkins> manage jenkins > script console >         (below gruby script)
+
+import hudson.plugins.git.*;
+def scm = new GitSCM("git@github.com:dermeister0/Tests.git")
+scm.branches = [new BranchSpec("*/develop")];
+def flowDefinition = new org.jenkinsci.plugins.workflow.Cps.CpsScmFlowDefinition(scm, "jenkinsfile")
+def parent = jenkins.instance
+def job = new org.jenkinsci.plugins.workflow.job.Workflowjob(parent, "New job)
+job.definition = flowDefinition
+parent.reload()
+
+Build and console output
+-----
+
+Q. How can you copy job which created in your local jenkins instance to other local jenkins instance?
+Ans:
+cd /home/spovedd/
+cd ~/.jenkins ; cd jobs/;
+ls # web-hook, test, job
+mkdir copy_1
+cp -r web-hook/ copy_1/
+
+goto manage jenkins > Tools and Actions > Reload configuration from Disk
+Now copy_1 job name exist   ( with same configuration)
+
+
+Q. A Unix script which accepts one parameter it can be filename or folder, if it folder delete it else print "This is a file"
+Ans 
+if [ -d $file ]
+then
+rm -rf $file
+elif [ -f $file ]
+then
+echo "its file"
+else
+echo file and dir not exist
+fi
+
+Q. How to check whether particular port is already in use or not?
+Ans:
+netstat -tupln   # use port listed
+
+Q. Logic for checking whether supplied string for a script is palindrome or not? what are all the commands you will use?
+Ans:
+
+read palindrome
+reverse=$(echo $palindrome|rev)
+if [ $palindrome=$reverse ]
+then
+echo "its palindrome"
+else
+echo " its not palindrome"
+fi
+
+./abc.sh
+zooz      # output palindrom
+sunder    # its not palindrom
+
+Q. Command to get number of lines in a file?
+Ans:
+wc -l
+
+Q. Ansible : 
+Let's say i have 4 machines consider 1 as ansible master other 3 as nodes, what are the basic setup you need to do to create ansible cluster?
+Ans:
+
+Ansible can be run from any machine with python 2 (version 2.6 or 2.7) or python 3 (version 3.5 and higher) installed
+sudo apt-get update
+sudo apt-get install software-properties-common
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install ansible       # where ansible installed that is ansible master)
+passwd root         #change root password
+/etc/ssh/sshd_config    # Change PasswordAughentication Yes, PermitRootLogin Yes     
+systemctl restart sshd, service sshd restart
+
+ssh-keygen
+ssh-copy-id root@ip_address
+sh root@ip_address
+
+Installation verification
+ansible --version
+# check reference with bhupender Ansible doc
+
+Q. what is ansible roles? why we need ansible roles? Have you worked on ansible galaxy?
+
+Ans:
+Roles provide a interdependent collection of variables, tasks, files, templates, and modules.
+In Ansible, the role is the primary mechanism for breaking a playbook into multiple files. This simplifies writing complex playbooks, and it makes 
+them easier to reuse.
+The breaking of playbook allows you to logical break the playbook into reusable components.
+Roles are not playbook, Roles are small functionality which can be independently used but have to used within playbooks.
+
+/home/user/roles/selinux/tasks/main.yml
+vi main.yml
+- name: Download EPEL Repo - Centos/RHEL version 6
+  get_url: url=http://d1.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm dest=/tmp/epel-release-latest-6.noarch.rpm
+  when: "ansible_os_family == 'RedHat' and ansible_distribution_major_version == '6'"
+
+- name: Install EPEL Repo - Centos/RHEL 6
+  command: rpm -ivh /tmp/epel-release-latest-6.noarch.rpm creates=/etc/yum.repos.d/epel.repo
+  when: "ansible_os_family =='RedHat' and ansible_distribution_major_version =='6'"
+
+- name: Install libselinux-python
+  yum name=libselinux-python
+
+vi site.yml
+---  # this is playbook deploy
+- hosts: tomcat_servers
+  user: ansible
+  become: yes
+  connection: ssh
+  gather_facts: yes
+  roles:
+     - selinux
+     - tomcat
+
+Ansible galaxy command is used for create directory structure.
+ansible-galaxy init role_name   # role structure created
+ansible-galaxy search role_name   # search role
+ansible-galaxy init --force --offline role_name
+
+Q. What are ansible facts?
+Ans:
+
+Ansible collects pretty much all the information about the remote hosts as it runs a playbook. The task of collecting this remote system information is called as Gathering Facts by ansible and the details collected are generally known as facts or variable.
+This information can be obtained manually using Ansible adhoc command and a specialized module named setup.
+
+ansible all -i '35.223.59.4,' -m setup      #gathering fact ( software, services, service_name, server_ip)
+
+Q. Can we have windows machine as ansible master? As a node ? Have you worked on any windows modules? Can list few? Any extra configuration do we need to do?
+Ans:
+windows machine can't be ansible master. But windows machine can be as node. setup as below
+linux:
+vi hosts
+[winhost]
+192.60.30.20
+
+[winhost:vars]
+ansible_user=user_name
+ansible_password=*********
+ansible_connection=winrm
+ansible_winrm_server_cert_validation=ignore
+------
+sudo apt install python-pip
+pip install pywinrm
+
+windows:
+window system should be window 7 or later
+Ensure your system is running .NET Framework 4.0 and later
+Windows PowerShell should be Version 3.0 & later
+============================================================
+
+				DOCKER:
+Q. What is different between virtualization and containerization?
+Ans:
+Virtualization : Host OS <=> Hypervisor <=> Guest OS <=> Bins/Libs <=> app
+Containerization: Host OS<=> Container Eng<=> Bins/Libs <=> app
+Only difference is Guest OS (seprate kernal) used in virtualization. But containerization is not used seprate kernal Guest OS), it used only Host OS.
+
+Q. Without using Docker, can you see the process running inside a container from the outside?
+Ans:  yes   
+ps aux |grep watch          # suppose  this command "watch -n 1 ls -l" runing in container.
+
+Q What is Dockerfile used for?
+Ans:
+A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image.
+FROM hshar/webapp
+ADD ./devopsIQ /var/www/html/devopsIQ
+docker build . -t test
+docker run -it -p 84:80 -d test
+URL: IP:84/devopsIQ          # Runing fine.
+
+
+Q. Have you worked on multistage dockerfile and why we need that?
+Ans:
+
+Redused image size using multistage dockerfile, minimum use RUN command and don't try to install curl,vim,etc.
+vi Dockerfile
+FROM maven as maven
+RUN mkdir /usr/src/mymaven
+WORKDIR /usr/src/mymaven
+COPY . .
+RUN mvn install -DskipTests
+
+FROM tomcat
+WORKDIR webapps
+COPY --from=maven /usr/src/mymaven/target/java-tomcat-maven-example.war .
+RUN rm -rf ROOT && mv java-tomcat-maven-example.war ROOT.war
+
+Q. Can you copy a file from local or container to running another container? 
+Ans:      (docker cp, shared volume)
+
+docker run -d -it busybox /bin/bash
+exit
+docker cp del.sh container_id /   # copy from local to container machine. Or copy container to container.
+docker exec -it container_id /bin/bash
+ls    # found del.sh in container server.
+exit
+
+Q. Let's say I have container which is attached with a volume, if container crashes what happens to volume?
+
+Ans: do not lose the data using volume.
+sudo docker run -it --name my-volume-test -v data-volume:/data busybox /bin/bash
+exit
+docker volume ls   # data-volume
+docker volume prune     # removed all unused volume
+
+
+Q. Have you ever encountered failed deployment ? How have you handled them ?
+
+Ans:
+Automate code Testing.
+Use Docker for same environment
+Use Microservice
+Overcome risks to avoid failure
+
+--------- Virtualization and Containerization
+
+Q. What is different between virtualization and containerzation ?
+Ans:
+Virtualization : Host OS is devided into multiple Guest OS and it has seprate kernal. Guest OS install on Hypervisor.
+Host OS ---> Hypervisor ---> multi Guest OS ---> Bins/Libs -- > App1
+
+Containerization : it has only Host OS and on Host OS installed Container engine not any Guest OS. And it has not seprate kernal.
+Host OS ---> Container Engine ---> Bins/Libs  ---> App1
+
+Q. Without using Docker, can you see the processes running inside a container from the outside ?
+Ans:
+docker ps #  now no any container
+docker run -it  -d ubuntu
+docker ps # now runing one container
+docker exec -it container_id bash       # now logined into container
+watch -n 1 ls -l     # now ls process runing  (execute in every one second using -n 1)
+
+Yes, we can see the process. ps aux|grep watch        # now found ls process is runing from outside container.
+
+Q. What is Dockerfile used for?
+Ans:
+
+A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image.
+
+docker run -it -p 83:80 -d hshar/webapp              # detach from terminal
+docker exec -it container_id bash
+cd /var/www/html ; ls  # index.html 
+
+URL : ec2_public_IP:83      # Apache working fine.
+
+Now exist; docker stop container_id
+git clone https://github.com/hshar/devopsIQ.git
+ls   # devopsIQ folder is there.     and copy this folder into container /var/www/html/
+vi Dockerfile
+FROM hshar/webapp
+ADD ./devopsIQ /var/www/html/devopsIQ
+
+docker build -it test .
+docker run -it -p 84:80 -d test
+docker exec -it container_id bash
+ls /var/www/html/         #found devopsIQ folder
+URL : ec2P/public_IP:84/devopsIQ         # runing.
+URL : ec2P/public_IP:84  		 # Apache runing.
+
+
+Q. Explain container orchestration ?
+Ans:
+
+Applications are typically made up of individually containerized components (ofter called microservices) that must be organized at the networking level in order for the application to run as intended. The process of organizing multiple containers in this manner is known as container orchestration.
+
+Q. What is the different between Docker Swarm and kubernetes?
+Ans:
+
+Docker easy to install and run because there is prepackage. Docker is faster than kubernetes. it has No auto scaling
+kubernetes tough/diffcult to install and run because there is lot of dependency is there. Since it is a little complex and hence deployments are slower. It provides auto scaling.
+
+
+===================  Continuous Integration..
+
+Q. What is Continuous Integration ?
+
+Ans:
+CI is a development practice where developers integrate code into a shared repository frequently, preferably serval times a day. Each integration can then ve verified by an automated build and automated tests. Testing is optional in a CI lifecycle.
+
+Q. What is webhook in jenkins.
+Ans:
+
+A webhook is a mechanism to automatically trigger the build of a Jenkins project upon a commit pushed in a Git repository. In order for builds to be triggered automatically by PUSH and PULL REQUEST events,
+
+Q. Create a CI/CD pipeline using Git and jenkins to deploy a website on every commit on the main branch.
+
+Ans:
+Developer ---> GitHub ----> Jenkins ---> Build Server
+service jenkins status       # Active
+logined jenkins and Create Item name , select freestyle project.  > Create
+select GitHub project >
+Project url : https://github.com/hshar/devopsIQ.git
+Git > Repository URL: https://github.com/hshar/deveopsIQ.git   # copied this Dockerfile and devopsIQ into jenkins workspace/demojob
+Build Trigger > select GitHub hook trigger for GITScm polling        # 
+Build > Execute shell >
+sudo docker rm -f $(docker ps -a -q)       #remove all container.
+sudo docker build /var/lib/jenkins/workspace/demojob/ -t jenkins        # Dockerfile build from jenkins workspace
+sudo docker run -it -p 87:80 -d jenkins
+SAVE.
+
+goto GitHub > setting > Webhooks > Enter Jenkins URL.
+
+linux:
+cd devopsIQ ; ls  # Dockerfile, devopsIQ/index.html.  these files in this repository deveopsIQ.git
+cat Dockerfile
+FROM hshar/webapp
+ADD ./devopsIQ /var/www/html/devopsIQ
+
+vi /devopsIQ/index.html       # edit code here
+git add .
+git commit -m "added docker file"
+git push origin master      
+# whenever pushed code into github then jenkins job run automatically and deployed into apache, no need to run manually.
+URL : ec2public IP:87/devopsIQ        # runing website 
+
+# Also we can revert code.
+git log     # show commit ID details
+git revert commit_Id      #  code reverted in previw version
+git push origin master       # automatically jenkins job triggered and deployed code into apache
+
+Referesh URL   # preview version website runing fine.
+------------
+
+git pull --rebase  - your local changes are reapplied on top of the remote changes.
+git checkout branch_name file_name      # move file from another branch to current branch.
+
+================ Configuration Management & Continious Monitoring.
+
+Q. What is the difference between Ansible vs Chef vs Puppet?
+
+Ans:
+Ansible : Easy to learn as uses Python. Preferred for environments designed to scale rapidly. Offers simplified orchestration(directly install ansible  and there is no need to install any dependency/package). Underdeveloped GUI with limited features.
+
+CHEF : It is Ruby based and hence difficult to learn. Initial setup is complicated. it very stable, reliable and mature. One of the most flexible solution for OS and middleware management.
+
+Puppet : Can be tough/diffcult for beginners as uses language called Puppet DSL. Initial setup is smooth and supports different OSs. String compliance automation and reporting tools.
+
+Q. Create an Ansible playbook to deploy apache on a client server.
+
+Ans:
+ansible -m ping all
+vi apache.yml
+---
+- hosts: servers
+  sudo: yes
+  become: yes
+  connection: ssh
+  user: ansible
+  tasks:
+    - name: install apache2
+      apt: name=apache2 update_cache=yes state=latest
+
+ansible-playbook apache.yml
+
+URL : ec2PublicIP        # apache runing fine;
+
+=================== Continuous Testing
+
+Q. What is the difference between verify and assert commands ?.
+
+Ans:
+Assert : If the command fails, entire execution comes to a halt. It is used to validate critical functionality.
+Verify : Execution does not stop even if the command is false. it is used to validate normal functionality.
+
+Q. What is Docker images?
+
+Ans:
+A Docker image helps in creating Docker containers.
+We can create the Docker image with the build command; due to this, it creates a container that start when it begins to run. All the Docker images are stored in the Docker registry such as the public/private Docker registry.
+These have minimal amounts of layers within the image so that there is a minimum amount of data on the network.
+
+Q. What is a Docker container?
+Ans:
+It has set of applications including all its dependencies which share the same OS kernel, along with the other containers running in separate processes within the operating system ina user space. Docker can run on any computer system or on the cloud. We can create a Docker container using Docker images and then run it. or we can use the images that are already created in the Docker Hub.
+
+Q. What is Docker Hub ?
+Ans:
+We can think of Docker Hub as a cloud registry that lets us link the code repositories, create the images, and push them.
+We can also store pushed images, or we can link to the Docker Cloud, so that the images can be deployed to the host.
+
+Q. What is Docker Swarm ?
+
+Ans:
+We can think of a Docker Swarm as the way of orchestrating the Docker containers. Means multiple docker container run on multiple host machine. We will be able to implement Dockers in a cluster. We can convert our Docker pools into a single Docker Swarm for easy management and monitoring.
+
+Q. What is the use of a Dockerfile ?
+Ans:
+
+A Dockerfile is a set of specific instructions that we need to pass on to Docker so that the images can be built. We can think of the Dockerfile as text document which has all the commands that are needed for creating a Docker image.
+We can create an automated build that lets us execute multiple command lines one after the other.
+
+Q. is it possible to use JSON instead of YAML for Docker Compose ?
+Ans:
+We can sue JSON insted of YAML for a Docker Compose file.
+docker-compose -f docker-compose.json up.
+
+Q. What is the process for creating a Docker container ?
+Ans:
+We can use any specific Docker image for creating a Docker container using the below command.
+docker run -it --name container_name image_name.
+
+Q. What is the process for stopping and restarting a Docker Container?
+Ans:
+docker stop container_id; docker start container_id;
+
+Q. How do you scale your Docker containers?
+Ans:
+
+Docker containers can be scaled to any level, starting from a few hundreds to even thousands or millions of containers. only need the memory and the OS all the time.
+
+Q. Where can we use Docker Compose ?
+Ans:
+
+Docker compose is a tool that lets you define multiple containers and their configurations via a YAML or JSON file.
+The most common use for Docker Compose is when your application has one or more dependencies, eg: MYSQL or Redis. Normally, during development, these dependencies are installed locally.
+You can avoid these installaion and configuration parts by using Docker Compose. Once set up, you can bring all of these containers/dependencies up and running with a single docker-compose up command.
+
+Q. What is the role of a .dockerignore file ?
+Ans:
+
+To tell ignore some files during the build. you need to put ignore file name in the .dockerignore, suppose all the files not needed for your build.
+this .dockerignore file and Dockerfile exist should be on same location.
+
+Q. What is --mermory-swap flag ?
+ANs:
+using swap allows the container to write excess memory requirements to disk when the container has exhausted all the RAM that is available to it.
+
+Q. How to view the status of a Docker container ?
+Ans:
+docker ps -a
+
+Q. Can we use multi Apche server in one server.
+Ans: Yes
+Make a Directory for Each Site.
+sudo mkdir -p /var/www/example.com/public_html; vi index.html
+sudo mkdir -p /var/www/test.com/public_html ; vi index.html
+
+Q. How to monitor cron jobs using Nagios?
+Ans:
+first Login into Nagios Tool and goto "Configure" > Configuration Wizards >  Linux Server > 
+enter Server IP: 192.168.0.1 (which server need to monitor) and Linux type: CentOS  > Next > 
+checked "Service Metrix" (CPU, memory, ping, Disk Usages, No of services(http, https, ssh), Cron, etc.). > click Finish 
+Search option: enter server IP, Then show all service status.
+===================================
+
+
+---------
+export HELLO="WORLD"
+
+[[ $HELLO == "WORLD" ]] && echo "hello" || echo "WORLD"
+-----------
+==============================================
+Kubernetes Question Answers
+
+Q. What are three different types of multi-container pods.
+Ans:
+Sidecar : application<-> one container is write log and another container is read log. Both container shared same volume.
+Adapter: Application<-> generate desire output formate log. like json,xml, etc in premeouthous..
+Ambassador: application<->log-proxy
+
+Q. What is the Namespaces?
+Ans:
+A namespace is used to work with multiple teams or projects spread across. it is used to divide the cluster resources for multiple users.
+kubectl get namespaces
+
+Q. Mention different kinds of Namespaces in kubernetes?
+Ans:
+The namespaces are of three kinds.
+Default
+kube-system    # created by kubernetes.
+kube-public         # it create automatically, readable publically in cluster
+
+Q. Why do we need Container orchestration in  kubernetes?
+Ans:
+container orchestration is used to communicate with several micro-services that are placed inside a single container of an application to perform various tasks.
+Automate: Configuration, Provisioning, Avalability, Scaling, Security, Resource Allocation, LoadBalancing, Health Monitoring.
+
+Q. What are the tools of container orchestration?
+Ans: Kubernetes, Dockerswarm, Apache Mesos
+
+Q. What is the different between the pod and the container?
+Ans:
+Pod: Pods are the collection of containers used as the unit of replication in kubernetes.
+Container: Containers are the set of codes/dependency to compile in pod of the application.
+
+Q. Explain stateful sets in kubernetes?
+Ans:
+Stateful set is used to manage the backend database application, using stateful new pode name will be same as per old pod deleted.
+
+Q. how to determine the status of deployment?
+Ans: Kubectl rollout status.
+
+Q. What are the feature of kubernetes
+Ans: It provides an automated and advanced scheduler to launch the containers on the cluster.
+Replacing, rescheduling, and restarting the containers that are failed while compilation.
+
+Q. What is kubectl?
+Ans: kubectl is the command-line tool used to control the kubernetes clusters.
+
+Q. Mention the various container resource monnitoring tools.
+Ans: Grafana, Prometheus, Heapster, CAdvisor, InflusDB.
+
+Q. What is a performance monitoring and metric collection system?
+Ans: Heapster is a performance monitoring and metric collection system.
+
+Q. Explain Daemon sets?
+Ans: A daemon set ensures that all the eligible nodes run a copy of the pod runs only once in a host. And schedule by Daemon controler.
+
+Q. What are the uses of Daemon sets?
+Ans: it runs the logs collection of daemons on every node such as fluentd or filebeat. it runs node monitoring on every node. And storage dameon also
+
+Q. Explain the ingress controller?
+Ans: An ingress controller is a pod that acts as an inbound traffic handler.
+
+Q. What is the based selector that is used in the replication controller?
+ANs:
+The Repllication controller uses the Equity-Based selector that allows filtering by labels ky and values.
+
+Q. Explaing two type of load balancer?
+Ans: Internal load balancer: it balances the laod and allocates the pod automatically with required configuration
+EXternal Load Balancer: it direct the traffic from external loads to the backend pods.
+
+Q. what is minikube?
+Ans: minikube is a type of tool that helps to run the kubernetes locally.
+
+Q. EXplain Prometheous in kubernetes?
+Ans: 
+Promethous is an open-source toolkit that is used for metric-based monitoring and alerting the application.
+
+Q. What are the types of controller manager?
+Ans:
+Endpoint controller, Namespace controller, Service account controller, Replication controller, Node controller, token controller.
+
+Q. how to monitor the kubernetes cluster?
+ANs: kubelet, Container Advisor, Kubernetes Dashboard, Prometheus, Kubewathc.
+
+Q. How do we control the resource usage of POD?
+ANs:
+Request, limit.
+
+Q. What is ingress network, and how does it work?
+Ans: Ingress network is a collection of routed rules that acts as an entry point to the kubernetes cluster.
+
+Q. What is Headless Service?
+ANs:
+A Headless service is a service with a service IP but instead of load-balancing it will return the IPs of our associated pods.
+This allows us to intract directly with the pods instead of a proxy.
+
+Q.What are the best security measures that you can take while using kubernetes?
+Ans:
+Enable Role-Based Access Control
+Use Third-Party Authentication for API Server
+Protect ETCD with TLS and Firwall
+Isolate kubernetes Nodes
+Turn on Audit logging
+Keep kubernetes Version up to date.
+Lock Down kubelet.
+
+Q. How to run a POD on a particualr node?
+ANs:
+nodeName, nodeSelector, nodeaffinities, taint
+
+Q. What are the different ways to provide external network connectivity to K8s.
+Ans: Nodeport, LoadBalancer (4 layer TCP/IP protocol), Ingress (7 layer of TCP/IP protocol)
+
+Q. How can we forward the port 8080(container) -> 8080(service) -> 8080 (ingress) -> 80(browser) and how it can be done?
+ANs:
+The ingress is exposing port 80 externally for the browser to access, and connecting to a service that listens on 8080. The ingress will listen on ort 80 by default.
+
+Q. What is the basic operatioal unit of kubernetes?:  -> Pod
+Q. what is primary data store of kubernetes: -> etcd
+Q. which of the following ensures containers are running in a pod?: -> Kubelet
+Q. Replication Controller and Deployment Controller are part of? : -> Master controller Manager
+Q. who developed kubernete: : -> Google
+Q. Kubernetes is a platform?: -> (Portable, Extensible, Open-source)
+Q. Which of the following manages the assigning nodes to a pods, depending on resource availability?: - Scheduler
+Q. Kubernetes is written is what programing language?: -> Go
+Q. To create a new deployment in kubernetes, use the command ?: -> Kubectl run
+
+Q. How to take backup of etcd? 
+ANs: ETCDCTL_API=3 etcdctl --endpoints=https://[172.31.98.230]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=etc/kubernetes/pki/etcd/server.key snapshot save /data/backup.db
+
+etcdctl_api - version
+endpoints - master private ip
+cacert/cert/key - security key
+snapshot - backup store
+
+Q. how to restore etcd?
+Ans: ETCDCTL_API=3 etcdctl snapshot restore /data/backup.db ( parameter)
+--------------------------------------
+
+Q. How to configure IP in linux.
+ANs
+hostname       # print server name
+ifconfig       # show current ip (inet 192.168.1.5)
+vi /etc/sysconfig/network-scripts/ifcfg-eno16777736
+BOOTPROTO="none"                                # bydefault BOOTPROTO="dhcp". using dhcp, it generate new ip when reboot system.
+IPADDR="192.168.1.10"              #add this line
+----
+
+systemctl restart network         # or ifdown/ifup eno16777736
+ifconfig        # Now show ip (inet 192.168.1.10)
+cat /etc/sysconfig/network-scripts/ifcfg-eno16777736    # show below
+BOOTPROTO="none"                               
+IPADDR="192.168.1.10"
+
+open cmd command
+ping 192.168.1.10       # pinging fine
+connect from putty also
+---------------------------
+
+Q. How to resolve network issues.  (window)
+Ans:
+ipconfig/ip           # to check ip/MAC and other details
+nslookup             # to check ip and domain name
+ping                 # to check connectiviy and host reachable or not
+tracert              # to check route path between src and dest in network
+netstat              # to check all active connection in network
+host:
+curl/wget
+telnet               # to check connectivity
+ssh
+route
+dig
+---------
+
+---------
+Q what is different between Unix and Linux?
+Ans:
+Linux is free to use (open source). Linux OS is widely used in desktops, mobiles, mainframes etc.
+But Unix is Linces OS (not free). Unix widely used on servers, workstations etc
+Linux filesystem type is Ext2/3/4, FAT/32, NTFS. 
+But Unix filesystem type is fs,gpfs,hfs, ufs, xfs, zfs.
+
+Q. How to reduce or shrink the size of LVM partition?
+Ans:
+to check logical volume: df -hT
+1) Unmount filesystem: umount /dev/hda2/dir1
+2) resize2fs command: resize2fs /dev/mapper/myvg-mylv 10G
+3) lvreduce -L 10G /dev/mapper/myvg-mylv
+
+Q what is swap space and size of swap partition?
+Ans: certain amount of space used by temporarily hold activity program. And size is twice amout of physical memory.
+
+Q. How to recover lost ssh key in linux 
+Ans:  # two way recover(using create image and mount/umout volume)
+
+Below steps is mount/umount
+(two server server1 runing (losted key), server2 (runing with key)
+1) stop ec2 instance which server key is losted    (save instanceID, root volume type /dev/xvda)
+
+2) Goto Volume and select volume then Action and Detach volume. (from losted key server)
+3) Select (losted key server volume), Goto Action and Attached volume in another runing server with key
+InstanceID: runing serverID   (with Key)
+Device name: /dev/sdf     # as it is, then click Attached
+
+4) connect putty using runing server (with key).
+blkid        # to check primary and secondry volume.
+lsblk       # list new attached disk also  (losted key volume also attached in runing server key)
+mkdir -p /var/recovery-disk
+mount -o nouuid /dev/xvdf2 /var/recovery-disk       # or mount -t xfs-o nouuid /dev/xvdf1 /mnt/tempvol1 
+(losted key volume mounted temprary in runing server with key)
+
+df -h    # found mounted /var/recovery-disk
+
+#Now copy exist key of runing server Key to losted key volume
+cat /home/ec2-user/.ssh/authorized_keys >> /var/recovery-disk/home/ec2-user/.ssh/authorized_keys
+umount /var/recovery-disk
+df -h       # now unmounted /var/recovery-disk
+
+5) select volume > Action > Detach volume         # detached from runing server with key
+6) select volume > Action > Attach Volume         # Attached same volume in losted key Server.
+Instance: enter losted key server's ID
+Device: /dev/sda1         # must sda1 for pick root disk  (or /dev/xvda)
+
+7) Goto server, select stopped server > Action > Start
+Now connected using putty this losted key server, Using another runing server with k
+ey.
+Now Connected.
+=====================
+
+Q. How to configure multiple website on single server.
+Ans: 
+hostnamectl set-hostname www.nehraclasses.com           # first set static host
+hostnamectl      # to verify static host configure or not
+dnf install -y httpd openssl mod_ssl            # instlled three packages
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout localhost.key -out localhost.crt          # Generating RSA private key for 365 days
+
+# enter all aksed details and generated below key files.
+# localhost.crt
+# localhost.key
+cp -r localhost.crt /etc/pki/tls/certs/
+cp -r localhost.key /etc/pki/tls/private/
+
+cat /etc/httpd/conf.d/ssl.conf |grep localhost                # this file use for SSL certificate.
+# listed above SSLCertificateFile .crt and .key file here
+httpd -t        #get syntax OK, means verify httpd
+apachectl configtest        # to very httpd
+
+mkdir /var/www/html/website1
+mkdir /var/www/html/website2
+
+vi /etc/httpd/conf.d/httpd.conf
+<VirtualHost *:443>
+SSLEngine on
+SSLCertificateFile /etc/pki/tls/certs/localhost.crt
+SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+ServerName www.nehraclasses.com
+DocumentRoot /var/www/html/website1
+</VirtualHost>
+
+<VirtualHost *:443>
+SSLEngine on
+SSLCertificateFile /etc/pki/tls/certs/localhost.crt
+SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+ServerName www.nehraclasses.net
+DocumentRoot /var/www/html/website2
+</VirtualHost>
+
+ls -ldZ /var/www/html/website1
+# copy first website code in /var/www/html/website1
+# copy second website code in /var/www/html/website2
+
+firewall-cmd --permanent --add-service=https --zone=public
+firewall-cmd --permanent -add-port=443/tcp --zone=public
+firewall-cmd --reload
+firewall-cmd --list-all      # to verify
+systemctl enable httpd --now        # started and enabled httpd service
+
+# URL: www.nehraclasses.net       working fine
+# URL: www.nehraclasses.com       working fine
+------------------------------------------------------
+
+
+
+
+
+

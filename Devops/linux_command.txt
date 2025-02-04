@@ -1,0 +1,25 @@
+Q. How to check free RAM?: free -h, free -th
+Q. How to check percentage memory and cpu utilization? : top/htop
+Q. How to check disk utilization? : du/du folder
+Q. how to check hostname linux server? : uname
+Q. How to check CPU core? : lscpu
+Q. How to check of type of architucture? : arch
+Q. How to list of storage device disk partition of your system ?: lsblk
+Q. How to see the os name? : uname -a, cat /etc/os-release, neofetch
+Q. How to check current login user?: whoami
+
+ssh user@ip -i "key.pem"  # connected without asking pass
+Q. How to display linux system information : uname -a 
+uname -r : see kernal information
+lsb_release-a : check which version of ubuntu installed
+uptime : see how long time system is running
+hostname : check system hostname
+hostname -i : check ip addres of host
+last reboot : check system reboot history
+w : to check who is online
+whoami
+mount|column -t   : adjust screen output
+shred filenmae : encrypt file
+script     : recorded terminal work
+netstat -nltup     # to check port open/LISTEN
+

@@ -1,0 +1,208 @@
+1) How do you automate kubernetes deployment?
+ANs:
+User -> GitHub -> Build Image and push to docker hub using Jenkins tool -> Docker Hub ->  
+Deploy using kubectl or Helm command using Jenkins to -> Kubernetes cluster
+
+2) How do you secure kubernetes app?
+Ans:
+a) application security: we can secure pod, namespace, Node Using RBAC, IRSA.
+b) DevSecOps - Devops + Security = security of the container DevOps lifecycle Using Authorization, scan repository, scan running container)
+c) Security Compliance ( FedRAMP, HIPPA, SOC etc)	
+
+3) How do you cost/performance optimize kubernetes app?
+Ans:
+a) Control plan cost (Fixed, not much room for improvement)
+b) Worker Node number and Types as below
+Pod resource speceification
+Unused CPU/Memory allocation
+Detect CPU/Memory waste - Utilize Metric Server (tool - Cloud watch container, Kubecost, CloudHealth, kubernetes Resource, Report)
+
+4) Tell me about a challenge you faced in kubernetes application
+Ans:
+Challenge:
+Kubernetes version upgrade for worker nodes on EKS
+* Keeping application up and running
+* Keeping applicationi highly available
+* Maintaining Pod Disruption Budget
+
+Solution:
+Used managed nodegroup
+* AWS provides pathced AMI
+* Application will be up, running with high availability
+* Respect Pod Discruption Budget
+* One click update
+
+5) How do you scale kubernetes?
+ANs:
+Horizontal Pod Autoscaler (HPA)
+Cluster Autoscaler
+Cluster Overprovisioning (Real world App)
+
+6) How do you expose a kubernetes microservice to consumers?
+ANs: 
+* Services:
+Nodeport
+Load balancer
+ClusterIP
+* Ingress is what is used in actual application
+
+
+7) Do you have to use kubernetes to run your containerized app?
+ANs: No
+----------------------------
+Intellipat
+
+Q. What is Kubernetes?
+ANs:
+kubernetes is a container orchestration tool that is used to automating the task of managing, monitoring, scaling, and deploying containerized application. it create groups of container that can be logically discovered and manged for easy operation on containers.
+
+Q. What is the different between kubernetes and Docker Swarm?
+Ans:
+Docker Swarm is a default container orchestration tool that comes with Docker. Docker Swarm can only orchestration simple Docker containers. Kubernetes manage much more complex software application containers. Kubernetes offeres support for larger demand production environment.
+
+Docker Swarm can't do auto-scaling. Docker Swarm doesn't have GUI. Docker can deploy rolling update but can't deploy automatic rollbacks.
+
+Q. What is a Heapster?
+Ans:
+The Heapster lets us do the container cluster monitoring. It lets us do cluster-wide monitoring and event data aggeration. it has native support for 
+kubernetes.
+
+Q. How to set a static for kubernetes load balancer?
+Ans:
+We can set a static IP for kubernetes load balancer by changing the DNS records whenever kubernetes Master assigns a new IP address.
+
+Q. Can we use many claims out of a persistent volume?
+And:
+The mapping between persistentVolume and persistentVolumeClaim is always one to one. Even when you delete the claim, persistentVolume remains as we set 
+persistentVolumeReclaimPolicy is set to Retain and it will not be reused by any other claims.
+
+Q. How do you deploy a feature with zero downtime in kubernetes?
+Ans:
+In Kubernetes you can define the update strategy in deployments, you should put RollingUpdate as a strategy to ensure no down time.
+
+Q. What is the difference between  replication controllers and replica sets?
+Ans:
+Replicaset is a next generation Replication Controller. The only difference between replicaion controllers and replica sets is the MatchExpression. Replication controllers don't have MatchExpression in their spec.
+
+
+Q. What is Headless Service?
+Ans:
+Headless Service is similar to that of a 'Normal' services but does not have a Cluster IP. This service enables you to directly reach the pods without the need of accessing it through a proxy.
+
+Q. What is PVC?
+Ans:
+This is Persistent Volume Claim. it storage requested by kubernetes for pods. The user does not require to know the underlying provisioning. This claim should be created in the same namespace where the pod is created.
+
+Q. If you have to pass a sensitive information in you cluster how would you do it?
+Ans:
+We can pass sensitive information in Kubernetes using secrets. Secrets can be created through yaml and text files. Majority of the orgs use secret to pass sensitive information like username and password.
+
+Q. What is Sematext Docker Agent?
+Ans: Sematext Docker agent is a log collection agent with events and metrics. It runs as a small container in each Docker host. These agents gather metrics, events and logs for all cluster nodes and containers.
+
+Q. If you delete a pod (created as part of deployment) what happens to information inside of it?
+Ans:
+We will use persistent volume if any information is there in pod, incase pod delete then data will not lost.
+
+Q. is there any pattern to pods being assigned to nodes? Can you make sure a pod gets scheduled to a particular node.
+Ans:
+Generally when you create pod it spawns automatically on any node. But if yo want to spawn a pod on particaluar node that can also be done throuth taints.
+
+Q. Let's say a kubernetes job should finish in 20 seconds, however sometimes it takes 5 minuts, How can i make sure to stop the application if it exceeds more the 40 seconds?
+
+Ans:
+When we create job spec, we can give --activeDeadlineSeconds flag to the command, this flag related to the duration of the job, once the job reaches the threshold specified by the flag, the job will be terminated.
+
+---------------
+
+Architecture of Kubernetes in Detail-Hindi/Urdu |Lec-46 | What is Kubernetes | Devops Tutorial
+===============================
+Kubernetes Architecture: 
+
+1. etcd Cluster: it is higly availble distributed key value store as dictionary, which is used to store cluster wide secrets (like authentication details) and cluster changes data. it is only accessible by kubernetes API server, as it has sensitive information. etcd is the cluster brain.
+
+2. API Server: User communicate with API Server. This is cluster gateway and is used to deploy and execute all operations commands in kubernetes. And validate the Request.
+
+3. Controll Manager :  It Runs all the controller on the Kubernetes Cluster. All the controllers are compiled into a single process. 
+Node Controller, Replication Controller, Endpoints Controller, Service Accounts and Token Controllers.
+Actually It manage the actual and desire state health of POD. 
+
+4. Kube Scheduler:   The scheduler takes care of scheduling of all the processes cluster wise, like HealthCheck, Deployment, Scaling Up/Down, Dynamic Resource Management and manage present and future events on the cluster. Scheduler just decides on which Node new Pod should be scheduled. means assign the pod to the node.
+
+5. Docker, container engine.
+------------------
+Node Worker/minion:     it can be any no of Node
+
+1. Kube proxy    -> The kube-proxy runs on each of the nodes. kube-proxy is responsible for directing traffic to the right container based on IP and the port number of incoming requests. And as making services availble to the external host. As well capable of load balancing to services (pod).
+
+2. kubelet -> Kubelet takes the specification from the API server, and ensure the application is running according to the specifications which were mentioned. Each node has its kubelet service. it communicate between node and master.
+
+it is controll the any no of POD, POD/container/image creation, deletion and monitor.  Kubelet is agent and communicate between master and worker node. kublet interacts with both the container and node.
+
+3. Docker, container engine ->  it create container.
+===============================
+
+Code is written in JSON/YMAL  and called manifest. Manifest run on only master node.
+
+POD : it is smallest logical unit of kubernetes. i can create and contain many container and volume in one POD same host, But generally or must only one container create in one POD. if once POD is damaged then only create new POD, not repaire same POD. POD runs on node which controlled by master. Kubernetes know only POD not container. In one POD all containers communicated with only local host.
+
+Cluster : A cluster is group of Nodes/server(master and worker)
+
+In kubernetes control the POD not container. If one POD has 5 container, due to any reason one container is down then automatically all container will be down in one POD. POD run on node and managed by Master node.
+
+Role of Master Node:
+Kubernetes cluster contains containers running or Bare Metal/VM instances/Cloud instances/ all mix.
+
+Kubernetes designates one or more of these as master and all other as worker.
+
+The master is now going to run set of K8s process. these process will insure smooth, functioning of cluster These process are called "Control Plane"
+
+Can be Multi-master for high availability. Master runs control plan to run cluster smoothly.
+
+Kube api-server is front-end of Control-plane.
+
+etcd :
+stores metadata and states of cluster and of each components. etcd is Consistent and high available store (key - value store). it 
+
+Volume controler : it creating and attaching and mounting a volume and intracting with the cloud provider to orchastrat volume.
+
+Q. How may kind of deployment is there in K8s.
+Ans:
+There are 5 type of deployment.
+1) Recreate, 2) Rolling Update, 3) canary deployment, 4) Blue Green deployment 5) A by B kind of deployment
+
+Recreate : use in testing environment.
+
+Rolling Update: delete old version and create new version without any downtime. this is high available. there is maximum pod available and 
+upgradation option is there during deployment 
+
+A by B deployment: same as canary deployment almost.
+
+Q. what is canary deployment?
+Ans:
+Deploy two version are same time both v1 and v2 in cluster. 90% traffict forward to v1 and just 10% traffic forward to v2 to check how is version 
+is performing. This is also less cost deployment and no downtime.
+
+Q. what is Blue, Green deployment?
+Ans:
+In this, Both version v1,v2 are runing in cluster. Currently deployment is pointing to v1 and i immediate traffic point to v2, 
+just to see how v2 is performing, if performing is fine the ok. But if any issues found v2 the immediatly Rollback to v1, 
+because both are runing in our cluster. Rollback is very easy in this case. Blue Green deployment is Zero downtime deployment.
+
+Q. Can we schedule pod on master node
+Ans: Yes, using taint and tolleration.
+
+Q. Can we schedule pod on node1 and node2.
+Ans: yes, using nodeSelector, Node affinity.
+
+# kubectl drain node-1 : it will mark the node as unschedulable and also evict pods on the node.
+And it waits for graceful termination. You should not operate on the machine until the command completes
+
+Q. How to move pod from node-1 to node-2?
+Ans: kubectl cordon node-1               # Scheduling disabled, now node no longer available to schedule pod
+pod and pvc will leave this node. And delete the pod, kubernetes will create pod and assign it in different node 
+automatically. kubectl delete pod pod_name. And uncordon the old node
+kubectl uncordon node-1                  # Ready, now node available to schedule the pod
+
+
+ 

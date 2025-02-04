@@ -1,0 +1,96 @@
+1) Fix this site can't be reached in google chrome.
+solution a ) should be correct date and time.
+b ) setting > goto Local Area Network > Advance > Open your computer proxy setting > LAN > checked Automatically detect setting.
+c) right click on network icon > Troubleshoot probelems > then auto resolved.
+d) cmd > netsh winsock reset catalog;  netsh int ipv4 reset reset.log
+e) goto network and sharing > properties > select internet protocol version v4 > properties > 
+ENter manual DNS server (prefer dns server: 8.8.8.8) (Alternet dns server: 8.8.4.4)    # issue resolved
+f) goto 3 dots > more tools > extensions > left menu > open crome webstore > search browsec and select browsec vpn, then Add to chrome. 
+-------------
+Devops Q/N
+============================================
+
+1. Devops : What do you understand by the term devops? How has it benefited the IT industry. 
+Ans:
+Devops is not any technologies, it is a methodlogi  and set of practices. And implement to no of tools to performs tasks.
+
+Operations, Dev, QA are verticals of DevOps
+Operation: (Continous Integration/Testing/Delivery/Deployment)
+QA:  Sanity/Regression/Performance Test and Automation
+Dev: Code, Debug, Review, Unit Test, Source Control.
+
+Benefits of Devops
+Speed, Rapid Delivery, Reliability, Scale, Security, Improved Collaboratoin.
+
+Devops help Organization:
+Increase business agility, Reduced time to market cycle, Increase Productivity, Reduced Cost, Increased in customer satisfaction, incresed Application/
+Product uptime, 
+
+How does devops co-relate with CI/CD?
+ANs:
+Automated Build, Automated Tests/Deployment. CI/CD intgerated no of tools to automate the tasks.
+
+
+2. AWS : Explain the architecture of a VPC?  :  VPC>AZ>Subnet>ec2. per AZ has group of subnet. user requsted and traffic will through internet gateway
+or NAT gateway depends on public or private subnet. Then router > router table > NACL > security group.
+
+What are the tenancy models in AWS? :  
+Ans: 
+Shared Tenancy (hardwar) it shared hardware for multiple Ec2
+Dedicated Tenancy, it EC2 instances are run on specific hardware to your account but comes at a price
+Dedicated Host (entire phycial host dedicated) and billed hourly
+
+
+How can you have an internet connection from the private subnet? : NAT gateway, vpc endpoint.
+Any idea of what is the difference between S3,EBS and EFS?
+Can you connect multiple route tables to a single subnet and vice versa : No,  single/multiple subnet associate with only one Route Table.
+Your application needs storage which should be able to scale up/ down on the fly
+There is a user trying to harm your application, how can you block the user/ IP : NACL subnet lavel, security grp resource lavel
+How do ECS and EKS service works
+
+3. Terraform : What is the significance of a terraform state file?
+Can you use multiple providers within a single TF file? : Yes, multi provider with alias.
+What are provisioners in terraform? : file, remote-exec, local-exec
+
+How to enable logging in  terraform? : 
+export TF_LOG="TRACE"
+export TF_LOG_PATH="tmp/terraform.log" in .profile
+
+What is the most verbose mode of logging in to TF? : TRACE, DEBUG, ERROR, WARN, INFO.
+
+Your state file got deleted and you do  "terraform apply", what will happen?: it will agian create.
+What is tainting a resource in TF? : Recreate the tainted resources.
+What happens if you do apply without init?  :  got error
+
+4. Ansible : Give an overview of ansible architecture? : master/worker server
+What network protocol does ansible master and node use? : SSH
+Inside a playbook, there are multiple tasks and a particular task should be only run based on certain criteria, What will you do?: use when condition/tag
+What are handlers and roles in ansible?
+How do you use and implement it?
+In asible inventory, what exactly do we mention
+
+4. Jenkins : What are various options to trigger build?
+Ans:
+Trigger builds remotely.
+Build after other projects are built.
+Build periodically.
+GitHub hook trigger for GITScm polling.
+Poll SCM.
+
+Your pipeline is using sensitive login credentials, how can you secure store them?:
+Goto credential >system> global credentials > select: Kind: user/pass/secret file/secret text
+scope: global
+
+How do you install a plugin in free & restricted any? : Node property > select restrict job execution at node
+
+Your pipeline is deploying an app to prod, how can you enable your pipeline to generate approve/deny notification to the release manager?
+Ans: using Global Slack Notifier Setting
+
+CI-CD : What is CI-CD?
+How does CI/CD co-relate with devops?
+Explain the CI/CD pipeline of your project?
+What is the difference between  continuous deployment & continuous delivery?
+
+Lambda : Multi part upload utility : upload a single object as a set of parts. improve throghput, quick recovery from network, paus/resume object, 
+Migration of the EC2 scenario with snapshot
+

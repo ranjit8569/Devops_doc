@@ -1,0 +1,136 @@
+ssh-keygen           # enter
+ssh-copy-id ubantu or root@ip   # enter, after enter provide paas.
+ssh ubantu          # no need paas
+and for sudo access open visudo
+sudo visudo   and write username ALL=NOPASSWD: ALL
+sudo ls
+------------------------------
+there is another way to set password less connectivity
+$ ssh-agent bash
+$ ssh-add ~/.ssh/id_rsa
+
+Another way to add private key files without using ssh-agent is using "ansible_ssh_private_key_file" in an inventory file.
+------------------------------
+first install epel repository
+rpm -ivh http://dl.fedoraproject.org/pub/epel-release-6-8.noarch.rpm               
+yum install ansible
+-------------------------------
+sudo apt-get update
+sudo apt-get install software-property-common
+sudo apt-add repository ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install ansible
+
+
+Service/Server - A process on the machine that provide the service.
+Machine - A physical server, VM, Container.
+Target Machine - A machine we are about to configure with ansible.
+Task - An action.(run,delte) managed by ansible.
+playbook - yml file where ansible command are written, and yml is executed on machine
+
+
+Ansible command line  (ansible <group> -m <module> -a <arguments>
+
+ansible localhost -m ping -e 'ansible_python_interpreter="/usr/bin/env python"'       ---- Running against localhost
+ansible all -m ping     -- it check connection for all server whatever in host/inventory file.
+ansible Client -m ping --ask-pass        ---- ask password for ssh.
+ansible webserver  -a "/sbin/reboot"
+ansible webserver -m setup|less   --- to collect system information for all connected host and display information os details of hosts.
+ansible Client -m setup -a "filter=ansible_distribution*"
+ansible <group> -m copy -a "src=/home/ansible dest=/tmp/home"       --- copy module copy file
+ansible <group> -m file -a "dest=/home/ansible/ mode=777 owner=ansible group=ansible state=directory -b"    --- create directory
+ansible <group> -m file -a "path=/temp/testfile state=touch mode 0755"        ----create file
+ansible all -a uptime
+ansible all -m shell -a uptime
+ansible all -m command -a uptime
+ansible multi -a "free -m" -i ansible_hosts
+ansible all -a "uname -a"
+ansible all -a "yum -y install httpd"   -- for installed apache httpd without module)
+ansible all -a "yum -y remove httpd"    -- for remove httpd (without module)
+ansible all -m yum -a "name=httpd state=present"  -- install httpd with module, httpd-1.8 check specific version and -s as sudo work)
+ansible all -m yum -a "name=httpd state=absent"  -- for remove httpd package
+ansible <group> -m service -a "name=httpd state=stopped"         ---stoping service
+ansible <group> -m service -a "name=httpd state=restarted"         -- restarting service
+service  httpd status  --- to check service start or not
+
+ansible all -m user -a "name=john password=redhat"  -- create unix user in all server (to check user exist or not -id johan)
+ansible all -m user -a "name=john state=absent"     -- to remove user
+ansible Client -m shell -a 'fdisk -l' -u username --become -k     ---- become provide root privilege and -k ask for password
+ansible  Client -m copy -a 'src=/home/a/b/c dest=/home/aa/bb/cc' mode=0644 owner=root group=root -u root --become -K  ---- file transfer/copy with permission
+ansible node1 -m fetch -a 'src=/etc/sudoers.d/nginx.yml dest=/home/geekflare/example/ flat=yes'      ---- download files
+ansible  Client -m apt -a 'name=nginx state=latest' --become           ----- Manage Package installed
+ansible Client -m apt -a 'name=nginx state=absent purge=yes' --become      --- remove nginx package
+ansible Client -m service -a 'name=nginx state=started enabled=yes' --become        --- started service.
+ansible appgroup -m service -a "name=httpd state=started" -s     --- service started as sudo privelege
+ansible Client -m service -a 'name=nginx state=stopped' --become     --- ngnix servie is stopped
+ansible  Client -m shell -a 'df -h /dev/sda2' --become        --- checking the space in system
+ansible client -m shell -a 'free -m' --become        --- check free memory RAM.
+ansible client -s -m cron -a "name='run_daily_task' minute=*/15 job='/aa/bb/cc/minup_script.sh'"  --- run job every 15 minute
+ansible client -s -m cron -a "name='run_daily_task' hour=4 job='/aa/bb/cc/hour_script.sh'"     ---- run job every 4 hour
+ansible client -s -m cron -a "name='run_daily_task' special_time=reboot job='/aa/bb/cc/reboot_script.sh'"  ---- run job at system reboot time
+ansible client -s -m cron -a "name='run_daily_task' special_time=daily/weekly job='/aa/bb/cc/script.sh'"
+ansible all -i inventory -b -B 1 -P 0 -m shell -a "sleep 5 && reboot"       --- job run in background.
+ansible multi -s -B 3600 -a "yum -y update"     --- -B background 
+ansible multi -m async_status -a "jid=763350539037"    ---frequently pull and check the status of the job
+
+
+
+ansible-doc -l|more    -- list all module(option metadata_dump, --playbook-dir, --version, --list-files, --module-path, --help, --josn, --list, --snippet, --verbose)
+ansible-doc -l|grep -i user      -- search particular user.
+ansible-doc -s user               --description of user module 
+rpm -q httpd      -- to check package installed or not
+rpm -qa|grep httpd     --- to check pakage install or not
+systemctl status httpd  -- to check httpd service running or not
+===================================================================================
+ansible-inventory   --- used to display or dump the configured inventory as ansible see it.
+option (--ask-valult-pass, --export, --graph, --host, --list, --output, --playbook-dir, --tomal, --vars, --valult-id, --help, --limit, --verbose, --yamal)
+
+ansible-playbook  --- tool to run ansible-playbook, which are configured and multinode deployment system.
+option (--ask-vault-pass, --become-method, --become-user, --flush-cashe, --force-handler, --list-hosts, --list-tasks, --private-key, --scp-extra-args, 
+--sftp-extra-args, --start-at-task, --step, --syntax-check, --version, --check, --diff, --ask-become-pass, --become, --inventory, --inventory-file, --ask-pass, 
+-u (remote user) --vervose)
+
+ansible-pull    ---- is a small script that will checkout a repo of configuration instructions from git.
+option ( --accept-host-key, --ask-volt-pass, --check, --clean, --diff, --full, --list-hosts, --private-key, --purge, --scp-extra-args, --sftp-extra-args, --ssh-common-args, --vault-id, --version, --ask-become-pass, --module-path, --force, --help, --inventory, --verbose)
+
+ansible-vault    ---- it can encript any structured data file used by Ansible.
+option (--version, --help, --verbose, --ask-vault-pass, --output, --vault-id, --vault-password-file, --name, --prompt, --encrypt-vault-id)
+
+
+===================================================================================
+ansible official document
+
+ansible all -m ping -u bruce               ------ user bruce
+ansible all -m ping -u bruce --become       ---- become give root privilege
+ansible all -m ping -u bruce --become  --become-user batman     --- as bruce sudoing to batman
+ansible antlanta -a "/sbin/reboot"
+ansible antlanta -a "/sbin/reboot" -f 10    ---- if we have more host then set for the fork count. reboot the server with 10 paralal
+ansible antlanta -a "/sbin/reboot" -f 10 -u username      --- i can use --become (for as root privelege)
+ansible ralegin -m shell -a "echo $TERM"
+ansible webserver -m file -a "dest=/path/to/c mode=755 owner=moon1 group=moon1 state=directory"     ---- like mkdir -p
+ansible webserver -m yum -a "name=acme state=present"         ---- to insure acme package install without updating it (present/absent/latest)
+ansible all -m user -a "name=foo state=absent"        ---remove user
+ansible webserver -m service -a "name=httpd state=started"        --- (started/restarted/stopped)
+
+- name: edit some yaml
+  yedit:
+    src: /path/to/yaml/file
+    key: foo
+    value: bar
+
+- name: Read the yaml
+  slurp:
+    path: myfile.yaml
+  register: r_myfile
+
+- name: Write back to a file
+  copy:
+    content: '{{ mydata | to_nice_yaml }}'
+    dest: myfile.yaml
+
+
+
+
+
+
+

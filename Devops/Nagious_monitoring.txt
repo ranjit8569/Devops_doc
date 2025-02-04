@@ -1,0 +1,230 @@
+Continious Monitoring tool - Nagios:
+
+Nagious : Nagios is an open-source software for continious monitoring of system, networks and infrastructure . it runs playing stored on a server which is connected with a host or another server an your network, or the internet in case of any failure, Nagios alerts about the issues so that the technical team can perform recovery process immediately. It enables organizations to identified  and resolve IT infrastructure problems before they affect critical business process.
+
+It used port number : 5666, 5667, 5668.  (change port in configuration file)
+
+Why Nagios?
+Ans:
+Detect all types of network, or server issues. Helps you to find the root cause of the problem which allow you to get the paremanent solution to the problem.
+Reduce downtime. 
+Active Monitoring of entire infrastructure. Allow you to monitor and troubleshot server performance issues. Automatically fix problem.
+Varios notification option (Email, mobile, phone, Ticketing).
+
+
+Features of Nagios ?
+Ans:
+Oldest and Latest.
+Good log and database system.
+Informative and attractive web interface. Automatically send alerts of condition changes.
+Helps you to detect network errors or server Crashes.
+You can monitor the entire business process and IT infrastructure with a single pass.
+Monitor network services like, http, smtp, snmp, ftp, ssh, pop, DNS, LDAP, IPMI etc.
+Windows/Linux/Servers/Application and Log Monitoring,
+-----------------------
+
+Phases of Continuous Monitoring:
+1) Define -> develop a monnitoring strategy.
+2) Establish -> How frequently you are going to monnitor it.
+3) Implement
+4) Analyze data and Report finding.
+5) Respond
+6) Renew and Update.
+
+
+Nagios plugin : NRPE  (Nagios remote plug-in executor)
+
+Nagios is a Client-server architecture usually on a network, Nagios server connect through SSH to all Nodes. A nagios server is running on a host and plugins are running on all the remote host which should you monitor.
+
+Pre-requisite:
+httpd (Browser)
+php (dashboard)
+gcc & gd  (Compiler to convert row code into binaries)/
+makefile (to build)
+perl  (script)
+
+Nagios Main Configuration File:
+/usr/local/nagios/etc/nagios.cfg
+
+All monitor things called as service.
+
+Nagios has 3 components:
+1. Nagios GUI - This is Web UI, which can be used to check the status of the host or the service.
+2. Scheduler  - The scheduler does the job of scheduling check ie what the check and when to check.
+3. NRPE Plugin. - The clients do not have Nagios installed on them, the log data of clients are sent through plugins.
+
+Indiviual node status check:
+is it up
+what is its load
+what is the memory and swap usages
+NFS and network load?
+Are the partition full
+Are application and services running properly
+How about ping latency?
+
+===============================================================================================
+
+LEC : 44 Nagious installation on AWS Linux machine
+
+Instal pre-requisite softwares on your EC2 machin prior to Nagios installation like apache, php, gcc compiler and gd development libaries.
+
+sudo su
+yum install -y httpd php
+yum install gcc glibc glibc-common -y
+yum install gd gd-devel
+adduser -m nagios
+passwd nagios   # 1234
+groupadd nagioscmd
+usermod -a -G nagioscmd nagios
+usermod -a G nagioscmd apache
+mkdir ~/downloads
+cd ~/downloads
+
+wget http://prdownloads.sourceforge.net/sourceforge/nagios/nagios-4.0.8.tar.gz
+wget http://nagios-plugins.org/download/nagios-plugins-2.0.3.tar.gz
+
+tar zxvf nagios-4.0.8.tar.gz
+cd nagios-4.0.8
+
+./configure --with-command-group=nagioscmd
+make all        ## compiled
+
+make install
+make install-init
+make install-config
+make install-commandmode
+
+vi /usr/local/nagios/etc/objects/contacts.cfg   # may change email address. and check username also
+make install-webconf
+
+htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin       # set password of nagiosadmin user - 12345
+service httpd restart
+
+cd ~/downloads
+tar zxvf nagios-plugins-2.0.3.tar.gz
+cd nagios-plugins-2.0.3
+
+./configure --with-nagios-user=nagios --with-nagios-group=nagios
+make
+make install
+
+chkconfig --add nagios       # while booting time nagios service started
+chkconfig nagios on
+
+/usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg        # came Total error/warning 0 
+
+service nagios start
+service httpd restart
+
+URL : public IP/nagios/
+user: nagiosadmin
+
+nagios logined and check system status.
+---------------------END---------------------------
+
+ls /usr/local/nagios/libexec            # all plugins there  ( nagios monitor with help of plugins)
+ex: check_http, check_ftp, check_log, check_disk, check_oracle, check_ping, check_ssh etc....
+
+cd /usr/local/nagios/            # bin, etc, include, libexec, sbin, share, var
+
+/var - log is there
+/sbin - all .cgi file is there. (nagios page and functionality access from this cgi file.)
+/etc  - cgi.cfg, htpasswd.users, nagios.cfg, resource.cfg, objects.  there is main configuration files( we can change configuration from here, )
+
+nagios.cfg - this file is hart of nagios. (all configuration files is exist in this nagios.cfg)
+cat nagios.cfg          # log_file=/usr/local/nagios/var/nagios.log, server add file, change refresh time etc......
+
+cd /objects; ls        # contacts.cfg, localhost.cfg, tamplate.cfg, window.cfg, switch.cfg etc....
+vi localhost.cfg        # add ec2 server.
+define host{
+       use       linux-server        # any name
+       host_nanme ftpserver.com
+       alias      ftpserver.com
+       address    ec2_public_ip          # past ip
+       }
+
+define service{
+        use          local_service       # any name
+        host_name    ftpserver.com
+        service_description  PING       # any name
+        check_command        check_ping!10.0,20%!00.0,60%        # service plugin
+        }
+
+define service{
+use local-service
+host_name ftpserver.com
+service_description FTP
+check_command check_ftp
+notification_enabled 0
+}
+## any many services using plugin
+
+vi templete.cfg        # my edit check_interval 1, check_max_attempts 10, etc
+
+service nagios restart
+goto nagios page > Hosts > Now found ftpserver.com  (means added server in nagios)
+goto nagios page > Service > Now found ping and ftp service
+
+/usr/local/nagios/sbin/nagios -v /usr/local/nagios/etc/nagios.cfg      # to verify, is any error
+--------------------------------------------------------------
+Configuration Example:
+
+first install apache softwrar on server
+sudo yum install apache2             on 3.17.178.208
+
+vi localhost.cfg       # copy any services example and past in host1.cfg do edit
+
+vi host1.cfg
+define host{                       	# using this block added server in nagios
+use			linux-server
+host_name		slave1         	 # any name
+alias			nagios-nrpe
+address			3.17.178.208        	 # ec2 IP  what server want to add
+}
+
+define service {
+  use			generic-service          # any name
+  host_name		slave1           	# same name as above
+  service_description	check Apache       	# any name
+  check_command		check_http
+}
+
+define service {
+ use		generic-service
+ host_name	slave1
+ service_description	check Apache Test
+ check_command		test_http
+ retry_interval		1
+ check_interval		1
+}
+
+sudo systemctl restart nagios         # nagios restarted
+or sudo service nagios restart
+
+login nagios application
+GoTo Hosts > and found slave1 server is added here
+GoTo Services > and found in slave1 Node, Apache service runing, status OK
+
+sudo service apache2 stop  
+GoTo Services > and found Apache service status critical in nagios
+
+## Now How to create command in Nagios
+cd /usr/local/nagios/etc/objects
+vi commands.cfg
+
+define command {
+ command_name		test_http                  # any name
+ command_line		$USER1$/check_http -I $HOSTADDRESS$ $ARG1$
+}
+
+
+cat templates.cfg      # This is reference file to check service type, suppose copy check_interval and retry_interval and use in host1.cfg file
+sudo systemctl restart nagios
+
+GoTo Services > and found Apache service and check Apache Test status is CRITICAL
+
+sudo service apache2 start
+GoTo Services > and found this service "check Apache Test" status OK in 1 minut, but this service "check Apache" status OK in 10 minut.
+# bydefault interval 10 minut define in template.cfg
+
+
