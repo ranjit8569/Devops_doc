@@ -1,0 +1,10 @@
+docker-compose.yaml file created in /opt/dns
+ docker-compose.yaml file creating -----------
+Corefile creating -------------------
+ db.openshiftqa3.icdlab.com creating --------------
+ reverse.openshiftqa3 creating ------------
+ /etc/hosts file configuring -------------
+ installing haproxy ------------
+ configuring /etc/haproxy/haproxy.cfg file ------------
+ configuring oc cli command --------
+docker-compose version

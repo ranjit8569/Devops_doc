@@ -1,0 +1,12 @@
+host_ip=172.20.150.32
+master1=172.20.152.135
+master2=172.20.152.136
+master3=172.20.152.137
+worker1=172.20.152.138
+worker2=172.20.152.139
+worker3=172.20.152.140
+worker4=172.20.152.141
+openshift=openshiftqa3
+loadbalancer=172.20.152.133
+bootstrap=172.20.152.134
+
